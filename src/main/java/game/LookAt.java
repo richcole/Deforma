@@ -1,19 +1,13 @@
 package game;
 
-import javax.vecmath.Vector3d;
-
-import org.apache.log4j.Logger;
-
-import com.google.inject.Inject;
-
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static org.lwjgl.util.glu.GLU.*;
+import static org.lwjgl.util.glu.GLU.gluLookAt;
 
-public class LookAt implements HasInit, HasRender  {
-  private static Logger logger = Logger.getLogger(LookAt.class);
-  
-  @Inject InputDevice inputDevice;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
+public class LookAt implements SimObject {
   
   Vector3d e, c, u;
   double ru, rs;
@@ -32,7 +26,20 @@ public class LookAt implements HasInit, HasRender  {
   boolean movingLeft = false;
   boolean movingRight = false;
   
-  synchronized void tick() {
+  Context context;
+  
+  public LookAt(Context context) {
+    this.context = context;
+    e = new Vector3d(-233f,  305f, -564f); 
+    c = new Vector3d(-77f,  63f,   -109f); 
+    u = new Vector3d(0.0f,  1.0f,   0.0f);
+    ru = 0;
+    rs = 0;
+    recalc();
+    context.getSimulator().register(this);
+  }
+
+  public synchronized void tick() {
     float velocity = 2;
     if ( movingForward ) {
       Vector3d tr = new Vector3d(forward());
@@ -63,6 +70,12 @@ public class LookAt implements HasInit, HasRender  {
   }
   
   private void addScale(Vector3d x, double s, Vector3d y) {
+    x.x += y.x *s;
+    x.y += y.y *s;
+    x.z += y.z *s;
+  }
+
+  private void addScale(Vector3f x, float s, Vector3f y) {
     x.x += y.x *s;
     x.y += y.y *s;
     x.z += y.z *s;
@@ -112,8 +125,8 @@ public class LookAt implements HasInit, HasRender  {
   }
 
   public synchronized void render() {
-    rs = inputDevice.getX() * 6.283f / 5000.0f;
-    ru = inputDevice.getY() * 6.283f / 5000.0f;
+    rs = context.getInputDevice().getX() * 6.283f / 5000.0f;
+    ru = context.getInputDevice().getY() * 6.283f / 5000.0f;
     
     recalc();
     gluLookAt(
@@ -136,15 +149,6 @@ public class LookAt implements HasInit, HasRender  {
     e.add(tr);
   }
 
-  synchronized public void init() {
-    e = new Vector3d(0.0f,  0.0f, -20.0f); 
-    c = new Vector3d(0.0f,  0.0f,   1.0f); 
-    u = new Vector3d(0.0f,  1.0f,   0.0f);
-    ru = 0;
-    rs = 0;
-    recalc();
-  }
-
   public void moveForward(boolean pressed) {
     movingForward = pressed;
   }
@@ -159,5 +163,26 @@ public class LookAt implements HasInit, HasRender  {
 
   public void moveRight(boolean pressed) {
     movingRight = pressed;
+  }
+
+  public Vector3d eye() {
+    return e;
+  }
+
+  public Vector3d up() {
+    return u;
+  }
+
+  public Vector3d c() {
+    return c;
+  }
+
+  public void fire() {
+    Vector3f velocity = new Vector3f(forward());
+    velocity.scale(10);
+    Vector3f position = new Vector3f(e);
+    addScale(position, 10, velocity);
+    Vector3f size = new Vector3f(1, 1, 1);
+    new PhysicalObject(context, velocity, position, size);
   }
 }

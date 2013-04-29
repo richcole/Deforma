@@ -2,6 +2,8 @@ package game;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.imageio.ImageIO;
 
@@ -10,7 +12,6 @@ public class Image {
   int width;
   int height;
   BufferedImage img;
-  byte buf[];
 
   Image(File file) {
     try {
@@ -28,17 +29,19 @@ public class Image {
     this.img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
   }
 
-  public byte[] getBytes() {
-    buf = new byte[width * height * 3];
+  public ByteBuffer getByteBuffer() {
+    ByteBuffer byteBuf = ByteBuffer.allocateDirect(width*height*3);
+    byteBuf.order(ByteOrder.nativeOrder());
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
         int rgb = img.getRGB(x, y);
-        buf[(((y * width) + x) * 3) + 2] = (byte) ((rgb >> 0) & 0xff);
-        buf[(((y * width) + x) * 3) + 1] = (byte) ((rgb >> 8) & 0xff);
-        buf[(((y * width) + x) * 3) + 0] = (byte) ((rgb >> 16) & 0xff);
+        byteBuf.put((byte) ((rgb >> 16) & 0xff));
+        byteBuf.put((byte) ((rgb >> 8) & 0xff));
+        byteBuf.put((byte) ((rgb >> 0) & 0xff));
       }
     }
-    return buf;
+    byteBuf.flip();
+    return byteBuf;
   }
 
   int getWidth() {

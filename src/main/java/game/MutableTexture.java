@@ -1,14 +1,26 @@
 package game;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_MODULATE;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_RGBA8;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV_MODE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexEnvf;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;

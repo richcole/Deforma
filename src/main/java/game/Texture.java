@@ -1,11 +1,25 @@
 package game;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_MODULATE;
+import static org.lwjgl.opengl.GL11.GL_RGB;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV_MODE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexEnvf;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
@@ -23,26 +37,7 @@ public class Texture {
   Texture(Image img) {
     width = img.getWidth();
     height = img.getHeight();
-    allocateTexture(width, height, getByteBuf(img.getBytes()));
-  }
-
-  private ByteBuffer getByteBuf(byte[] buf) {
-    ByteBuffer byteBuf = ByteBuffer.allocateDirect(buf.length);
-    byteBuf.order(ByteOrder.nativeOrder());
-    byteBuf.put(buf, 0, buf.length);
-    byteBuf.flip();
-    return byteBuf;
-  }
-  
-  Texture(int width, int height) {
-    int len = width*height*3;
-    byte[] buf = new byte[len];
-    for(int i=0;i<width;++i) {
-      for(int j=0;j<height;++j) {
-        buf[(j*width*3)+i*3] = (byte)(j % 256);
-      }
-    }
-    allocateTexture(width, height, getByteBuf(buf));
+    allocateTexture(width, height, img.getByteBuffer());
   }
 
   private void allocateTexture(int width, int height, ByteBuffer byteBuf) {

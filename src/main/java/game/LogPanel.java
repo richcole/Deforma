@@ -13,23 +13,22 @@ import java.awt.Graphics2D;
 
 import javax.vecmath.Vector3d;
 
-import com.google.inject.Inject;
+public class LogPanel {
 
-public class LogPanel implements HasInit, HasRender {
-
-  @Inject View view;
-  @Inject LookAt lookAt;
 
   MutableTexture texture;
   int x, y, width, height;
   
   String text;
 
-  public void init() {
+  private Context context;
+
+  public LogPanel(Context context) {
+    this.context = context;
     x = 10;
     y = 10;
-    width = (int) view.getWidth();
-    height = (int) view.getHeight();
+    width = (int) context.getView().getWidth();
+    height = (int) context.getView().getHeight();
     texture = new MutableTexture(width, height);
   }
 
@@ -38,13 +37,15 @@ public class LogPanel implements HasInit, HasRender {
   }
 
   public void render() {
-    text = "f=" + format(lookAt.forward()) + " s=" + format(lookAt.sideways());
+    text = "f=" + format(context.getLookAt().forward()) + " s=" + format(context.getLookAt().sideways()) 
+      + " e=" + format(context.getLookAt().eye()) + "\n";
+    text += " u=" + format(context.getLookAt().up()) + " c=" + format(context.getLookAt().c()); 
     renderFlat();
     renderGL();
   }
 
   private void renderGL() {
-    view.orthoView();
+    context.getView().orthoView();
     texture.update();
     texture.bind();
 

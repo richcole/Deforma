@@ -4,12 +4,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import com.google.inject.Inject;
-
-public class InputDevice implements HasInit  {
-  
-  @Inject View view;
-  @Inject LookAt lookAt;
+public class InputDevice {
   
   float mx = 0, my = 0;
   float x = 0, y = 0;
@@ -17,7 +12,10 @@ public class InputDevice implements HasInit  {
   boolean quit = false;
   boolean grabbed = false;
 
-  public void init() {
+  private Context context;
+
+  public InputDevice(Context context) {
+    this.context = context;
     Mouse.setGrabbed(grabbed);
   }
 
@@ -51,16 +49,19 @@ public class InputDevice implements HasInit  {
         quit = true;
         break;
       case Keyboard.KEY_W:
-        lookAt.moveForward(pressed);
+        context.getLookAt().moveForward(pressed);
         break;
       case Keyboard.KEY_S:
-        lookAt.moveBackward(pressed);
+        context.getLookAt().moveBackward(pressed);
         break;
       case Keyboard.KEY_A:
-        lookAt.moveLeft(pressed);
+        context.getLookAt().moveLeft(pressed);
         break;
       case Keyboard.KEY_D:
-        lookAt.moveRight(pressed);
+        context.getLookAt().moveRight(pressed);
+        break;
+      case Keyboard.KEY_SPACE:
+        context.getLookAt().fire();
         break;
       }
       eventProcessed = true;
@@ -82,13 +83,13 @@ public class InputDevice implements HasInit  {
       haveMouseCoords = true;
       mx = Mouse.getX();
       my = Mouse.getY();
-      float minX = view.getWidth() / 5;
-      float minY = view.getHeight() / 5;
-      float maxX = view.getWidth() - minX;
-      float maxY = view.getHeight() - minY;
+      float minX = context.getView().getWidth() / 5;
+      float minY = context.getView().getHeight() / 5;
+      float maxX = context.getView().getWidth() - minX;
+      float maxY = context.getView().getHeight() - minY;
       if ( mx <= minX || mx >= maxX || my <= minY || my >= maxY ) {
         haveMouseCoords = false;
-        Mouse.setCursorPosition((int)view.getWidth()/2, (int)view.getHeight()/2);
+        Mouse.setCursorPosition((int)context.getView().getWidth()/2, (int)context.getView().getHeight()/2);
       }
       eventProcessed = true;
     }

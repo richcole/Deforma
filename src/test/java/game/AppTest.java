@@ -11,8 +11,8 @@ public class AppTest {
 
   @Test
   public void testLookAt() {
-    LookAt lookAt = new LookAt();
-    lookAt.init();
+    Context context = new Context();
+    LookAt lookAt = new LookAt(context);
     lookAt.recalc();
     Assert.assertEquals(0f, lookAt.f.x, delta); 
     Assert.assertEquals(0f, lookAt.f.y, delta); 
@@ -41,8 +41,8 @@ public class AppTest {
 
   @Test
   public void testLookAt1() {
-    LookAt lookAt = new LookAt();
-    lookAt.init();
+    Context context = new Context();
+    LookAt lookAt = new LookAt(context);
     lookAt.rotate((float)Math.PI / 2, delta);
     lookAt.recalc();
     
@@ -61,8 +61,8 @@ public class AppTest {
 
   @Test
   public void testLookAt2() {
-    LookAt lookAt = new LookAt();
-    lookAt.init();
+    Context context = new Context();
+    LookAt lookAt = new LookAt(context);
     lookAt.rotate((float)Math.PI, delta);
     lookAt.recalc();
     

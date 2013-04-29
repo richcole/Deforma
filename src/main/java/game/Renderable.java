@@ -1,5 +1,5 @@
 package game;
 
-public interface HasRender {
+public interface Renderable {
   void render();
 }

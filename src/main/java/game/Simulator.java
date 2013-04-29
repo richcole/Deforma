@@ -1,26 +1,33 @@
 package game;
 
-import org.apache.log4j.Logger;
+import java.util.List;
 
-import com.google.inject.Inject;
+import com.google.common.collect.Lists;
 
-public class Simulator implements Runnable, HasInit {
+public class Simulator implements Runnable {
   
-  private static Logger logger = Logger.getLogger(Logger.class);
-  
-  @Inject Scene scene;
-  @Inject InputDevice inputDevice;
+  Context context;
   
   Thread thread;
   int tickNumber = 0;
+  List<SimObject> simObjects = Lists.newArrayList();
+
+  public Simulator(Context context) {
+    this.context = context;
+    thread = new Thread(this);
+    thread.setDaemon(true);
+    thread.start();
+  }
 
   @Override
   public void run() {
     long lastSymCompleted = System.currentTimeMillis();
     long symInterval = 50;
-    while( ! inputDevice.getQuit() ) {
+    while( ! context.getInputDevice().getQuit() ) {
       tickNumber += 1;
-      scene.tick();
+      for(SimObject o: simObjects) {
+        o.tick();
+      }
       long afterTime = System.currentTimeMillis();
       long sleepTime = lastSymCompleted + symInterval - afterTime; 
       lastSymCompleted = afterTime;
@@ -30,15 +37,12 @@ public class Simulator implements Runnable, HasInit {
     }    
   }
   
-  public void init() {
-    thread = new Thread(this);
-    thread.setDaemon(true);
-    thread.start();
-    
-  }
-
   public int getCurrentTick() {
     return tickNumber;
+  }
+
+  public void register(SimObject o) {
+    simObjects.add(o);
   }
   
   

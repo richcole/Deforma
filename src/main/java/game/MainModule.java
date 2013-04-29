@@ -14,6 +14,7 @@ public class MainModule extends AbstractModule {
     bind(Simulator.class).in(Singleton.class);
     bind(Rectangle.class).in(Singleton.class);  
     bind(LogPanel.class).in(Singleton.class);
+    bind(StoneTexture.class).in(Singleton.class);
   }
   
 }

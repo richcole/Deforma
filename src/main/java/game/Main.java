@@ -2,82 +2,66 @@ package game;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class Main {
   
   private static Logger logger = Logger.getLogger(Main.class);
+  Context context;
 
-  @Inject private View view;
-  @Inject private Scene scene;
-  @Inject private InputDevice inputDevice;
-  @Inject private Simulator simulator;
-  
+  public Main(Context context) {
+    this.context = context;
+  }
+
   public static void main(String[] args) {
-    Guice.createInjector(new MainModule()).getInstance(Main.class).run();
+    BasicConfigurator.configure();
+    openDisplay();
+    try {
+      new Context().getMain().run();
+    }
+    catch(RuntimeException e) {
+      logger.info("Exception raised in main", e);
+    }
+    finally {
+      closeDisplay();
+    }
+  }
+
+  private static void closeDisplay() {
+    Display.destroy();
   }
   
   private void run() {
-    
     try {
-      BasicConfigurator.configure();
-      openDisplay();
-      
-      try {
-        init(view, scene, inputDevice, simulator);
-        view.initGL();
-        scene.initGL();
-  
-        int lastTick = 0;
-        while (! inputDevice.getQuit()) {
-          if ( inputDevice.process() || simulator.getCurrentTick() != lastTick ) {
-            lastTick = simulator.getCurrentTick();
-            scene.render();
-            Display.update();
-          }
+      int lastTick = 0;
+      context.getBorgShipRectangle();
+      while (! context.getInputDevice().getQuit()) {
+        if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {
+          lastTick = context.getSimulator().getCurrentTick();
+          context.getScene().render();
+          Display.update();
         }
       }
-      finally {
-        Display.destroy();
-        inputDevice.setQuit();
-      }
+    }
+    catch(RuntimeException e) {
+      logger.info("Exception raised in main", e);
+      throw e;
+    }
+    finally {
+      context.getInputDevice().setQuit();
+    }
+  }
 
-    } catch (Exception e) {
+
+  private static void openDisplay() {
+    try {
+      DisplayMode mode = new DisplayMode(800, 800);
+      Display.setDisplayMode(mode);
+      Display.create();
+    }
+    catch(Exception e) {
       throw new RuntimeException(e);
     }
   }
-
-  private void init(HasInit ... inits) {
-    for(HasInit init: inits) {
-      init.init();
-    }
-  }
-
-  private void openDisplay() throws LWJGLException {
-    // DisplayMode mode = selectLargestMode();
-    DisplayMode mode = new DisplayMode(800, 800);
-    view.setMode(mode);
-    Display.setDisplayMode(mode);
-    Display.create();
-    logger.info("Mode " + mode.getWidth() + " " + mode.getHeight());
-  }
-
-  private DisplayMode selectLargestMode() throws LWJGLException {
-    DisplayMode[] modes = Display.getAvailableDisplayModes();
-    DisplayMode maxMode = null;
-    for (DisplayMode mode : modes) {
-      if (maxMode == null || maxMode.getWidth() < mode.getWidth()) {
-        maxMode = mode;
-      }
-    }
-    return maxMode;
-  }
-
 }

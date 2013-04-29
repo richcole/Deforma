@@ -1,36 +1,34 @@
 package game;
 
-import com.google.inject.Inject;
+import java.util.List;
 
-public class Scene implements HasInit, HasRender  {
+import com.google.common.collect.Lists;
+
+public class Scene {
   
-  @Inject Rectangle rectangle;
-  @Inject LookAt    lookAt;
-  @Inject LogPanel  logPanel;
-  @Inject View      view;
+  private Context context;
   
-  public void init() {
-    lookAt.init();
-    rectangle.init();
-    logPanel.init();
+  List<Renderable> renderables = Lists.newArrayList();
+
+  public Scene(Context context) {
+    this.context = context;
   }
 
   public void render() {
-    view.perspectiveView();
-    view.clear();
-    lookAt.render();
-    rectangle.render();
+    context.getView().perspectiveView();
+    context.getView().clear();
+    context.getLookAt().render();
+    
+    for(Renderable r: renderables) {
+      r.render();
+    }
 
-    view.orthoView();
-    logPanel.render();
+    context.getView().orthoView();
+    context.getLogPanel().render();
   }
-  
-  public void tick() {
-    lookAt.tick();
+
+  public void register(Renderable o) {
+    renderables.add(o);
   }
-  
-  public void initGL() {
-    rectangle.initGL();
-  }
-  
+    
 }
