@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class AppTest {
+public class LookAtTest {
   
   float delta = 1e-7f;
   
