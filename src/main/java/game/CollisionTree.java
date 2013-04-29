@@ -16,6 +16,10 @@ public class CollisionTree {
     Node[] children;
     List<Object> objects = Lists.newArrayList();
     
+    // add max depth to the tree
+    // convert oMin and oMax be Vector3f
+    // lowerIndex, upperIndex become 3 vectors
+    
     public void insert(int radix, float oMin, float oMax, Object o) {
       if ( oMin <= 0 && oMax >= 1 ) {
         objects.add(o);
