@@ -33,15 +33,22 @@ public class Main {
   }
   
   private void run() {
+    context.getView().init();
+    context.getLogPanel();
+
+    context.getSimulator().start();
     try {
       int lastTick = 0;
       context.getBorgShipRectangle();
       while (! context.getInputDevice().getQuit()) {
+        long before = System.currentTimeMillis();
         if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {
           lastTick = context.getSimulator().getCurrentTick();
           context.getScene().render();
           Display.update();
         }
+        long after = System.currentTimeMillis();
+        context.getLogPanel().setRenderSpeed(after - before);
       }
     }
     catch(RuntimeException e) {

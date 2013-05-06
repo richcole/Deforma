@@ -49,19 +49,21 @@ public class InputDevice {
         quit = true;
         break;
       case Keyboard.KEY_W:
-        context.getLookAt().moveForward(pressed);
+        context.getPlayer().setMovingForward(pressed);
         break;
       case Keyboard.KEY_S:
-        context.getLookAt().moveBackward(pressed);
+        context.getPlayer().setMovingBackward(pressed);
         break;
       case Keyboard.KEY_A:
-        context.getLookAt().moveLeft(pressed);
+        context.getPlayer().setMovingLeft(pressed);
         break;
       case Keyboard.KEY_D:
-        context.getLookAt().moveRight(pressed);
+        context.getPlayer().setMovingRight(pressed);
         break;
       case Keyboard.KEY_SPACE:
-        context.getLookAt().fire();
+        if ( pressed ) {
+          context.getPlayer().fire();
+        }
         break;
       }
       eventProcessed = true;

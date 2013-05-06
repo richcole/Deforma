@@ -52,22 +52,6 @@ public class View {
     zNear = 1.0f;
     zFar = 1500.0f;
     mode = Display.getDisplayMode();
-    
-    glEnable(GL_TEXTURE_2D);
-    glShadeModel(GL_SMOOTH);       
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
-    
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);               
-    glClearDepth(1f);
-    
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glViewport(0, 0, (int)getWidth(), (int)getHeight());
   }
   
   public float getPerspAngle() {

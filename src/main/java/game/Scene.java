@@ -17,7 +17,7 @@ public class Scene {
   public void render() {
     context.getView().perspectiveView();
     context.getView().clear();
-    context.getLookAt().render();
+    context.getPlayer().render();
     
     for(Renderable r: renderables) {
       r.render();

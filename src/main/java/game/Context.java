@@ -8,10 +8,10 @@ public class Context {
   InputDevice inputDevice;
   Simulator simulator;
   BorgShipRectangle borgShipRectangle;
-  LookAt    lookAt;
   LogPanel  logPanel;
   Main      main;
   StoneTexture stoneTexture;
+  Player player;
   
   Context() {
   }
@@ -51,11 +51,11 @@ public class Context {
     return view;
   }
 
-  public LookAt getLookAt() {
-    if ( lookAt == null ) {
-      lookAt = new LookAt(this);
+  public Player getPlayer() {
+    if ( player == null ) {
+      player = new Player(this);
     }
-    return lookAt;
+    return player;
   }
 
   public Main getMain() {

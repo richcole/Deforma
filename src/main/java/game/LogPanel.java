@@ -18,6 +18,8 @@ public class LogPanel {
 
   MutableTexture texture;
   int x, y, width, height;
+  double renderSpeed = 0;
+  double sleepTime;
   
   String text;
 
@@ -37,9 +39,9 @@ public class LogPanel {
   }
 
   public void render() {
-    text = "f=" + format(context.getLookAt().forward()) + " s=" + format(context.getLookAt().sideways()) 
-      + " e=" + format(context.getLookAt().eye()) + "\n";
-    text += " u=" + format(context.getLookAt().up()) + " c=" + format(context.getLookAt().c()); 
+    text =  "p=" + context.getPlayer().p;
+    text += String.format(" rate = %3.2e", 1000.0 / renderSpeed);  
+    text += String.format(" sleep = %3.2e", sleepTime);  
     renderFlat();
     renderGL();
   }
@@ -73,6 +75,14 @@ public class LogPanel {
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1));
     g.drawString(text, x, y);
     g.dispose();
+  }
+
+  public void setRenderSpeed(double speed) {
+    renderSpeed = (0.99 * renderSpeed) + (0.01 * speed);
+  }
+
+  public void setSleepTime(double sleepTime) {
+    this.sleepTime = (0.99 * this.sleepTime) + (0.01 * sleepTime);
   }
 
 }
