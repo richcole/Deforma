@@ -41,7 +41,6 @@ public class Simulator implements Runnable {
       long sleepTime = lastSymCompleted + symInterval - afterTime; 
       lastSymCompleted = afterTime;
       if ( sleepTime > 0 ) {
-        logger.info("Sleep time " + sleepTime);
         context.getLogPanel().setSleepTime(sleepTime);
         try { Thread.sleep(sleepTime); } catch(Exception e) { throw new RuntimeException(e); };
       }
@@ -61,6 +60,8 @@ public class Simulator implements Runnable {
     }
   }
   
-  
+  public List<SimObject> getSimObjects() {
+    return simObjects;
+  }
 
 }

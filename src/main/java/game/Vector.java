@@ -40,7 +40,11 @@ public class Vector {
   }
 
   private double unscaledLength() {
-    return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+    return Math.sqrt(unscaledLengthSquared());
+  }
+
+  private double unscaledLengthSquared() {
+    return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
   }
   
   double dot(Vector o) {
@@ -99,7 +103,7 @@ public class Vector {
     return r;
   }
 
-  public Vector scaleTo(float s) {
+  public Vector scaleTo(double s) {
     Vector r = new Vector(this);
     r.v[3] = unscaledLength() / s;
     return r;
@@ -133,5 +137,9 @@ public class Vector {
     }
     r.v[3] = 1.0;
     return r;
+  }
+
+  public double lengthSquared() {
+    return unscaledLengthSquared() / (v[3] * v[3]);
   }
 }

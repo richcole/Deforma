@@ -50,7 +50,7 @@ public class View {
     perspAngle = 45f;
     aspect = 1.0f;
     zNear = 1.0f;
-    zFar = 1500.0f;
+    zFar = 15000.0f;
     mode = Display.getDisplayMode();
   }
   
@@ -103,10 +103,6 @@ public class View {
   }
 
   public void init() {
-    perspAngle = 45f;
-    aspect = 1.0f;
-    zNear = 1.0f;
-    zFar = 1500.0f;
     mode = Display.getDisplayMode();
 
     glEnable(GL_TEXTURE_2D);

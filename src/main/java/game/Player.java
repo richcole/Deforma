@@ -56,9 +56,6 @@ public class Player implements SimObject {
     Vector a = p.plus(forward());
     Vector up = up();
     GLU.gluLookAt((float)p.x(), (float)p.y(), (float)p.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)up.x(), (float)up.y(), (float)up.z());
-   // left.glRotate(-theta2);
-   // up.glRotate(-theta1);
-   // p.minus().glTranslate();
   }
 
   @Override
@@ -95,6 +92,18 @@ public class Player implements SimObject {
   }
 
   public void fire() {
-    new PhysicalObject(context, forward().minus().scaleTo(20), p.minus(forward().scaleTo(10)), new Vector(1, 1, 1, 1));
+    new PhysicalObject(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)), new Vector(1, 1, 1, 1));
   }
+
+  @Override
+  public Vector pos() {
+    return p;
+  }
+
+  @Override
+  public double mass() {
+    return 100;
+  }
+  
+  
 }
