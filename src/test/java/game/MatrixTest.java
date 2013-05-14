@@ -1,6 +1,9 @@
 package game;
 
 
+import game.math.Matrix;
+import game.math.Vector;
+
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -1,5 +1,9 @@
 package game;
 
+import game.models.BigCube;
+import game.models.SkyBox;
+import game.models.StoneTexture;
+
 public class Context {
 
   StoneTexture stoneText;
@@ -7,11 +11,12 @@ public class Context {
   Scene scene;
   InputDevice inputDevice;
   Simulator simulator;
-  BorgShipRectangle borgShipRectangle;
+  BigCube bigCube;
   LogPanel  logPanel;
   Main      main;
   StoneTexture stoneTexture;
   Player player;
+  SkyBox skyBox;
   
   Context() {
   }
@@ -72,11 +77,18 @@ public class Context {
     return stoneTexture;
   }
 
-  public BorgShipRectangle getBorgShipRectangle() {
-    if ( borgShipRectangle == null ) {
-      borgShipRectangle = new BorgShipRectangle(this);
+  public BigCube getBigCube() {
+    if ( bigCube == null ) {
+      bigCube = new BigCube(this);
     }
-    return borgShipRectangle;
+    return bigCube;
+  }
+
+  public SkyBox getSkyBox() {
+    if ( skyBox == null ) {
+      skyBox = new SkyBox(this);
+    }
+    return skyBox;
   }
 
   public LogPanel getLogPanel() {

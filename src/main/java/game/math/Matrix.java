@@ -1,20 +1,15 @@
-package game;
+package game.math;
+
 
 public class Matrix {
 
   double v[] = new double[16];
   
-  static Matrix IDENTITY;
-  static Matrix BASIS    = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.ZERO);
+  public static final Matrix IDENTITY = Matrix.id();
+  public static final Matrix BASIS    = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.ZERO);
+  public static final Matrix ONES     = Matrix.ones();
   
-  static {
-    IDENTITY = new Matrix();
-    for(int i=0;i<4; ++i) {
-      IDENTITY.v[i*4+i] = 1;
-    }
-  }
-  
-  Matrix times(Matrix m) {
+  public Matrix times(Matrix m) {
     Matrix r = new Matrix();
     for(int i=0;i<4;++i) {
       for(int j=0;j<4;j++) {
@@ -27,7 +22,15 @@ public class Matrix {
     return r;
   }
   
-  Vector times(Vector o) {
+  public static Matrix ones() {
+    Matrix r = new Matrix();
+    for(int i=0;i<16;++i) {
+      r.v[i] = 1;
+    }
+    return r;
+  }
+
+  public Vector times(Vector o) {
     Vector r = new Vector();
     for(int i=0;i<4;++i) {
       for(int k=0;k<4;++k) {
@@ -37,7 +40,7 @@ public class Matrix {
     return r;
   }
   
-  static Matrix skew(Vector v) {
+  public static Matrix skew(Vector v) {
     Matrix r = new Matrix();
     r.v[1] = -v.v[2];
     r.v[2] = v.v[1];
@@ -48,7 +51,7 @@ public class Matrix {
     return r;
   }
   
-  static Matrix square(Vector v) {
+  public static Matrix square(Vector v) {
     Matrix r = new Matrix();
     for(int i=0;i<4;++i) {
       for(int j=0;j<4;j++) {
@@ -58,7 +61,7 @@ public class Matrix {
     return r;
   }
   
-  static Matrix rows(Vector v1, Vector v2, Vector v3, Vector v4) {
+  public static Matrix rows(Vector v1, Vector v2, Vector v3, Vector v4) {
     Matrix r = new Matrix();
     Vector v[] = new Vector[4];
     v[0] = v1;
@@ -73,11 +76,11 @@ public class Matrix {
     return r;
   }
   
-  static Matrix columns(Vector v1, Vector v2, Vector v3, Vector v4) {
+  public static Matrix columns(Vector v1, Vector v2, Vector v3, Vector v4) {
     return Matrix.rows(v1, v2, v3, v4).transpose();
   }
   
-  Matrix transpose() {
+  public Matrix transpose() {
     Matrix r = new Matrix();
     for(int i=0;i<4;++i) {
       for(int j=0;j<4;++j) {
@@ -87,11 +90,15 @@ public class Matrix {
     return r;
   }
 
-  static Matrix id() {
-    return IDENTITY;
+  public static Matrix id() {
+    Matrix r = new Matrix();
+    for(int i=0;i<4; ++i) {
+      r.v[i*4+i] = 1;
+    }
+    return r;
   }
   
-  Matrix minus(Matrix o) {
+  public Matrix minus(Matrix o) {
     Matrix r = new Matrix();
     for(int i=0;i<16;++i) {
       r.v[i] = v[i] - o.v[i];
@@ -99,7 +106,7 @@ public class Matrix {
     return r;
   }
   
-  Matrix plus(Matrix o) {
+  public Matrix plus(Matrix o) {
     Matrix r = new Matrix();
     for(int i=0;i<16;++i) {
       r.v[i] = v[i] + o.v[i];
@@ -107,7 +114,7 @@ public class Matrix {
     return r;
   }
   
-  Matrix times(double d) {
+  public Matrix times(double d) {
     Matrix r = new Matrix();
     for(int i=0;i<16;++i) {
       r.v[i] = v[i] * d;
@@ -115,10 +122,10 @@ public class Matrix {
     return r;
   }
 
-  static Matrix rot(double theta, Vector x) {
+  public static Matrix rot(double theta, Vector x) {
     x = x.normalize();
     Matrix square = Matrix.square(x);
-    Matrix r = square.plus(Matrix.id().minus(square).times(Math.cos(theta)).plus(Matrix.skew(x).times(Math.sin(theta))));
+    Matrix r = square.plus(Matrix.IDENTITY.minus(square).times(Math.cos(theta)).plus(Matrix.skew(x).times(Math.sin(theta))));
     for(int i=0; i<4; ++i) {
       r.v[i*4+3] = i == 3 ? 1 : 0;
       r.v[3*4+i] = i == 3 ? 1 : 0;
@@ -169,5 +176,13 @@ public class Matrix {
       r.v[i] = v[i*4+j];
     }
     return r;
+  }
+
+  public double get(int i, int j) {
+    return v[i*4+j];
+  }
+
+  public void set(int i, int j, double value) {
+    v[i*4+j] = value;
   }
 }

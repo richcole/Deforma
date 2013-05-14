@@ -39,7 +39,8 @@ public class Main {
     context.getSimulator().start();
     try {
       int lastTick = 0;
-      context.getBorgShipRectangle();
+      context.getBigCube();
+      context.getSkyBox();
       while (! context.getInputDevice().getQuit()) {
         long before = System.currentTimeMillis();
         if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {

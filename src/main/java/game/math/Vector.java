@@ -1,17 +1,20 @@
-package game;
+package game.math;
+
 
 import org.lwjgl.opengl.GL11;
 
 public class Vector {
 
+
   double v[] = new double[4];
   
-  static Vector U1   = new Vector(1, 0, 0, 1);
-  static Vector U2   = new Vector(0, 1, 0, 1);
-  static Vector U3   = new Vector(0, 0, 1, 1);
-  static Vector ZERO = new Vector(0, 0, 0, 1);
+  public static final Vector U1   = new Vector(1, 0, 0, 1);
+  public static final Vector U2   = new Vector(0, 1, 0, 1);
+  public static final Vector U3   = new Vector(0, 0, 1, 1);
+  public static final Vector ZERO = new Vector(0, 0, 0, 1);
+  public static final Vector ONES = new Vector(1, 1, 1, 1);
   
-  Vector(double x1, double x2, double x3, double x4) {
+  public Vector(double x1, double x2, double x3, double x4) {
     v[0] = x1;
     v[1] = x2;
     v[2] = x3;
@@ -27,35 +30,35 @@ public class Vector {
     }
   }
 
-  Vector times(double s) {
+  public Vector times(double s) {
     return new Vector(v[0], v[1], v[2], v[3] / s);
   }
   
-  Vector project() {
+  public Vector project() {
     return new Vector(v[0]/v[3], v[1]/v[3], v[2]/v[3], 1.0);
   }
   
-  Vector normalize() {
+  public Vector normalize() {
     return new Vector(v[0], v[1], v[2], unscaledLength());
   }
 
-  private double unscaledLength() {
+  public double unscaledLength() {
     return Math.sqrt(unscaledLengthSquared());
   }
 
-  private double unscaledLengthSquared() {
+  public double unscaledLengthSquared() {
     return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
   }
   
-  double dot(Vector o) {
+  public double dot(Vector o) {
     return (v[0] * o.v[0] + v[1] * o.v[1] + v[2] * o.v[2]) / (v[3] * o.v[3]);
   }
   
-  double length() {
+  public double length() {
     return unscaledLength() / v[3];
   }
   
-  Vector cross(Vector o) {
+  public Vector cross(Vector o) {
     return Matrix.skew(this).times(o);
   }
 
@@ -141,5 +144,9 @@ public class Vector {
 
   public double lengthSquared() {
     return unscaledLengthSquared() / (v[3] * v[3]);
+  }
+
+  public double get(int i) {
+    return v[i];
   }
 }

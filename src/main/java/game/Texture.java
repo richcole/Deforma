@@ -30,7 +30,7 @@ public class Texture {
   int height;
   int textureId;
   
-  Texture(File file) {
+  public Texture(File file) {
     this(new Image(file));
   }
   

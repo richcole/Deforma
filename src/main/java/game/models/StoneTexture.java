@@ -1,10 +1,13 @@
-package game;
+package game.models;
+
+import game.Context;
+import game.Texture;
 
 import java.io.File;
 
 public class StoneTexture extends Texture {
 
-  StoneTexture(Context context) {
+  public StoneTexture(Context context) {
     super(new File("res/image.jpg"));
   }
 

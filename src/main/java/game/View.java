@@ -50,7 +50,7 @@ public class View {
     perspAngle = 45f;
     aspect = 1.0f;
     zNear = 1.0f;
-    zFar = 15000.0f;
+    zFar = 100000.0f;
     mode = Display.getDisplayMode();
   }
   

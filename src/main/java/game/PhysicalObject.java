@@ -1,5 +1,7 @@
 package game;
 
+import game.math.Vector;
+
 import org.apache.log4j.Logger;
 
 public class PhysicalObject implements SimObject {
@@ -8,12 +10,14 @@ public class PhysicalObject implements SimObject {
   
   Context context;
   Vector velocity;
-  Rectangle rectangle;
-
-  PhysicalObject(Context context, Vector velocity, Vector position, Vector size) {
+  Vector position;
+  Vector size;
+  
+  protected PhysicalObject(Context context, Vector velocity, Vector position, Vector size) {
     this.context = context;
     this.velocity = new Vector(velocity);
-    this.rectangle = new Rectangle(context, position, size);
+    this.position = position;
+    this.size = size;
     context.getSimulator().register(this);
   }
 
@@ -24,7 +28,7 @@ public class PhysicalObject implements SimObject {
       velocity = velocity.plus(collisionForce(o));
     }
     if ( velocity.length() > 1 ) {
-      rectangle.move(velocity);
+      move(velocity);
       velocity = velocity.times(0.95f);
     }
   }
@@ -43,15 +47,19 @@ public class PhysicalObject implements SimObject {
       return Vector.ZERO;
     }
   }
+  
+  public void move(Vector velocity) {
+    position = position.plus(velocity);
+  }
 
   @Override
   public Vector pos() {
-    return rectangle.position;
+    return position;
   }
   
   @Override
   public double mass() {
-    return rectangle.size.x()*rectangle.size.y();
+    return size.x()*size.y();
   }
 
 }

@@ -1,5 +1,9 @@
 package game;
 
+import game.math.Matrix;
+import game.math.Vector;
+import game.models.LittleCube;
+
 import org.lwjgl.util.glu.GLU;
 
 public class Player implements SimObject {
@@ -92,7 +96,7 @@ public class Player implements SimObject {
   }
 
   public void fire() {
-    new PhysicalObject(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)), new Vector(1, 1, 1, 1));
+    new LittleCube(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
   }
 
   @Override
