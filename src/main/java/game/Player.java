@@ -1,8 +1,10 @@
 package game;
 
+import game.base.SimObject;
 import game.math.Matrix;
 import game.math.Vector;
 import game.models.LittleCube;
+import game.models.LittleLight;
 
 import org.lwjgl.util.glu.GLU;
 
@@ -97,6 +99,10 @@ public class Player implements SimObject {
 
   public void fire() {
     new LittleCube(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+  }
+
+  public void fireLight() {
+    new LittleLight(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
   }
 
   @Override

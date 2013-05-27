@@ -65,6 +65,11 @@ public class InputDevice {
           context.getPlayer().fire();
         }
         break;
+      case Keyboard.KEY_L:
+        if ( pressed ) {
+          context.getPlayer().fireLight();
+        }
+        break;
       }
       eventProcessed = true;
     }

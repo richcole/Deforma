@@ -16,6 +16,8 @@ import static org.lwjgl.opengl.GL11.GL_SMOOTH;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
@@ -113,6 +115,9 @@ public class View {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);               
     glClearDepth(1f);

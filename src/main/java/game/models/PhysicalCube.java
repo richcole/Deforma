@@ -1,7 +1,7 @@
 package game.models;
 
 import game.Context;
-import game.PhysicalObject;
+import game.base.PhysicalObject;
 import game.math.Vector;
 
 public class PhysicalCube extends PhysicalObject {

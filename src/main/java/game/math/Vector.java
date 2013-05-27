@@ -149,4 +149,8 @@ public class Vector {
   public double get(int i) {
     return v[i];
   }
+
+  public void set(int i, double value) {
+    v[i] = value;
+  }
 }

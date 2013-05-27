@@ -1,5 +1,7 @@
 package game;
 
+import game.base.SimObject;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;

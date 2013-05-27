@@ -1,6 +1,8 @@
 package game;
 
+import game.math.Vector;
 import game.models.BigCube;
+import game.models.Light;
 import game.models.SkyBox;
 import game.models.StoneTexture;
 
@@ -17,6 +19,9 @@ public class Context {
   StoneTexture stoneTexture;
   Player player;
   SkyBox skyBox;
+  Light light;
+  int lightNumber;
+  Material material;
   
   Context() {
   }
@@ -96,6 +101,22 @@ public class Context {
       logPanel = new LogPanel(this);
     }
     return logPanel;
+  }
+
+  public int getNextLightNumber() {
+    if ( lightNumber == 0 ) {
+      lightNumber = 0;
+    } else {
+      lightNumber += 1;
+    }
+    return lightNumber;
+  }
+
+  public Material getMaterial() {
+    if ( material == null ) {
+      material = new Material();
+    }
+    return material;
   }
   
 }
