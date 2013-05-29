@@ -19,7 +19,6 @@ public class PhysicalObject implements SimObject {
     this.velocity = new Vector(velocity);
     this.position = position;
     this.size = size;
-    context.getSimulator().register(this);
   }
 
   @Override
@@ -61,6 +60,10 @@ public class PhysicalObject implements SimObject {
   @Override
   public double mass() {
     return size.x()*size.y();
+  }
+  
+  public void register() {
+    context.getSimulator().register(this);    
   }
 
 }

@@ -13,7 +13,7 @@ import com.google.gson.GsonBuilder;
 
 public class TestReader {
 
-  Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+  Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
   File root = new File("/mnt/nwn/");
 
   KeyReader keyReader;
@@ -42,7 +42,13 @@ public class TestReader {
     for(int i=0;i<keyReader.header.numKeys;++i) {
       KeyReader.KeyEntry entry = keyReader.readKeyEntry(i);
       if ( entry.type == 2002 ) {
-        MdlReader mdlReader = new MdlReader(getResource(entry));
+        Resource resource = getResource(entry);
+        MdlReader mdlReader = new MdlReader(resource);
+        if ( mdlReader.header.zero == 0 && mdlReader.header.model.classification != 0 ) {
+          printlnJson(entry);
+          printlnJson(mdlReader.header);
+          return;
+        }
       }
     }
   }
@@ -55,12 +61,8 @@ public class TestReader {
     return new Resource(bifReader, entryHeader.offset, (int)entryHeader.size);
   }
 
-  private void writeEntry(KeyReader.KeyEntry entry, File out) {
-    int bifIndex = entry.getBifIndex();
-    int resourceIndex = entry.getResourceIndex();
-    BifReader bifReader = bifReaders.get(bifIndex);
-    EntryHeader entryHeader = bifReader.readEntryHeader(resourceIndex);
-    byte[] bytes = bifReader.inp.readBytes(entryHeader.offset, (int)entryHeader.size);
+  private void writeEntry(Resource resource, File out) {
+    byte[] bytes = resource.reader.inp.readBytes(resource.offset, resource.length);
     try {
       Files.write(bytes, out);
     }

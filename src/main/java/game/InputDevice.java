@@ -44,9 +44,14 @@ public class InputDevice {
           haveMouseCoords = false;
         }
         break;
-      case Keyboard.KEY_Q:
       case Keyboard.KEY_ESCAPE:
         quit = true;
+        break;
+      case Keyboard.KEY_Q:
+        context.getPlayer().setMovingUpward(pressed);
+        break;
+      case Keyboard.KEY_E:
+        context.getPlayer().setMovingDownward(pressed);
         break;
       case Keyboard.KEY_W:
         context.getPlayer().setMovingForward(pressed);

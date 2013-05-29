@@ -20,6 +20,8 @@ public class Player implements SimObject {
 
   double theta1, theta2;
   
+  boolean movingDownward = false;
+  boolean movingUpward = false;
   boolean movingForward = false;
   boolean movingBackward = false;
   boolean movingLeft = false;
@@ -79,6 +81,20 @@ public class Player implements SimObject {
     if ( movingRight ) {
       p = p.plus(left().scaleTo(-velocity));
     }
+    if ( movingUpward ) {
+      p = p.plus(up().scaleTo(velocity));
+    }
+    if ( movingDownward ) {
+      p = p.plus(up().scaleTo(-velocity));
+    }
+  }
+
+  public void setMovingDownward(boolean movingForward) {
+    this.movingDownward = movingForward;
+  }
+
+  public void setMovingUpward(boolean movingForward) {
+    this.movingUpward = movingForward;
   }
 
   public void setMovingForward(boolean movingForward) {
@@ -98,11 +114,13 @@ public class Player implements SimObject {
   }
 
   public void fire() {
-    new LittleCube(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    LittleCube littleCube = new LittleCube(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    littleCube.register();
   }
 
   public void fireLight() {
-    new LittleLight(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    LittleLight littleLight = new LittleLight(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    littleLight.register();
   }
 
   @Override

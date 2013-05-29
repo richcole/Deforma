@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
@@ -20,7 +22,7 @@ public class BinaryFileReader implements Closeable {
     }
   }
   
-  public  Long readWord() {
+  public long readWord() {
     long result = 0;
     int i = 0;
     try {
@@ -46,6 +48,16 @@ public class BinaryFileReader implements Closeable {
       Throwables.propagate(e);
     }
     return result;
+  }
+
+  public  int readSignedShort() {
+    try {
+      return inp.readShort();
+    }
+    catch(Exception e) {
+      Throwables.propagate(e);
+    }
+    return -1;
   }
 
   public int readByte()  {
@@ -127,13 +139,37 @@ public class BinaryFileReader implements Closeable {
     return result;
   }
 
-  public long tell() {
+  public int[] readShorts(int len) {
+    int[] result = new int[len];
+    for(int i=0;i<len;++i) {
+      result[i] = readShort();
+    }
+    return result;
+  }
+
+  public int[] readSignedShorts(int len) {
+    int[] result = new int[len];
+    for(int i=0;i<len;++i) {
+      result[i] = readSignedShort();
+    }
+    return result;
+  }
+
+  public long pos() {
     try {
       return inp.getFilePointer();
     } catch(Exception e) {
       Throwables.propagate(e);
     }
     return 0;
+  }
+
+  public float readFloat() {
+    try {
+      return ByteBuffer.wrap(readBytes(4)).order(ByteOrder.LITTLE_ENDIAN ).getFloat();
+    } catch(Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

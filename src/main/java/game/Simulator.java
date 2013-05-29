@@ -30,26 +30,31 @@ public class Simulator implements Runnable {
 
   @Override
   public void run() {
-    long lastSymCompleted = System.currentTimeMillis();
-    long symInterval = 10;
-    while( ! context.getInputDevice().getQuit() ) {
-      tickNumber += 1;
-      synchronized(simObjects) {
-        for(SimObject o: simObjects) {
-          o.tick();
+    try {
+      long lastSymCompleted = System.currentTimeMillis();
+      long symInterval = 10;
+      while( ! context.getInputDevice().getQuit() ) {
+        tickNumber += 1;
+        synchronized(simObjects) {
+          for(SimObject o: simObjects) {
+            o.tick();
+          }
+        }
+        long afterTime = System.currentTimeMillis();
+        long sleepTime = lastSymCompleted + symInterval - afterTime; 
+        lastSymCompleted = afterTime;
+        if ( sleepTime > 0 ) {
+          context.getLogPanel().setSleepTime(sleepTime);
+          try { Thread.sleep(sleepTime); } catch(Exception e) { throw new RuntimeException(e); };
+        }
+        else {
+          context.getLogPanel().setSleepTime(0);
         }
       }
-      long afterTime = System.currentTimeMillis();
-      long sleepTime = lastSymCompleted + symInterval - afterTime; 
-      lastSymCompleted = afterTime;
-      if ( sleepTime > 0 ) {
-        context.getLogPanel().setSleepTime(sleepTime);
-        try { Thread.sleep(sleepTime); } catch(Exception e) { throw new RuntimeException(e); };
-      }
-      else {
-        context.getLogPanel().setSleepTime(0);
-      }
-    }    
+    }
+    catch(Exception e) {
+      logger.error("Simulator exception", e);
+    }
   }
   
   public int getCurrentTick() {

@@ -22,6 +22,7 @@ public class Context {
   Light light;
   int lightNumber;
   Material material;
+  Colors colors;
   
   Context() {
   }
@@ -114,9 +115,16 @@ public class Context {
 
   public Material getMaterial() {
     if ( material == null ) {
-      material = new Material();
+      material = new Material(this);
     }
     return material;
+  }
+  
+  public Colors getColors() {
+    if ( colors == null ) {
+      colors = new Colors();
+    }
+    return colors;
   }
   
 }

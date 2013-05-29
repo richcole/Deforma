@@ -1,20 +1,12 @@
 package game.models;
 
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_EMISSION;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SHININESS;
-import static org.lwjgl.opengl.GL11.GL_SPECULAR;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3d;
 import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glMaterial;
-import static org.lwjgl.opengl.GL11.glMaterialf;
+import static org.lwjgl.opengl.GL11.glNormal3d;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3d;
-import static org.lwjgl.opengl.GL11.glNormal3d;
-
 import game.Context;
 import game.GrayCode;
 import game.Material;
@@ -93,9 +85,23 @@ public class Cube implements Renderable {
       for(int j=0;j<4;++j) {
         glTexCoord2f((float)textureCode.get(j, 0), (float)textureCode.get(j, 1));
         glNormal3d(normal.x(), normal.y(), normal.z());
-        glVertex3d(position.x() + code.get(j, 0)*size.x(), position.y() + code.get(j, 1)*size.y(), position.z() + code.get(j, 2)*size.z());
+        Vector v = new Vector(position.x() + code.get(j, 0)*size.x(), position.y() + code.get(j, 1)*size.y(), position.z() + code.get(j, 2)*size.z(), 1.0);
+        glVertex3d(v.x(), v.y(), v.z());
       }
       glEnd();
+    }
+    
+    // renderNormals();
+  }
+
+  private void renderNormals() {
+    for(int i=0;i<6;++i) {
+      Matrix code = getCode(i);
+      Vector normal = getNormal(i);
+      for(int j=0;j<4;++j) {
+        Vector v = new Vector(position.x() + code.get(j, 0)*size.x(), position.y() + code.get(j, 1)*size.y(), position.z() + code.get(j, 2)*size.z(), 1.0);
+        new Line(v, normal.scaleTo(20), 3f).render();
+      }
     }
   }
 

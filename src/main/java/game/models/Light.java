@@ -3,11 +3,12 @@ package game.models;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
 import static org.lwjgl.opengl.GL11.GL_EMISSION;
 import static org.lwjgl.opengl.GL11.GL_LIGHT0;
-import static org.lwjgl.opengl.GL11.GL_LIGHT_MODEL_AMBIENT;
 import static org.lwjgl.opengl.GL11.GL_POSITION;
 import static org.lwjgl.opengl.GL11.GL_SPECULAR;
+import static org.lwjgl.opengl.GL11.GL_QUADRATIC_ATTENUATION;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLight;
-import static org.lwjgl.opengl.GL11.glLightModel;
+import static org.lwjgl.opengl.GL11.glLightf;
 import game.Context;
 import game.Renderable;
 import game.math.Vector;
@@ -49,11 +50,13 @@ public class Light implements Renderable {
     lightPosition.put((float)1.0f);
     lightPosition.flip();
             
-    glLight(GL_LIGHT0 + lightNumber, GL_POSITION,      lightPosition);  
-    glLight(GL_LIGHT0 + lightNumber, GL_SPECULAR,      whiteLight);     
-    glLight(GL_LIGHT0 + lightNumber, GL_DIFFUSE,       whiteLight);     
-    glLight(GL_LIGHT0 + lightNumber, GL_EMISSION,      whiteLight);     
-    glLightModel(GL_LIGHT_MODEL_AMBIENT, lModelAmbient);                 
+    int glLightIndex = GL_LIGHT0 + lightNumber;
+    glEnable(glLightIndex);
+    glLight(glLightIndex, GL_POSITION,      lightPosition);  
+    glLight(glLightIndex, GL_SPECULAR,      whiteLight);     
+    glLight(glLightIndex, GL_DIFFUSE,       whiteLight);     
+    glLight(glLightIndex, GL_EMISSION,      whiteLight);
+    glLightf(glLightIndex, GL_QUADRATIC_ATTENUATION, 1.0f/10000);
   }
 
   public void move(Vector velocity) {
