@@ -172,4 +172,12 @@ public class BinaryFileReader implements Closeable {
     }
   }
 
+  public String[] readNullStrings(int stringLen, int numStrings) {
+    String[] r = new String[numStrings];
+    for(int i=0;i<numStrings;++i) {
+      r[i] = readNullString(stringLen);
+    }
+    return r;
+  }
+
 }

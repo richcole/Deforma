@@ -43,6 +43,7 @@ public class TestReader {
       KeyReader.KeyEntry entry = keyReader.readKeyEntry(i);
       if ( entry.type == 2002 ) {
         Resource resource = getResource(entry);
+        writeEntry(resource, new File("/tmp/out"));
         MdlReader mdlReader = new MdlReader(resource);
         if ( mdlReader.header.zero == 0 && mdlReader.header.model.classification != 0 ) {
           printlnJson(entry);
