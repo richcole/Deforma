@@ -1,4 +1,4 @@
-package game;
+package game.base;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_MODULATE;
@@ -18,6 +18,7 @@ import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
+
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -34,7 +35,7 @@ public class Texture {
     this(new Image(file));
   }
   
-  Texture(Image img) {
+  public Texture(Image img) {
     width = img.getWidth();
     height = img.getHeight();
     allocateTexture(width, height, img.getByteBuffer());

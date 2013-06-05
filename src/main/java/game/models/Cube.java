@@ -11,7 +11,7 @@ import game.Context;
 import game.GrayCode;
 import game.Material;
 import game.Renderable;
-import game.Texture;
+import game.base.Texture;
 import game.math.Matrix;
 import game.math.Vector;
 

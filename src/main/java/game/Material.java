@@ -8,6 +8,9 @@ import static org.lwjgl.opengl.GL11.GL_AMBIENT;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
 import static org.lwjgl.opengl.GL11.glMaterial;
 import static org.lwjgl.opengl.GL11.glMaterialf;
+import game.math.Vector;
+
+import java.nio.FloatBuffer;
 
 public class Material implements Renderable {
   

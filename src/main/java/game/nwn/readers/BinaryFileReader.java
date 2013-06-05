@@ -1,4 +1,4 @@
-package game.nwn;
+package game.nwn.readers;
 
 import java.io.Closeable;
 import java.io.File;
@@ -11,6 +11,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 
 public class BinaryFileReader implements Closeable {
+  public static final int VECTOR_SIZE = 12;
+  public static final int WORD_SIZE = 4;
   public RandomAccessFile inp;
 
   public BinaryFileReader(File bifFile) {
@@ -60,8 +62,8 @@ public class BinaryFileReader implements Closeable {
     return -1;
   }
 
-  public int readByte()  {
-    int result = 0;
+  public long readByte()  {
+    long result = 0;
     try {
       result = inp.readUnsignedByte();
     }
@@ -100,12 +102,28 @@ public class BinaryFileReader implements Closeable {
 
   public String readNullString(int len) {
     String result = new String(readBytes(len), Charsets.UTF_8);
-    int i = result.indexOf(0);
-    if ( i != -1 ) {
-      return result.substring(0, i);
-    } else {
-      return result;
+    for(int i=0;i<result.length();++i) {
+      char c = result.charAt(i);
+      if ( c == 0 ) {
+        return result.substring(0, i);
+      }
+      if ( ! isValid(c) ) {
+        throw new RuntimeException("Invalid string " + c);
+      }
     }
+    return result;
+  }
+
+  private boolean isValid(char c) {
+    return 
+      (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      (c >= '0' && c <= '9') ||
+      (c == '_') ||
+      (c == '-') ||
+      (c == '.') ||
+      (c == '\\') ||
+      (c == ' ');
   }
 
   @Override
@@ -128,7 +146,7 @@ public class BinaryFileReader implements Closeable {
 
   public String readStringAt(long offset, int len) {
     seek(offset);
-    return readString(len);
+    return readNullString(len);
   }
 
   public long[] readWords(int len) {
@@ -165,11 +183,16 @@ public class BinaryFileReader implements Closeable {
   }
 
   public float readFloat() {
+    float r = 0;
     try {
-      return ByteBuffer.wrap(readBytes(4)).order(ByteOrder.LITTLE_ENDIAN ).getFloat();
+      r = ByteBuffer.wrap(readBytes(4)).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+      if ( Float.isNaN(r) ) {
+        throw new RuntimeException("NAN");
+      }
     } catch(Exception e) {
-      throw new RuntimeException(e);
+      Throwables.propagate(e);
     }
+    return r;
   }
 
   public String[] readNullStrings(int stringLen, int numStrings) {

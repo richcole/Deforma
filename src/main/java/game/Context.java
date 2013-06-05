@@ -1,10 +1,19 @@
 package game;
 
+import java.io.File;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import game.base.Textures;
 import game.math.Vector;
 import game.models.BigCube;
 import game.models.Light;
+import game.models.Rat;
+import game.models.Rotation;
 import game.models.SkyBox;
 import game.models.StoneTexture;
+import game.nwn.readers.KeyReader;
 
 public class Context {
 
@@ -23,8 +32,14 @@ public class Context {
   int lightNumber;
   Material material;
   Colors colors;
+  Rat rat;
   
-  Context() {
+  Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+  File root = new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/");
+  KeyReader keyReader;
+  Textures textures;
+
+  public Context() {
   }
   
   public StoneTexture getStoneText() {
@@ -90,6 +105,13 @@ public class Context {
     return bigCube;
   }
 
+  public Rat getRat() {
+    if ( rat == null ) {
+      rat = new Rat(this, 50, new Rotation(-90, new Vector(1f, 0f, 0f, 1f)));
+    }
+    return rat;
+  }
+
   public SkyBox getSkyBox() {
     if ( skyBox == null ) {
       skyBox = new SkyBox(this);
@@ -126,5 +148,26 @@ public class Context {
     }
     return colors;
   }
+
+  public Gson getGson() {
+    return gson;
+  }
   
+  public File getNwnRoot() {
+    return root;
+  }
+  
+  public KeyReader getKeyReader() {
+    if ( keyReader == null ) {
+      keyReader = new KeyReader(this, "chitin.key");
+    }
+    return keyReader;
+  }
+
+  public Textures getTextures() {
+    if ( textures == null ) {
+      textures = new Textures();
+    }
+    return textures;
+  }
 }

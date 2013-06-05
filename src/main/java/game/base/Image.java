@@ -1,11 +1,20 @@
-package game;
+package game.base;
+
+import game.nwn.readers.BinaryFileReader;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
+
+import com.google.common.base.Throwables;
 
 public class Image {
 
@@ -13,7 +22,7 @@ public class Image {
   int height;
   BufferedImage img;
 
-  Image(File file) {
+  public Image(File file) {
     try {
       img = ImageIO.read(file);
       width = img.getWidth();
@@ -29,6 +38,30 @@ public class Image {
     this.img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
   }
 
+  public Image(BinaryFileReader inp, long offset, int length, String ext) {
+    long mark = inp.pos();
+    inp.seek(offset);
+    try {
+      Iterator<ImageReader> it = ImageIO.getImageReadersBySuffix(ext);
+      while(it.hasNext()) {
+        ImageReader reader = it.next();
+        reader.setInput(new FileImageInputStream(inp.inp));
+        try {
+          this.img = reader.read(0);
+          this.width = img.getWidth();
+          this.height = img.getHeight();
+          return;
+        }
+        catch(Exception e) {
+          Throwables.propagate(e);
+        }
+      }
+    }
+    finally {
+      inp.seek(mark);
+    }
+  }
+  
   public ByteBuffer getByteBuffer() {
     ByteBuffer byteBuf = ByteBuffer.allocateDirect(width*height*3);
     byteBuf.order(ByteOrder.nativeOrder());
@@ -43,16 +76,20 @@ public class Image {
     byteBuf.flip();
     return byteBuf;
   }
+  
+  public void setRGB(int x, int y, int rgb) {
+    img.setRGB(x, y, rgb);
+  }
 
-  int getWidth() {
+  public int getWidth() {
     return width;
   }
 
-  int getHeight() {
+  public int getHeight() {
     return height;
   }
   
-  BufferedImage getImage() {
+  public BufferedImage getImage() {
     return img;
   }
 

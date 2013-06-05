@@ -1,4 +1,4 @@
-package game.nwn;
+package game.nwn.readers;
 
 import java.io.Closeable;
 import java.io.File;

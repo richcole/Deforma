@@ -1,7 +1,7 @@
 package game.models;
 
 import game.Context;
-import game.Texture;
+import game.base.Texture;
 
 import java.io.File;
 

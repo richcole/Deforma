@@ -1,4 +1,4 @@
-package game.nwn;
+package game.nwn.readers;
 
 public enum MdlNodeType {
   
@@ -32,5 +32,9 @@ public enum MdlNodeType {
 
   public boolean hasMesh() {
     return (id & 0x21) == 0x21;
+  }
+
+  public boolean hasAnim() {
+    return (id & 0x80) == 0x80;
   }
 }

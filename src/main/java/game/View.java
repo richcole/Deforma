@@ -40,6 +40,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 
 public class View {
 
@@ -141,6 +142,7 @@ public class View {
   }
 
   public void orthoView() {
+    GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, getWidth(), getHeight(), 0, 1, -1);

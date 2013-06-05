@@ -1,4 +1,4 @@
-package game.nwn;
+package game.nwn.readers;
 
 public enum ModelType {
   

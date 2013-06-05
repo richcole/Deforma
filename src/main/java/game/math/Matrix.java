@@ -8,6 +8,7 @@ public class Matrix {
   public static final Matrix IDENTITY = Matrix.id();
   public static final Matrix BASIS    = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.ZERO);
   public static final Matrix ONES     = Matrix.ones();
+  public static final Matrix ZERO     = IDENTITY.minus(IDENTITY);
   
   public Matrix times(Matrix m) {
     Matrix r = new Matrix();
@@ -22,6 +23,25 @@ public class Matrix {
     return r;
   }
   
+  public Matrix(double ... v) {
+    if ( v.length == 0 ) {
+      this.v =  new double[16];
+    } else {
+      this.v = v;
+    }
+  }
+  
+  Matrix(float q1) {
+    
+  }
+
+  public Matrix(Matrix o) {
+    v = new double[16];
+    for(int i=0;i<16;++i) {
+      v[i] = o.v[i];
+    }
+  }
+
   public static Matrix ones() {
     Matrix r = new Matrix();
     for(int i=0;i<16;++i) {
@@ -133,6 +153,14 @@ public class Matrix {
     return r;
   }
   
+  public static Matrix translate(Vector x) {
+    Matrix tr = new Matrix(Matrix.IDENTITY);
+    for(int i=0;i<3;++i) {
+      tr.v[i*4 + 3] = x.v[i];
+    }
+    return tr;
+  }
+  
   public String toString() {
     StringBuffer b = new StringBuffer();
     b.append("[ ");
@@ -185,4 +213,5 @@ public class Matrix {
   public void set(int i, int j, double value) {
     v[i*4+j] = value;
   }
+
 }

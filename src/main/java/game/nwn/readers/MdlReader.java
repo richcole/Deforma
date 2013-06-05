@@ -1,147 +1,36 @@
-package game.nwn;
+package game.nwn.readers;
 
+import game.math.Quaternion;
 import game.math.Vector;
 
 import java.io.Closeable;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 // note that this model reader is not correct I couldn't find an accurate description
 // of the NWN model format
 public class MdlReader implements Closeable {
+  
+  private static Logger logger = Logger.getLogger(MdlReader.class);
 
   Resource resource;
   Header header;
   BinaryFileReader inp;
-  Map<Long, ModelNodeHeader> modelNodeHeaders = Maps.newHashMap();
+  Map<Long, MdlNodeHeader> modelNodeHeaders = Maps.newHashMap();
   Map<Long, MdlGeometryHeader> geometryHeaders = Maps.newHashMap();
   Map<Long, MdlModel> mdlModels = Maps.newHashMap();
+  KeyReader keyReader;
 
-  MdlReader(Resource resource) {
+  MdlReader(KeyReader keyReader, Resource resource) {
+    this.keyReader = keyReader;
     this.resource = resource;
     this.inp = resource.reader.inp;
     this.header = readHeader();
-  }
-  
-  static public class ArrayRef {
-    long offset;
-    int count;
-    long alloc;
-  }
-  
-  static public class MdlReferenceNode {
-    String refModel;
-    long reattachable;
-  }
-  
-  static public class Face {
-    Vector planeNormal;
-    float planeDistance;
-    long surface;
-    int[] adjFace;
-    Object vertex;
-  }
-  
-  static public class MdlAnimationEvent {
-    float after;
-    String name;
-  }
-  
-  static public class MdlAnimation {
-    MdlGeometryHeader geometryHeader;
-    float length;
-    float transTime;
-    String animRoot;
-    MdlAnimationEvent[] events;
-  }
-  
-  static public class MdlMeshHeader {
-    long[]       meshRoutines;      
-    Face[]       faces;
-    Vector       bMin;
-    Vector       bMax;
-    float        radius;
-    Vector       bAverage;
-    Vector       diffuse;
-    Vector       ambient;
-    Vector       specular;
-    float        shininess;
-    long         shadow;
-    long         beaming;
-    long         render;
-    long         transparencyHint;
-    long         unknown5;
-    String[]     textures;
-    long         tileFade;
-    long[]       vertexIndices;
-    long[]       leftOverFaces;
-    long         vertexIndicesCount;
-    long[]       rawVertexIndices;
-    long         something3Offset;
-    long         something3Count;
-    int          triangleMode;
-    // pad 3 + 4
-    Vector[]     vertices;
-    long         vertexCount;
-    long         textureCount;
-  }
-  
-  static public class ModelNodeHeader {
-    long[] nodeRoutines;
-    long inheritColor;
-    long partNumber;
-    String name;
-    MdlGeometryHeader geomemtryHeader;
-    ModelNodeHeader parentNode;
-    ModelNodeHeader[] children;
-    MdlControllerKey[] controllerKey;
-    float[] controllerData;
-    long flags;
-    MdlNodeType nodeType;
-    MdlMeshHeader meshHeader;
-    MdlReferenceNode referenceNode;
-  }
-  
-  static public class MdlGeometryHeader {
-    long[] aulGeomRoutines;
-    String name;
-    ModelNodeHeader geometry;
-    Long nodeCount;
-    long[] rtArray1;
-    long[] rtArray2;
-    long  u2;
-    long geomType;
-  }
-  
-  static public class MdlModel {
-    MdlGeometryHeader geometryHeader;
-    int       aucFlags; 
-    long      classification;
-    int       fog;
-    long      refCount;
-    MdlAnimation[] animations;
-    MdlModel  superModel;
-    long[]    bb;
-    float     radius;
-    float     animScale;
-    String    superModelName;
-  }
-  
-  static public class Header {
-    long      zero;
-    long      dataOffset;
-    long      dataSize;
-    MdlModel  model;
-  }
-  
-  public static class MdlControllerKey {
-    long type;
-    int  rows;
-    int  keyOffset;
-    int  dataOffset;
-    int  columns;
-    int  pad;
+    this.header.setModel(readMdlModel());
   }
   
   public MdlAnimationEvent readMdlAnimationEvent() {
@@ -153,10 +42,12 @@ public class MdlReader implements Closeable {
   
   public MdlAnimation readMdlAnimation() {
     MdlAnimation r = new MdlAnimation();
+    r.geometryHeader = readMdlGeometryHeader();
     r.length = inp.readFloat();
     r.transTime = inp.readFloat();
-    r.animRoot = inp.readString(64);
+    r.animRoot = inp.readNullString(64);
     r.events  = readMdlAnimationEventList();
+    logger.info("animRoot " + r.animRoot);
     return r;
   }
 
@@ -165,7 +56,7 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     MdlAnimationEvent[] r = new MdlAnimationEvent[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*36);
+      seekOffset(arrayRef.offset + i*MdlAnimationEvent.SIZE);
       r[i] = readMdlAnimationEvent();
     }
     inp.seek(mark);
@@ -177,7 +68,7 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     MdlAnimation[] r = new MdlAnimation[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*4);
+      seekOffset(arrayRef.offset + i*inp.WORD_SIZE);
       seekOffset(inp.readWord());
       r[i] = readMdlAnimation();
     }
@@ -198,7 +89,7 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     MdlControllerKey[] r = new MdlControllerKey[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*16);
+      seekOffset(arrayRef.offset + i*MdlControllerKey.SIZE);
       r[i] = readControllerKey();
     }
     inp.seek(mark);
@@ -211,8 +102,8 @@ public class MdlReader implements Closeable {
     r.rows = inp.readShort();
     r.keyOffset = inp.readShort();
     r.dataOffset = inp.readShort();
-    r.columns = inp.readByte();
-    r.pad = inp.readByte();
+    r.columns = (int) inp.readByte();
+    r.pad = (int) inp.readByte();
     return r;
   }
   
@@ -228,20 +119,35 @@ public class MdlReader implements Closeable {
     return r;
   }
   
-  Face[] readFaceList() {
+  Vector[] readVectorList() {
     ArrayRef arrayRef = readArrayRef();
     long mark = inp.pos();
-    Face[] r = new Face[(int)arrayRef.count];
+    Vector[] r = new Vector[(int)arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*4);
+      seekOffset(arrayRef.offset + i*12);
+      float x = inp.readFloat();
+      float y = inp.readFloat();
+      float z = inp.readFloat();
+      r[i] = new Vector(x, y, z, 1.0);
+    }
+    inp.seek(mark);
+    return r;
+  }
+  
+  MdlFace[] readFaceList() {
+    ArrayRef arrayRef = readArrayRef();
+    long mark = inp.pos();
+    MdlFace[] r = new MdlFace[(int)arrayRef.count];
+    for(int i=0;i<arrayRef.count;++i) {
+      seekOffset(arrayRef.offset + i*MdlFace.SIZE);
       r[i] = readFace();
     }
     inp.seek(mark);
     return r;
   }
   
-  Face readFace() {
-    Face r = new Face();
+  MdlFace readFace() {
+    MdlFace r = new MdlFace();
     r.planeNormal = readVector();
     r.planeDistance = inp.readFloat();
     r.surface = inp.readWord();
@@ -257,6 +163,12 @@ public class MdlReader implements Closeable {
     return new Vector(x, y, z, 1.0);
   }
   
+  Vector read2Vector() {
+    float x = inp.readFloat();
+    float y = inp.readFloat();
+    return new Vector(x, y, 0.0, 1.0);
+  }
+
   Vector[] readVectors(int len) {
     Vector r[] = new Vector[len];
     for(int i=0;i<len;++i) {
@@ -270,9 +182,9 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     Vector[] r = new Vector[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*4);
+      seekOffset(arrayRef.offset + i*inp.VECTOR_SIZE);
       long p = inp.readWord();
-      if ( p != 0xFFFFFFFF) {
+      if ( p != 0xFFFFFFFFL) {
         seekOffset(p);
         r[i] = readVector();
       }
@@ -285,7 +197,7 @@ public class MdlReader implements Closeable {
     Vector[] r = new Vector[len];
     for(int i=0;i<len;++i) {
       long p = inp.readWord();
-      if ( p != 0xFFFFFFFF) {
+      if ( p != 0xFFFFFFFFL) {
         long mark = seekOffset(p);
         r[i] = readVector();
         inp.seek(mark);
@@ -336,12 +248,12 @@ public class MdlReader implements Closeable {
     return r;
   }
 
-  ModelNodeHeader[] readModelNodeHeaderList() {
+  MdlNodeHeader[] readIndirectModelNodeHeaderList() {
     ArrayRef arrayRef = readArrayRef();
     long mark = inp.pos();
-    ModelNodeHeader[] r = new ModelNodeHeader[arrayRef.count];
+    MdlNodeHeader[] r = new MdlNodeHeader[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*4);
+      seekOffset(arrayRef.offset + i*inp.WORD_SIZE);
       r[i] = readModelNodeHeader(inp.readWord());
     }
     inp.seek(mark);
@@ -395,7 +307,6 @@ public class MdlReader implements Closeable {
     }
     r.dataOffset = inp.readWord();
     r.dataSize = inp.readWord();
-    r.model = readMdlModel();
     return r;
   }
   
@@ -409,43 +320,85 @@ public class MdlReader implements Closeable {
     return mark;
   }
   
-  public ModelNodeHeader readModelNodeHeader(Long offset) {
+  public MdlNodeHeader readModelNodeHeader(Long offset) {
     if ( offset == 0 ) {
       return null;
     }
-    ModelNodeHeader r = modelNodeHeaders.get(offset);
+    MdlNodeHeader r = modelNodeHeaders.get(offset);
     if ( r == null ) {
       long mark = seekOffset(offset);
       modelNodeHeaders.put(offset, r);
-      r = readModelNodeHeader();
+      r = readMdlNodeHeader();
       inp.seek(mark);
     }
     return r;
   }
 
-  private ModelNodeHeader readModelNodeHeader() {
-    ModelNodeHeader r;
-    r = new ModelNodeHeader();
+  private MdlNodeHeader readMdlNodeHeader() {
+    MdlNodeHeader r;
+    r = new MdlNodeHeader();
     r.nodeRoutines = inp.readWords(6);
     r.inheritColor = inp.readWord();
     r.partNumber = inp.readWord();
     r.name = inp.readNullString(32);
     r.geomemtryHeader = readGeomHeader(inp.readWord());
     r.parentNode = readModelNodeHeader(inp.readWord());
-    r.children = readModelNodeHeaderList();
+    r.setChildren(readIndirectModelNodeHeaderList());
     r.controllerKey = readControllerKeyList();
     r.controllerData = readFloatList();
     r.flags = inp.readWord();
     r.nodeType = MdlNodeType.getMdlNodeType(r.flags);
+    
+    for(MdlControllerKey key: r.controllerKey) {
+      if ( key.type == MdlControllerKey.KEY_POSITION ) {
+        r.position = getControllerData3Vector(key.dataOffset, r.controllerData);
+      }
+      if ( key.type == MdlControllerKey.KEY_ORIENTATION) {
+        r.orientation = getControllerQuaternion(key.dataOffset, r.controllerData);
+      }
+      if ( key.type == MdlControllerKey.KEY_SCALE ) {
+        r.scale = r.controllerData[key.dataOffset];
+      }
+    }
     if ( r.nodeType.hasMesh() ) {
       r.meshHeader = readMdlMeshHeader();
     }
     if ( r.nodeType == MdlNodeType.Ref ) {
       r.referenceNode = readMdlReferenceNode();
     }
+    if ( r.nodeType.hasAnim() ) {
+      r.animMeshNode = readMdlAnimMeshNode();
+    }
     return r;
   }
   
+  private MdlAnimMeshNode readMdlAnimMeshNode() {
+    MdlAnimMeshNode r = new MdlAnimMeshNode();
+    r.samplePeriod = inp.readFloat();
+    r.animVerts = readVectorList();
+    r.animTVerts = readVectorList();
+    r.animNormals = readVectorList();
+    long vertexSets = inp.readWord();
+    long textureSets = inp.readWord();
+    r.vertexSetCount = inp.readWord();
+    r.textureSetCount = inp.readWord();
+    r.vertexSets = readVectorListAt(vertexSets, header.dataOffset, (int) r.vertexSetCount);
+    r.textureSets = readVectorListAt(textureSets, header.dataOffset, (int) r.textureSetCount);
+    return r;
+  }
+
+  private Vector getControllerData3Vector(int i, float[] data) {
+    return new Vector(data[i], data[i+1], data[i+2], 1.0);
+  }
+
+  private Vector getControllerData4Vector(int i, float[] data) {
+    return new Vector(data[i], data[i+1], data[i+2], data[i+3]);
+  }
+
+  private Quaternion getControllerQuaternion(int i, float[] data) {
+    return new Quaternion(data[i], data[i+1], data[i+2], data[i+3]);
+  }
+
   private MdlReferenceNode readMdlReferenceNode() {
     MdlReferenceNode r = new MdlReferenceNode();
     r.refModel = inp.readNullString(64);
@@ -478,20 +431,82 @@ public class MdlReader implements Closeable {
     r.rawVertexIndices = readIndirectShortList();
     r.something3Offset = inp.readWord();
     r.something3Count = inp.readWord();
-    r.triangleMode = inp.readByte();
-    inp.readBytes(7);
+    r.triangleMode = (int) inp.readByte();
+    inp.readBytes(3);
+    long pad = inp.readWord();
     long vertPointer = inp.readWord();
     r.vertexCount = inp.readShort();
-    r.vertices = readVectorListAt(vertPointer, (int) r.vertexCount);
+    r.vertices = readVectorListAt(vertPointer, header.dataOffset, (int) r.vertexCount);
     r.textureCount = inp.readShort();
+    r.tverts = new Vector[4][];
+    for(int i=0;i<4;++i) {
+      r.tverts[i] = read2VectorListAt(inp.readWord(), header.dataOffset, (int) r.vertexCount);
+    }
+    r.normals = readVectorListAt(inp.readWord(), header.dataOffset, (int) r.vertexCount);
+    long[] colors = readWordListAt(inp.readWord(), header.dataOffset, (int) r.vertexCount);
+    r.colors = new Vector[(int)r.vertexCount];
+    for(int i=0;i<r.vertexCount;++i) {
+      r.colors[i] = new Vector(((colors[i] >> 0) & 0xff) / 255.0, ((colors[i] >> 8) & 0xff) / 255.0, ((colors[i] >> 16) & 0xff) / 255.0, 1.0f);
+    }
+    r.bumpMaps = new Vector[5][];
+    for(int i=0;i<5;++i) {
+      r.bumpMaps[i] = readVectorListAt(inp.readWord(), header.dataOffset, (int) r.vertexCount);
+    }
+    r.floatMap = readFloatListAt(inp.readWord(), header.dataOffset, (int) r.vertexCount);
+    r.lightMapped = inp.readByte();
+    r.rotateTexture = (int) inp.readByte();
+    long pad2 = inp.readShort();
+    r.faceNormalSumDiv2 = inp.readFloat();
     return r;
   }
   
-  public Vector[] readVectorListAt(long offset, int len) {
+  public Vector[] readVectorListAt(long offset, long dataOffset, int len) {
     Vector[] r = new Vector[len];
-    long mark = seekOffset(offset);
+    if ( offset == 0xFFFFFFFFL ) {
+      return r;
+    }
+    long mark = seekOffset(offset + dataOffset);
     for(int i=0;i<len;++i) {
       r[i] = readVector();
+    }
+    inp.seek(mark);
+    return r;
+  }
+
+  public long[] readWordListAt(long offset, long dataOffset, int len) {
+    long[] r = new long[len];
+    if ( offset == 0xFFFFFFFFL ) {
+      return r;
+    }
+    long mark = seekOffset(offset + dataOffset);
+    for(int i=0;i<len;++i) {
+      r[i] = inp.readWord();
+    }
+    inp.seek(mark);
+    return r;
+  }
+
+  public float[] readFloatListAt(long offset, long dataOffset, int len) {
+    float[] r = new float[len];
+    if ( offset == 0xFFFFFFFFL ) {
+      return r;
+    }
+    long mark = seekOffset(offset + dataOffset);
+    for(int i=0;i<len;++i) {
+      r[i] = inp.readFloat();
+    }
+    inp.seek(mark);
+    return r;
+  }
+
+  public Vector[] read2VectorListAt(long offset, long dataOffset, int len) {
+    Vector[] r = new Vector[len];
+    if ( offset == 0xFFFFFFFFL ) {
+      return r;
+    }
+    long mark = seekOffset(offset + dataOffset);
+    for(int i=0;i<len;++i) {
+      r[i] = read2Vector();
     }
     inp.seek(mark);
     return r;
@@ -515,7 +530,7 @@ public class MdlReader implements Closeable {
     MdlGeometryHeader r = new MdlGeometryHeader();
     r.aulGeomRoutines = inp.readWords(2);
     r.name   = inp.readNullString(64);
-    r.geometry = readModelNodeHeader(inp.readWord());
+    r.setGeometry(readModelNodeHeader(inp.readWord()));
     r.nodeCount = inp.readWord();
     r.rtArray1  = readWordList();
     r.rtArray2  = readWordList();
@@ -526,10 +541,10 @@ public class MdlReader implements Closeable {
   
   public MdlModel readMdlModel() {
     MdlModel r = new MdlModel();
-    r.geometryHeader = readMdlGeometryHeader();
+    r.setGeometryHeader(readMdlGeometryHeader());
     r.aucFlags = inp.readShort();
     r.classification = inp.readByte();
-    r.fog = inp.readByte();
+    r.fog = (int) inp.readByte();
     r.refCount = inp.readWord();
     r.animations = readIndirectMdlAnimationList();
     r.superModel = readMdlModel(inp.readWord());
@@ -563,6 +578,10 @@ public class MdlReader implements Closeable {
 
   public void close() {
     inp.close();
+  }
+
+  public Header getHeader() {
+    return header;
   }
   
 }
