@@ -10,13 +10,14 @@ import org.lwjgl.util.glu.GLU;
 
 public class Player implements SimObject {
   
-  static int LEFT     = 0;
-  static int UP       = 2;
-  static int FORWARD  = 1;
+  static Vector LEFT     = Vector.LEFT;
+  static Vector UP       = Vector.UP;
+  static Vector NORMAL   = Vector.NORMAL;
 
-  Vector p;
-  Matrix b; // basic
-  Matrix c; // transformed co-orindates
+  Vector pos;
+  Vector left;
+  Vector up;
+  Vector normal;
 
   double theta1, theta2;
   
@@ -31,61 +32,60 @@ public class Player implements SimObject {
   
   public Player(Context context) {
     this.context = context;
-    this.p = Vector.ZERO;
+    this.pos = Vector.ZERO;
     this.theta1 = 0;
     this.theta2 = 0;
-    
-    this.b = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.ZERO);
-    this.c = b;
-
-    context.getSimulator().register(this);
   }
 
   Vector left() {
-    return c.row(LEFT);
+    return left;
   }
   
   Vector up() {
-    return c.row(UP);
+    return up;
   }
 
   Vector forward() {
-    return c.row(FORWARD);
+    return normal;
   }
 
   public synchronized void render() {
     theta1 = context.getInputDevice().getX() * 6.283f / 5000.0f;
     theta2 = context.getInputDevice().getY() * 6.283f / 5000.0f;
 
-    c = b.times(Matrix.rot(theta1, b.row(UP)));
-    Vector left = c.row(LEFT);
-    c = c.times(Matrix.rot(theta2, left));
-
-    Vector a = p.plus(forward());
-    Vector up = up();
-    GLU.gluLookAt((float)p.x(), (float)p.y(), (float)p.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)up.x(), (float)up.y(), (float)up.z());
+    Matrix rotUp = Matrix.rot(-theta1, UP);
+    left = rotUp.times(LEFT);
+    normal = rotUp.times(NORMAL);
+    
+    Matrix rotLeft = Matrix.rot(-theta2, left);
+    normal = rotLeft.times(normal);
+    up = rotLeft.times(UP);
+    
+    Vector a = pos.plus(forward());
+    Vector u = up();
+    GLU.gluLookAt((float)pos.x(), (float)pos.y(), (float)pos.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)u.x(), (float)u.y(), (float)u.z());
   }
 
   @Override
   public void tick() {
     float velocity = 2;
     if ( movingForward ) {
-      p = p.plus(forward().scaleTo(velocity));
+      pos = pos.plus(forward().scaleTo(velocity));
     }
     if ( movingBackward ) {
-      p = p.plus(forward().scaleTo(-velocity));
+      pos = pos.plus(forward().scaleTo(-velocity));
     }
     if ( movingLeft ) {
-      p = p.plus(left().scaleTo(velocity));
+      pos = pos.plus(left().scaleTo(velocity));
     }
     if ( movingRight ) {
-      p = p.plus(left().scaleTo(-velocity));
+      pos = pos.plus(left().scaleTo(-velocity));
     }
     if ( movingUpward ) {
-      p = p.plus(up().scaleTo(velocity));
+      pos = pos.plus(up().scaleTo(velocity));
     }
     if ( movingDownward ) {
-      p = p.plus(up().scaleTo(-velocity));
+      pos = pos.plus(up().scaleTo(-velocity));
     }
   }
 
@@ -114,22 +114,22 @@ public class Player implements SimObject {
   }
 
   public void fire() {
-    LittleCube littleCube = new LittleCube(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    LittleCube littleCube = new LittleCube(context, forward().scaleTo(20), pos.plus(forward().scaleTo(10)));
     littleCube.register();
   }
 
   public void fireLight() {
-    LittleLight littleLight = new LittleLight(context, forward().scaleTo(20), p.plus(forward().scaleTo(10)));
+    LittleLight littleLight = new LittleLight(context, forward().scaleTo(20), pos.plus(forward().scaleTo(10)));
     littleLight.register();
   }
 
   @Override
-  public Vector pos() {
-    return p;
+  public Vector getPos() {
+    return pos;
   }
 
   @Override
-  public double mass() {
+  public double getMass() {
     return 100;
   }
   

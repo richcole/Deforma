@@ -7,23 +7,21 @@ import org.apache.log4j.Logger;
 
 public class PhysicalObject implements SimObject {
   
-  private static Logger logger = Logger.getLogger(PhysicalObject.class);
+  protected Context context;
+  protected Vector velocity;
+  protected Vector pos;
+  protected double mass;
   
-  Context context;
-  Vector velocity;
-  Vector position;
-  Vector size;
-  
-  protected PhysicalObject(Context context, Vector velocity, Vector position, Vector size) {
+  protected PhysicalObject(Context context, Vector velocity, Vector pos, double mass) {
     this.context = context;
     this.velocity = new Vector(velocity);
-    this.position = position;
-    this.size = size;
+    this.pos = pos;
+    this.mass = mass;
   }
 
   @Override
   public void tick() {
-    velocity = velocity.plus(pos().minus().times(0.0001));
+    velocity = velocity.plus(getPos().minus().times(0.0001));
     for(SimObject o: context.getSimulator().getSimObjects()) {
       velocity = velocity.plus(collisionForce(o));
     }
@@ -35,8 +33,8 @@ public class PhysicalObject implements SimObject {
   
   public Vector collisionForce(SimObject o) {
     if ( o != this ) {
-      double r  = o.mass();
-      Vector v  = pos().minus(o.pos());
+      double r  = o.getMass();
+      Vector v  = getPos().minus(o.getPos());
       double vls = v.lengthSquared(); 
       if ( vls < 1 ) {
         vls = 1;
@@ -49,17 +47,17 @@ public class PhysicalObject implements SimObject {
   }
   
   public void move(Vector velocity) {
-    position = position.plus(velocity);
+    pos = pos.plus(velocity);
   }
 
   @Override
-  public Vector pos() {
-    return position;
+  public Vector getPos() {
+    return pos;
   }
   
   @Override
-  public double mass() {
-    return size.x()*size.y();
+  public double getMass() {
+    return mass;
   }
   
   public void register() {

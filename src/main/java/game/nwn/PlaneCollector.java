@@ -62,8 +62,8 @@ public class PlaneCollector implements Visitor {
       Texture[] textures = new Texture[4];
       for(int i=0;i<4;++i) {
         String textureName = meshHeader.getTextures()[i]; 
-        if ( textureName.length() > 0 ) {
-          textures[i] = context.getTextures().getTexture(textureName, new TextureProvider(context, textureName));
+        if ( textureName.length() > 0 && ! textureName.equals("NULL") ) {
+          textures[i] = context.getTextures().getTexture(textureName, new NwnTextureProvider(context, textureName));
           if ( i > 0 ) {
             int a = 1;
           }

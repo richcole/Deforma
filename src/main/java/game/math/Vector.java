@@ -9,11 +9,20 @@ public class Vector {
 
   double v[] = new double[4];
   
-  public static final Vector U1   = new Vector(1, 0, 0, 1);
-  public static final Vector U2   = new Vector(0, 1, 0, 1);
-  public static final Vector U3   = new Vector(0, 0, 1, 1);
-  public static final Vector ZERO = new Vector(0, 0, 0, 1);
-  public static final Vector ONES = new Vector(1, 1, 1, 1);
+  public static final Vector LEFT   = new Vector(-1,  0,  0, 1);
+  public static final Vector UP     = new Vector(0,  0,  1, 1);
+  public static final Vector NORMAL = new Vector(0,  1,  0, 1);
+  public static final Vector U1     = new Vector(1,  0,  0, 1);
+  public static final Vector U2     = new Vector(0,  1,  0, 1);
+  public static final Vector U3     = new Vector(0,  0,  1, 1);
+  public static final Vector ZERO   = new Vector(0,  0,  0, 1);
+  public static final Vector ONES   = new Vector(1,  1,  1, 1);
+  
+  static {
+    if ( ! LEFT.cross(UP).equals(NORMAL) ) {
+      throw new RuntimeException("Not right handed " + LEFT.cross(UP) + " " + NORMAL);
+    }
+  }
   
   public Vector(double x1, double x2, double x3, double x4) {
     v[0] = x1;

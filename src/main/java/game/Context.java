@@ -1,23 +1,20 @@
 package game;
 
+import game.base.Texture;
+import game.base.Textures;
+import game.models.BigCube;
+import game.models.Light;
+import game.models.Rat;
+import game.models.SkyBox;
+import game.nwn.readers.KeyReader;
+
 import java.io.File;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import game.base.Textures;
-import game.math.Vector;
-import game.models.BigCube;
-import game.models.Light;
-import game.models.Rat;
-import game.models.Rotation;
-import game.models.SkyBox;
-import game.models.StoneTexture;
-import game.nwn.readers.KeyReader;
-
 public class Context {
 
-  StoneTexture stoneText;
   View view;
   Scene scene;
   InputDevice inputDevice;
@@ -25,7 +22,7 @@ public class Context {
   BigCube bigCube;
   LogPanel  logPanel;
   Main      main;
-  StoneTexture stoneTexture;
+  Texture stoneTexture;
   Player player;
   SkyBox skyBox;
   Light light;
@@ -42,13 +39,6 @@ public class Context {
   public Context() {
   }
   
-  public StoneTexture getStoneText() {
-    if ( stoneText == null ) {
-      stoneText = new StoneTexture(this);
-    }
-    return stoneText;    
-  }
-
   public Scene getScene() {
     if ( scene == null ) {
       scene = new Scene(this);
@@ -91,9 +81,9 @@ public class Context {
     return main;
   }
 
-  public StoneTexture getStoneTexture() {
+  public Texture getStoneTexture() {
     if ( stoneTexture == null ) {
-      stoneTexture = new StoneTexture(this);
+      stoneTexture = getTextures().getFileTexture("res/image.jpg");
     }
     return stoneTexture;
   }
@@ -107,7 +97,7 @@ public class Context {
 
   public Rat getRat() {
     if ( rat == null ) {
-      rat = new Rat(this, 50);
+      rat = new Rat(this, "c_troll", 50);
     }
     return rat;
   }

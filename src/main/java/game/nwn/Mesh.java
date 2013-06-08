@@ -1,17 +1,15 @@
 package game.nwn;
 
+import game.Context;
 import game.base.Face;
 import game.nwn.readers.Header;
-import game.nwn.readers.KeyReader;
 import game.nwn.readers.MdlAnimation;
 import game.nwn.readers.MdlGeometryHeader;
 import game.nwn.readers.MdlNodeHeader;
-import game.Context;
 
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class Mesh {

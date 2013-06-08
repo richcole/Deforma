@@ -68,6 +68,7 @@ public class Matrix {
     r.v[6] = -v.v[0];
     r.v[8] = -v.v[1];
     r.v[9] = v.v[0];
+    r.v[15] = 1.0;
     return r;
   }
   

@@ -1,5 +1,6 @@
 package game.base;
 
+import game.models.FileTextureProvider;
 import game.nwn.TextureProvider;
 
 import java.util.Map;
@@ -19,4 +20,7 @@ public class Textures {
     return texture;
   }
   
+  public Texture getFileTexture(String name) {
+    return getTexture(name, new FileTextureProvider(name));
+  }
 }

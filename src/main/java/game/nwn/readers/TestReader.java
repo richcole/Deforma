@@ -2,16 +2,11 @@ package game.nwn.readers;
 
 import game.Context;
 import game.nwn.Mesh;
-import game.nwn.readers.BifReader.EntryHeader;
 
 import java.io.File;
-import java.util.Map;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class TestReader {
 
@@ -39,7 +34,7 @@ public class TestReader {
     printlnJson(mesh);
   }
   
-  private void writeEntry(Resource resource, File out) {
+  public void writeEntry(Resource resource, File out) {
     byte[] bytes = resource.reader.inp.readBytes(resource.offset, resource.length);
     try {
       Files.write(bytes, out);

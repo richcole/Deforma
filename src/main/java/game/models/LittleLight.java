@@ -6,7 +6,7 @@ import game.math.Vector;
 
 public class LittleLight extends PhysicalObject {
   
-  private static final Vector SIZE = new Vector(1, 1, 1, 1);
+  private static final double SIZE = 1;
   
   Light light;
   Cube  cube;
@@ -14,13 +14,11 @@ public class LittleLight extends PhysicalObject {
   public LittleLight(Context context, Vector velocity, Vector position) {
     super(context, velocity, position, SIZE);
     light = new Light(context, position, context.getNextLightNumber());
-    cube = new Cube(context, position, SIZE);
+    cube = new Cube(context, position, Vector.U1.scaleTo(SIZE), Vector.U2.scaleTo(SIZE), Vector.U3.scaleTo(SIZE));
   }
 
   @Override
   public void move(Vector velocity) {
     super.move(velocity);
-    light.move(velocity);
-    cube.move(velocity);
   }
 }

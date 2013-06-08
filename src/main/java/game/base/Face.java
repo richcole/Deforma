@@ -1,7 +1,5 @@
 package game.base;
 
-import java.util.List;
-
 import game.math.Vector;
 
 public class Face {

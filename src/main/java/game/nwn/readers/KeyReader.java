@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -38,7 +37,7 @@ public class KeyReader {
     keyIndex = Multimaps.newListMultimap(Maps.<String, Collection<Resource>>newHashMap(), new ListSupplier<Resource>());
     for(int i=0;i<header.numKeys;++i) {
       KeyReader.KeyEntry entry = readKeyEntry(i);
-      if ( entry.name.contains("c_wererat") ) {
+      if ( entry.name.startsWith("c_") && ResourceType.getType(entry.type) == ResourceType.MDL ) {
         logger.info("model " + entry.name + " type " + ResourceType.getType(entry.type));
       }
       keyIndex.put(entry.name, createResource(entry));

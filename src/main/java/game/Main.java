@@ -41,8 +41,12 @@ public class Main {
       int lastTick = 0;
       context.getBigCube();
       context.getSkyBox();
+      context.getScene().register(context.getBigCube());
+      context.getScene().register(context.getSkyBox());
+      context.getScene().register(context.getRat());
       context.getScene().register(context.getRat());
       context.getSimulator().register(context.getRat());
+      context.getSimulator().register(context.getPlayer());
       while (! context.getInputDevice().getQuit()) {
         long before = System.currentTimeMillis();
         if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {

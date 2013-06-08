@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 // note that this model reader is not correct I couldn't find an accurate description
@@ -47,7 +46,6 @@ public class MdlReader implements Closeable {
     r.transTime = inp.readFloat();
     r.animRoot = inp.readNullString(64);
     r.events  = readMdlAnimationEventList();
-    logger.info("anim name " + r.geometryHeader.name + " " + r.length + " " + r.transTime);
     return r;
   }
 
@@ -401,15 +399,6 @@ public class MdlReader implements Closeable {
     return r;
   }
 
-  private Vector[] getControllerData4Vector(int offset, float[] data, int columns, int rows) {
-    Vector[] r = new Vector[rows];
-    for(int i=0;i<rows; ++i) {
-      int index = offset + (i*4);
-      r[i] = new Vector(data[index + 0], data[index+1], data[index+2], data[index+3]);
-    }
-    return r;
-  }
-
   private Quaternion[] getControllerQuaternion(int offset, float[] data, int columns, int rows) {
     if ( columns != 4 ) {
       throw new RuntimeException("Expected 4 columns");
@@ -605,13 +594,6 @@ public class MdlReader implements Closeable {
     return r;
   }
   
-  private void assertPos(long offset) {
-    long currentOffset = inp.pos() - resource.offset;
-    if ( currentOffset != offset ) {
-      throw new RuntimeException("Expected offset " + offset + " but found " + currentOffset);
-    }
-  }
-
   public void close() {
     inp.close();
   }

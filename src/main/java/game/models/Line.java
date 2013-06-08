@@ -1,9 +1,9 @@
 package game.models;
 
-import org.lwjgl.opengl.GL11;
-
 import game.Renderable;
 import game.math.Vector;
+
+import org.lwjgl.opengl.GL11;
 
 public class Line implements Renderable {
   

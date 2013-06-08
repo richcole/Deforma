@@ -1,9 +1,6 @@
 package game.imageio;
 
-import java.nio.ByteBuffer;
-
 import game.base.Image;
-import game.nwn.readers.BifReader;
 import game.nwn.readers.BinaryFileReader;
 
 public class TgaLoader {

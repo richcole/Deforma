@@ -1,7 +1,5 @@
 package game.nwn.readers;
 
-import java.util.List;
-
 import game.math.Vector;
 
 public class MdlMeshHeader {
