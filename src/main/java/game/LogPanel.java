@@ -13,6 +13,8 @@ import java.awt.Graphics2D;
 
 import javax.vecmath.Vector3d;
 
+import com.google.common.base.Joiner;
+
 public class LogPanel {
 
 
@@ -41,7 +43,11 @@ public class LogPanel {
   public void render() {
     text =  "p=" + context.getPlayer().p;
     text += String.format(" rate = %3.2e", 1000.0 / renderSpeed);  
-    text += String.format(" sleep = %3.2e", sleepTime);  
+    text += String.format(" sleep = %3.2e", sleepTime); 
+    text += String.format(" frame = %d", context.getRat().getFrameIndex());
+    for(Integer frameNumber: context.getRat().getNumberOfFrames()) {
+      text += String.format(" totalFrames = %s", frameNumber);
+    }
     renderFlat();
     renderGL();
   }

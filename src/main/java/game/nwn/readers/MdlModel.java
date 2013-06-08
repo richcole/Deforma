@@ -1,5 +1,7 @@
 package game.nwn.readers;
 
+import java.util.Map;
+
 public class MdlModel {
   private MdlGeometryHeader geometryHeader;
   int       aucFlags; 
@@ -13,6 +15,16 @@ public class MdlModel {
   float     animScale;
   String    superModelName;
   
+  Map<String, MdlAnimation> animMap;
+  
+  public Map<String, MdlAnimation> getAnimMap() {
+    return animMap;
+  }
+
+  public void setAnimMap(Map<String, MdlAnimation> animMap) {
+    this.animMap = animMap;
+  }
+
   public MdlGeometryHeader getGeometryHeader() {
     return geometryHeader;
   }

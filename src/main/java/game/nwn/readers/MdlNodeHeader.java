@@ -12,7 +12,7 @@ public class MdlNodeHeader {
   String name;
   MdlGeometryHeader geomemtryHeader;
   MdlNodeHeader parentNode;
-  private MdlNodeHeader[] children;
+  MdlNodeHeader[] children;
   MdlControllerKey[] controllerKey;
   float[] controllerData;
   long flags;
@@ -21,9 +21,11 @@ public class MdlNodeHeader {
   MdlReferenceNode referenceNode;
   MdlAnimMeshNode animMeshNode;
   
-  Vector position;
-  Quaternion orientation;
-  float scale;
+  Vector position[];
+  Quaternion orientation[];
+  float scale[];
+  public float[] positionTimings;
+  public float[] orientationTimings;
     
   public MdlNodeHeader[] getChildren() {
     return children;
@@ -129,16 +131,24 @@ public class MdlNodeHeader {
     this.referenceNode = referenceNode;
   }
 
-  public Quaternion getOrientation() {
+  public Quaternion[] getOrientation() {
     return this.orientation;
   }
 
-  public Vector getPosition() {
+  public Vector[] getPosition() {
     return this.position;
   }
 
-  public float getScale() {
+  public float[] getScale() {
     return this.scale;
+  }
+
+  public float[] getPositionTimings() {
+    return this.positionTimings;
+  }
+
+  public float[] getOrientationTimings() {
+    return this.orientationTimings;
   }
 
 }

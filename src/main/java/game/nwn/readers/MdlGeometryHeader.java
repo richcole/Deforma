@@ -17,4 +17,8 @@ public class MdlGeometryHeader {
   public void setGeometry(MdlNodeHeader geometry) {
     this.geometry = geometry;
   }
+
+  public String getName() {
+    return name;
+  }
 }

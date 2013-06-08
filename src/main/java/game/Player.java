@@ -11,8 +11,8 @@ import org.lwjgl.util.glu.GLU;
 public class Player implements SimObject {
   
   static int LEFT     = 0;
-  static int UP       = 1;
-  static int FORWARD  = 2;
+  static int UP       = 2;
+  static int FORWARD  = 1;
 
   Vector p;
   Matrix b; // basic

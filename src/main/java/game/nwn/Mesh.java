@@ -9,8 +9,10 @@ import game.nwn.readers.MdlNodeHeader;
 import game.Context;
 
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class Mesh {
   
@@ -18,8 +20,8 @@ public class Mesh {
   Header header;
     
   interface Visitor {
-    void preVisit(MdlNodeHeader node, MdlNodeHeader fromNode, MdlNodeHeader toNode, float alpha);
-    void postVisit(MdlNodeHeader node, MdlNodeHeader fromNode, MdlNodeHeader toNode, float alpha);
+    void preVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha);
+    void postVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha);
   }
 
   public Mesh(Context context, Header header, int x) {
@@ -27,26 +29,49 @@ public class Mesh {
     this.header = header;
   }
 
-  private void visit(MdlNodeHeader geometry, boolean fromMatched, String fromAnimRoot, MdlNodeHeader fromGeom, boolean toMatched, String toAnimRoot, MdlNodeHeader toGeom, float alpha, Visitor visitor) {
+  private void visit(MdlNodeHeader geometry, boolean fromMatched, String fromAnimRoot, MdlNodeHeader fromGeom, float alpha, Visitor visitor) {
     fromMatched = fromMatched || fromAnimRoot.equals(geometry.getName());
-    toMatched = toMatched || toAnimRoot.equals(geometry.getName());
-    visitor.preVisit(geometry, fromMatched ? fromGeom : null, toMatched ? toGeom : null, alpha);
+    visitor.preVisit(geometry, fromMatched ? fromGeom : null, alpha);
     MdlNodeHeader[] c1 = geometry.getChildren();
     MdlNodeHeader[] c2 = fromGeom.getChildren();
-    MdlNodeHeader[] c3 = toGeom.getChildren();
     for(int i=0;i<c1.length;++i) {
-      visit(c1[i], fromMatched, fromAnimRoot, fromMatched ? c2[i] : fromGeom, toMatched, toAnimRoot, toMatched ? c3[i] : toGeom, alpha, visitor);
+      visit(c1[i], fromMatched, fromAnimRoot, fromMatched ? c2[i] : fromGeom, alpha, visitor);
     }
-    visitor.postVisit(geometry, fromMatched ? fromGeom : null, toMatched ? toGeom : null, alpha);
+    visitor.postVisit(geometry, fromMatched ? fromGeom : null, alpha);
   }
 
-  public List<Face> getFaces(int fromAnimIndex, int toAnimIndex, float alpha) {
-    MdlAnimation[] animations = header.getModel().getAnimations();
-    MdlAnimation fromAnim = animations[fromAnimIndex % animations.length];
-    MdlAnimation toAnim = animations[toAnimIndex % animations.length];
+  public List<Face> getFaces(String name, float alpha) {
+    MdlAnimation anim = header.getModel().getAnimMap().get(name);
+    alpha = alpha * anim.getLength();
     PlaneCollector planeCollector = new PlaneCollector(context);
-    visit(header.getModel().getGeometryHeader().getGeometry(), false, fromAnim.getAnimRoot(), fromAnim.getGeometryHeader().getGeometry(), false, toAnim.getAnimRoot(), toAnim.getGeometryHeader().getGeometry(), alpha, planeCollector);
+    visit(header.getModel().getGeometryHeader().getGeometry(), false, anim.getAnimRoot(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
     return planeCollector.getFaces();
   }
+  
+  public Set<Integer> getNumberOfFrames(String name) {
+    MdlAnimation anim = header.getModel().getAnimMap().get(name);
+    Set<Integer> numberOfFrames = Sets.newHashSet();
+    getNumberOfFrames(anim.getGeometryHeader(), numberOfFrames);
+    return numberOfFrames;
+  }
 
+  private void getNumberOfFrames(MdlGeometryHeader header, Set<Integer> frames) {
+    if ( header.getGeometry() != null && header.getGeometry().getPosition() != null ) {
+      frames.add(header.getGeometry().getPosition().length);
+    }
+    if ( header.getGeometry() != null && header.getGeometry().getOrientation() != null ) {
+      frames.add(header.getGeometry().getOrientation().length);
+    }
+    for(MdlNodeHeader child: header.getGeometry().getChildren()) {
+      if ( child.getOrientation() != null ) {
+        frames.add(child.getOrientation().length);
+      }
+      if ( child.getPosition() != null ) {
+        frames.add(child.getPosition().length);
+      }
+      if ( child.getGeomemtryHeader() != null ) {
+        getNumberOfFrames(child.getGeomemtryHeader(), frames);
+      }
+    }
+  }
 }

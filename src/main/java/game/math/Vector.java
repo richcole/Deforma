@@ -51,10 +51,6 @@ public class Vector {
     return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
   }
   
-  public double dot(Vector o) {
-    return (v[0] * o.v[0] + v[1] * o.v[1] + v[2] * o.v[2]) / (v[3] * o.v[3]);
-  }
-  
   public double length() {
     return unscaledLength() / v[3];
   }

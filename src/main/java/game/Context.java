@@ -107,7 +107,7 @@ public class Context {
 
   public Rat getRat() {
     if ( rat == null ) {
-      rat = new Rat(this, 50, new Rotation(-90, new Vector(1f, 0f, 0f, 1f)));
+      rat = new Rat(this, 50);
     }
     return rat;
   }
