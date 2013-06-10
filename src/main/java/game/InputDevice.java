@@ -65,9 +65,6 @@ public class InputDevice {
       case Keyboard.KEY_D:
         context.getPlayer().setMovingRight(pressed);
         break;
-      case Keyboard.KEY_N:
-        context.getRat().nextFrame(pressed);
-        break;
       case Keyboard.KEY_SPACE:
         if ( pressed ) {
           context.getPlayer().fire();

@@ -181,6 +181,15 @@ public class Vector {
       return false;
     return true;
   }
+
+  public double dot(Vector o) {
+    return (v[0]*o.v[0] + v[1]*o.v[1] + v[2]*o.v[2]) /  (v[3]*o.v[3]);
+  }
   
+  public double theta(Vector u1, Vector u2) {
+    double x1 = dot(u1) / (length()*u1.length());
+    double x2 = dot(u2) / (length()*u2.length());
+    return Math.atan2(x2, x1);
+  }
   
 }

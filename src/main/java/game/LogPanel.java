@@ -42,10 +42,6 @@ public class LogPanel {
     text =  "p=" + context.getPlayer().pos;
     text += String.format(" rate = %3.2e", 1000.0 / renderSpeed);  
     text += String.format(" sleep = %3.2e", sleepTime); 
-    text += String.format(" frame = %d", context.getRat().getFrameIndex());
-    for(Integer frameNumber: context.getRat().getNumberOfFrames()) {
-      text += String.format(" totalFrames = %s", frameNumber);
-    }
     renderFlat();
     renderGL();
   }

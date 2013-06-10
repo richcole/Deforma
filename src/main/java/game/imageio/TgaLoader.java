@@ -49,7 +49,7 @@ public class TgaLoader {
     header.imageDepth = (int) inp.readByte();
     header.descriptor = (int) inp.readByte();
     header.id = inp.readBytes((int)header.idLength);
-    if ( header.colorMapType == 1) {
+    if (header.colorMapType == 1) {
       header.colorMap = inp.readBytes(header.colorMapLength * header.colorMapEntrySize / 8);
     }
     header.pixels = inp.readBytes(header.width * header.height * header.imageDepth / 8);
@@ -57,7 +57,10 @@ public class TgaLoader {
     for(int j=0;j<header.height;++j) {
       for(int i=0;i<header.width;++i) {
         int x = (j*header.width+i)*(header.imageDepth / 8);
-        image.setRGB(i, j, header.pixels[x] | (((int)header.pixels[x+1]) << 8) | (((int)header.pixels[x+2]) << 16));
+        int r = (header.pixels[x  ] & 0xFF) << 0;
+        int g = (header.pixels[x+1] & 0xFF) << 8;
+        int b = (header.pixels[x+2] & 0xFF) << 16;
+        image.setRGB(i, j, r | g | b);
       }
     }
     inp.seek(mark);

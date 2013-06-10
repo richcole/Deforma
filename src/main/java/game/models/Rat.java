@@ -20,9 +20,8 @@ public class Rat implements Renderable, SimObject {
   double scale;
   long tick = 0;
   Vector pos = Vector.ZERO;
-  Vector normal = Vector.NORMAL;
+  Vector velocity = Vector.NORMAL;
   double mass = 0;
-  long frameIndex = 800;
 
   private String animName;
   private Header mdl;
@@ -34,14 +33,18 @@ public class Rat implements Renderable, SimObject {
     this.mdl = context.getKeyReader().getMdlReader(modelName).getHeader();
     this.mesh = new Mesh(context, mdl, 1);
     this.scale = scale;
-    this.frameIndex = 0;
-    this.animName = "cwalk";
+    this.animName = "crun";
   }
 
   @Override
   public void render() {
     float alpha = (float)((tick % 1000.0) / 1000.0);
     pos = new Vector(0f, tick / 10f, 0f, 1.0f);
+    Vector up = Vector.UP;
+    double theta = velocity.theta(Vector.NORMAL, Vector.LEFT) * 360 / (2*Math.PI);
+    GL11.glPushMatrix();
+    GL11.glTranslated(pos.x(), pos.y(), pos.z());
+    GL11.glRotated(theta, up.x(), up.y(), up.z());
     // alpha = (float)((frameIndex % 1000.0) / 1000.0);
     List<Face> faces = mesh.getFaces(animName, alpha); //(tick % 100)/100.0f);
     for(Face face: faces) {
@@ -62,10 +65,11 @@ public class Rat implements Renderable, SimObject {
         if ( tps != null && tps[i] != null ) {
           GL11.glTexCoord2d(tps[i].x(), tps[i].y());
         }
-        GL11.glVertex3d(vs[i].x()*scale+pos.x(), vs[i].y()*scale+pos.y(), vs[i].z()*scale+pos.z());
+        GL11.glVertex3d(vs[i].x()*scale, vs[i].y()*scale, vs[i].z()*scale);
       }
       GL11.glEnd();
     }
+    GL11.glPopMatrix();
   }
 
   @Override
@@ -81,19 +85,5 @@ public class Rat implements Renderable, SimObject {
   @Override
   public double getMass() {
     return mass;
-  }
-
-  public void nextFrame(boolean pressed) {
-    if ( pressed ) {
-      frameIndex += 10;
-    }
-  }
-
-  public long getFrameIndex() {
-    return frameIndex;
-  }
-  
-  public Set<Integer> getNumberOfFrames() {
-    return mesh.getNumberOfFrames(animName);
   }
 }

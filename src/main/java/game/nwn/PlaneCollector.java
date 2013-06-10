@@ -38,7 +38,7 @@ public class PlaneCollector implements Visitor {
     MdlMeshHeader meshHeader = node.getMeshHeader();
     trFroms.push(tr);
     
-    if ( fromNode.getPosition() != null ) {
+    if ( fromNode != null && fromNode.getPosition() != null ) {
       FrameInterp i = getInterp(alpha, fromNode.getPositionTimings());
       tr = tr.times(Matrix.translate(mixPosition(fromNode.getPosition()[i.i1], fromNode.getPosition()[i.i2], i.delta)));
     }
@@ -46,7 +46,7 @@ public class PlaneCollector implements Visitor {
       tr = tr.times(Matrix.translate(node.getPosition()[0]));
     }
     
-    if ( fromNode.getOrientation() != null ) {
+    if ( fromNode != null && fromNode.getOrientation() != null ) {
       FrameInterp i = getInterp(alpha, fromNode.getOrientationTimings());
       tr = tr.times(mixOrientation(fromNode.getOrientation()[i.i1], fromNode.getOrientation()[i.i2], i.delta).toMatrix());
     }

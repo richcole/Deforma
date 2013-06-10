@@ -31,7 +31,7 @@ public class Mesh {
     fromMatched = fromMatched || fromAnimRoot.equals(geometry.getName());
     visitor.preVisit(geometry, fromMatched ? fromGeom : null, alpha);
     MdlNodeHeader[] c1 = geometry.getChildren();
-    MdlNodeHeader[] c2 = fromGeom.getChildren();
+    MdlNodeHeader[] c2 = fromGeom != null ? fromGeom.getChildren() : null;
     for(int i=0;i<c1.length;++i) {
       visit(c1[i], fromMatched, fromAnimRoot, fromMatched ? c2[i] : fromGeom, alpha, visitor);
     }
@@ -40,10 +40,17 @@ public class Mesh {
 
   public List<Face> getFaces(String name, float alpha) {
     MdlAnimation anim = header.getModel().getAnimMap().get(name);
-    alpha = alpha * anim.getLength();
-    PlaneCollector planeCollector = new PlaneCollector(context);
-    visit(header.getModel().getGeometryHeader().getGeometry(), false, anim.getAnimRoot(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
-    return planeCollector.getFaces();
+    if ( anim != null ) {
+      alpha = alpha * anim.getLength();
+      PlaneCollector planeCollector = new PlaneCollector(context);
+      visit(header.getModel().getGeometryHeader().getGeometry(), false, anim.getAnimRoot(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
+      return planeCollector.getFaces();
+    }
+    else {
+      PlaneCollector planeCollector = new PlaneCollector(context);
+      visit(header.getModel().getGeometryHeader().getGeometry(), false, "null", null, alpha, planeCollector);
+      return planeCollector.getFaces();
+    }
   }
   
   public Set<Integer> getNumberOfFrames(String name) {

@@ -97,7 +97,7 @@ public class Context {
 
   public Rat getRat() {
     if ( rat == null ) {
-      rat = new Rat(this, "c_troll", 50);
+      rat = new Rat(this, "c_wererat", 50);
     }
     return rat;
   }

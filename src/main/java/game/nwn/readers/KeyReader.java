@@ -59,6 +59,7 @@ public class KeyReader {
     Image image = imageMap.get(name);
     if ( image == null ) {
       Resource r = getResource(name, ResourceType.TGA);
+      r.writeEntry(new File(name + ".tga"));
       TgaLoader imageLoader = new TgaLoader();
       image = imageLoader.readImage(r.reader.inp, r.offset, r.length);
       imageMap.put(name, image);
@@ -72,9 +73,14 @@ public class KeyReader {
   }
   
   private Resource getResource(String name, ResourceType type) {
-    for(Resource r: keyIndex.get(name)) {
+    for(Resource r: keyIndex.get(name.toLowerCase())) {
       if (r.entry.type == type.getId()) {
         return r;
+      }
+    }
+    for(Resource r: keyIndex.values()) {
+      if ( r.getName().equalsIgnoreCase(name) ) {
+        logger.info("File " + r.getName() + " type=" + r.entry.type);
       }
     }
     throw new RuntimeException("Unable to find resource with name " + name + " and type " + type);

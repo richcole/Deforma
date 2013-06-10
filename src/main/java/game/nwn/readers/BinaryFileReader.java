@@ -122,7 +122,9 @@ public class BinaryFileReader implements Closeable {
       (c == '_') ||
       (c == '-') ||
       (c == '.') ||
+      (c == '!') ||
       (c == '\\') ||
+      (c == '\'') ||
       (c == ' ');
   }
 
