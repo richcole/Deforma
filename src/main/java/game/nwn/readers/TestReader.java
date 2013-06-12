@@ -30,7 +30,7 @@ public class TestReader {
   
   public void run() {
     MdlReader mdlReader = context.getKeyReader().getMdlReader("rat");
-    Mesh mesh = new Mesh(context, mdlReader.getHeader(), 0);
+    Mesh mesh = new Mesh(context, mdlReader.readModel(), 0);
     printlnJson(mesh);
   }
   

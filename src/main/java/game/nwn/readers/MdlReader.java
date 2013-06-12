@@ -4,15 +4,17 @@ import game.math.Quaternion;
 import game.math.Vector;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 // note that this model reader is not correct I couldn't find an accurate description
 // of the NWN model format
-public class MdlReader implements Closeable {
+public class MdlReader {
   
   private static Logger logger = Logger.getLogger(MdlReader.class);
 
@@ -24,14 +26,36 @@ public class MdlReader implements Closeable {
   Map<Long, MdlModel> mdlModels = Maps.newHashMap();
   KeyReader keyReader;
 
-  MdlReader(KeyReader keyReader, Resource resource) {
+  public MdlReader(KeyReader keyReader, Resource resource) {
     this.keyReader = keyReader;
     this.resource = resource;
     this.inp = resource.reader.inp;
-    this.header = readHeader();
-    this.header.setModel(readMdlModel());
   }
   
+  public MdlModel readModel() {
+    inp.seek(resource.offset);
+    this.header = readHeader();
+    this.header.setModel(readMdlModel());
+    return header.getModel();
+  }
+  
+  private void printModel() {
+    printGeom("", header.getModel().getGeometryHeader().getGeometry());
+  }
+
+  private void printGeom(String indent, MdlNodeHeader mdlNodeHeader) {
+    logger.info(indent + " name: " + mdlNodeHeader.getName());
+    logger.info(indent + " flags: " + mdlNodeHeader.getFlags());
+    if ( mdlNodeHeader.getMeshHeader() != null ) {
+      for(String texture: mdlNodeHeader.getMeshHeader().getTextures()) {
+        logger.info(indent + " texture: " + texture);
+      }
+    }
+    for(MdlNodeHeader c: mdlNodeHeader.getChildren()) {
+      printGeom(indent + "  ", c);
+    }
+  }
+
   public MdlAnimationEvent readMdlAnimationEvent() {
     MdlAnimationEvent r = new MdlAnimationEvent();
     r.after = inp.readFloat();
@@ -61,14 +85,14 @@ public class MdlReader implements Closeable {
     return r;
   }
 
-  MdlAnimation[] readIndirectMdlAnimationList() {
+  List<MdlAnimation> readIndirectMdlAnimationList() {
     ArrayRef arrayRef = readArrayRef();
     long mark = inp.pos();
-    MdlAnimation[] r = new MdlAnimation[arrayRef.count];
+    List<MdlAnimation> r = Lists.newArrayList();
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*inp.WORD_SIZE);
+      seekOffset(arrayRef.offset + i*BinaryFileReader.WORD_SIZE);
       seekOffset(inp.readWord());
-      r[i] = readMdlAnimation();
+      r.add(readMdlAnimation());
     }
     inp.seek(mark);
     return r;
@@ -180,7 +204,7 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     Vector[] r = new Vector[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*inp.VECTOR_SIZE);
+      seekOffset(arrayRef.offset + i*BinaryFileReader.VECTOR_SIZE);
       long p = inp.readWord();
       if ( p != 0xFFFFFFFFL) {
         seekOffset(p);
@@ -251,7 +275,7 @@ public class MdlReader implements Closeable {
     long mark = inp.pos();
     MdlNodeHeader[] r = new MdlNodeHeader[arrayRef.count];
     for(int i=0;i<arrayRef.count;++i) {
-      seekOffset(arrayRef.offset + i*inp.WORD_SIZE);
+      seekOffset(arrayRef.offset + i*BinaryFileReader.WORD_SIZE);
       r[i] = readModelNodeHeader(inp.readWord());
     }
     inp.seek(mark);
@@ -318,6 +342,13 @@ public class MdlReader implements Closeable {
     return mark;
   }
   
+  long seekExternalOffset(long offset) {
+    long mark = inp.pos();
+    long seekPos = offset + resource.offset + 12;
+    inp.seek(seekPos);
+    return mark;
+  }
+
   public MdlNodeHeader readModelNodeHeader(Long offset) {
     if ( offset == 0 ) {
       return null;
@@ -549,6 +580,10 @@ public class MdlReader implements Closeable {
   public MdlGeometryHeader readMdlGeometryHeader() {
     MdlGeometryHeader r = new MdlGeometryHeader();
     r.aulGeomRoutines = inp.readWords(2);
+    logger.info("geomRoutines=" + r.aulGeomRoutines[0] + " " + r.aulGeomRoutines[1]);
+    if ( isAnUnknownModelFormat(r) ) {
+      throw new RuntimeException("Unknown model format");
+    }
     r.name   = inp.readNullString(64);
     r.geometry = readModelNodeHeader(inp.readWord());
     r.nodeCount = inp.readWord();
@@ -567,35 +602,71 @@ public class MdlReader implements Closeable {
     r.fog = (int) inp.readByte();
     r.refCount = inp.readWord();
     r.animations = readIndirectMdlAnimationList();
-    r.superModel = readMdlModel(inp.readWord());
+    long superModelPtr = inp.readWord();
     r.bb = inp.readWords(6);
     r.radius = inp.readFloat();
     r.animScale = inp.readFloat();
     r.superModelName = inp.readNullString(64);
-    
+
     r.animMap = Maps.newHashMap();
     for(MdlAnimation anim: r.animations) {
       r.animMap.put(anim.getGeometryHeader().getName(), anim);
     }
+
+    if ( ! r.superModelName.equalsIgnoreCase("null") ) {
+      logger.info("Reading " + r.superModelName);
+      long mark = inp.pos();
+      r.superModel = keyReader.getModel(r.superModelName);
+      inp.seek(mark);
+    }
+    
+    mix(r, r.superModel);
+
     return r;
   }
-  
-  public MdlModel readMdlModel(long offset) {
-    if ( offset == 0 ) {
-      return null;
+
+  private void mix(MdlModel m, MdlModel parent) {
+    if ( parent != null ) {
+      if ( parent.animations != null ) {
+        m.animations.addAll(parent.animations);
+        for(MdlAnimation a: parent.animations) {
+          String animName = a.getGeometryHeader().getName();
+          if ( m.animMap.get(animName) == null ) {
+            logger.info("Adding anim " + animName);
+            m.animMap.put(animName, a);
+          }
+        }
+      }
+      if ( false && parent.getGeometryHeader() != null ) {
+        MdlGeometryHeader pg = parent.getGeometryHeader();
+        MdlGeometryHeader mg = m.getGeometryHeader();
+        for(MdlNodeHeader pc: pg.geometry.children) {
+          for(MdlNodeHeader mc: mg.geometry.children) {
+            if ( pc.name.equalsIgnoreCase(pc.name) ) {
+              mix(mc, pc);
+            }
+          }
+        }
+      }
     }
-    long mark = seekOffset(offset);
-    MdlModel r = mdlModels.get(offset);
-    if ( r == null ) { 
-      r = readMdlModel();
-      mdlModels.put(offset, r);
+  }
+
+  private void mix(MdlNodeHeader m, MdlNodeHeader p) {
+    for(MdlNodeHeader mc : m.getChildren()) {
+      for(MdlNodeHeader pc : p.getChildren()) {
+        if ( pc.name.equalsIgnoreCase(pc.name) ) {
+          mix(mc, pc);
+        }
+      }
     }
-    inp.seek(mark);
-    return r;
+  }
+
+  private boolean isAnUnknownModelFormat(MdlModel r) {
+    return isAnUnknownModelFormat(r.getGeometryHeader());
   }
   
-  public void close() {
-    inp.close();
+  private boolean isAnUnknownModelFormat(MdlGeometryHeader h) {
+    return h.aulGeomRoutines[0] < 1000;
   }
 
   public Header getHeader() {

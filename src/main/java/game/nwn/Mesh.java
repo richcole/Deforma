@@ -5,56 +5,78 @@ import game.base.Face;
 import game.nwn.readers.Header;
 import game.nwn.readers.MdlAnimation;
 import game.nwn.readers.MdlGeometryHeader;
+import game.nwn.readers.MdlModel;
 import game.nwn.readers.MdlNodeHeader;
 
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.Sets;
 
 public class Mesh {
   
+  static private Logger logger = Logger.getLogger(Mesh.class);
+  
   Context context;
-  Header header;
+  MdlModel mdl;
     
   interface Visitor {
     void preVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha);
     void postVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha);
   }
 
-  public Mesh(Context context, Header header, int x) {
+  public Mesh(Context context, MdlModel mdl, int x) {
     this.context = context;
-    this.header = header;
+    this.mdl = mdl;
   }
 
-  private void visit(MdlNodeHeader geometry, boolean fromMatched, String fromAnimRoot, MdlNodeHeader fromGeom, float alpha, Visitor visitor) {
-    fromMatched = fromMatched || fromAnimRoot.equals(geometry.getName());
-    visitor.preVisit(geometry, fromMatched ? fromGeom : null, alpha);
-    MdlNodeHeader[] c1 = geometry.getChildren();
-    MdlNodeHeader[] c2 = fromGeom != null ? fromGeom.getChildren() : null;
-    for(int i=0;i<c1.length;++i) {
-      visit(c1[i], fromMatched, fromAnimRoot, fromMatched ? c2[i] : fromGeom, alpha, visitor);
+  private void visit(MdlNodeHeader geometry, MdlNodeHeader fromGeom, float alpha, Visitor visitor) {
+    visitor.preVisit(geometry, fromGeom, alpha);
+    if ( fromGeom != null ) {
+      MdlNodeHeader[] c1 = geometry.getChildren();
+      MdlNodeHeader[] c2 = fromGeom.getChildren();
+      for(int i=0;i<c1.length;++i) {
+        boolean found = false;
+        for(int j=0;j<c2.length;++j) {
+          if (c1[i].getName().equals(c2[j].getName())) {
+            visit(c1[i], c2[j], alpha, visitor);
+            found = true;
+            break;
+          }
+        }
+        if ( ! found ) {
+          visit(c1[i], null, alpha, visitor);
+        }
+      }
     }
-    visitor.postVisit(geometry, fromMatched ? fromGeom : null, alpha);
+    else {
+      MdlNodeHeader[] c1 = geometry.getChildren();
+      for(int i=0;i<c1.length;++i) {
+        visit(c1[i], null, alpha, visitor);
+      }
+    }
+    visitor.postVisit(geometry, fromGeom, alpha);
   }
 
   public List<Face> getFaces(String name, float alpha) {
-    MdlAnimation anim = header.getModel().getAnimMap().get(name);
+    MdlAnimation anim = mdl.getAnimMap().get(name);
     if ( anim != null ) {
       alpha = alpha * anim.getLength();
       PlaneCollector planeCollector = new PlaneCollector(context);
-      visit(header.getModel().getGeometryHeader().getGeometry(), false, anim.getAnimRoot(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
+      visit(mdl.getGeometryHeader().getGeometry(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
       return planeCollector.getFaces();
     }
     else {
       PlaneCollector planeCollector = new PlaneCollector(context);
-      visit(header.getModel().getGeometryHeader().getGeometry(), false, "null", null, alpha, planeCollector);
+      visit(mdl.getGeometryHeader().getGeometry(), null, alpha, planeCollector);
       return planeCollector.getFaces();
     }
   }
   
   public Set<Integer> getNumberOfFrames(String name) {
-    MdlAnimation anim = header.getModel().getAnimMap().get(name);
+    MdlAnimation anim = mdl.getAnimMap().get(name);
     Set<Integer> numberOfFrames = Sets.newHashSet();
     getNumberOfFrames(anim.getGeometryHeader(), numberOfFrames);
     return numberOfFrames;

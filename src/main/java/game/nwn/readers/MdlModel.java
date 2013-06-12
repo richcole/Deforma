@@ -1,5 +1,6 @@
 package game.nwn.readers;
 
+import java.util.List;
 import java.util.Map;
 
 public class MdlModel {
@@ -8,7 +9,7 @@ public class MdlModel {
   long      classification;
   int       fog;
   long      refCount;
-  MdlAnimation[] animations;
+  List<MdlAnimation> animations;
   MdlModel  superModel;
   long[]    bb;
   float     radius;
@@ -65,11 +66,11 @@ public class MdlModel {
     this.refCount = refCount;
   }
 
-  public MdlAnimation[] getAnimations() {
+  public List<MdlAnimation> getAnimations() {
     return animations;
   }
 
-  public void setAnimations(MdlAnimation[] animations) {
+  public void setAnimations(List<MdlAnimation> animations) {
     this.animations = animations;
   }
 

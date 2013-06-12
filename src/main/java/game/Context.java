@@ -4,8 +4,9 @@ import game.base.Texture;
 import game.base.Textures;
 import game.models.BigCube;
 import game.models.Light;
-import game.models.Rat;
+import game.models.Creature;
 import game.models.SkyBox;
+import game.models.Terrain;
 import game.nwn.readers.KeyReader;
 
 import java.io.File;
@@ -29,7 +30,8 @@ public class Context {
   int lightNumber;
   Material material;
   Colors colors;
-  Rat rat;
+  Creature creature;
+  Terrain terrain;
   
   Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
   File root = new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/");
@@ -95,11 +97,11 @@ public class Context {
     return bigCube;
   }
 
-  public Rat getRat() {
-    if ( rat == null ) {
-      rat = new Rat(this, "c_wererat", 50);
+  public Creature getCreature() {
+    if ( creature == null ) {
+      creature = new Creature(this, "c_wererat", "cwalk", 10);
     }
-    return rat;
+    return creature;
   }
 
   public SkyBox getSkyBox() {
@@ -159,5 +161,12 @@ public class Context {
       textures = new Textures();
     }
     return textures;
+  }
+  
+  public Terrain getTerrain() {
+    if ( terrain == null ) {
+      terrain = new Terrain(this, 20, 20, 20f);
+    }
+    return terrain;
   }
 }

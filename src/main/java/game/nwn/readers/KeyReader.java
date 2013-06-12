@@ -25,6 +25,7 @@ public class KeyReader {
   Header header;
   Multimap<String, Resource> keyIndex;
   Map<String, Image> imageMap = Maps.newHashMap();
+  Map<String, MdlModel> modelMap = Maps.newHashMap();
 
   public KeyReader(Context context, String keyFileName) {
     this.context = context;
@@ -37,7 +38,7 @@ public class KeyReader {
     keyIndex = Multimaps.newListMultimap(Maps.<String, Collection<Resource>>newHashMap(), new ListSupplier<Resource>());
     for(int i=0;i<header.numKeys;++i) {
       KeyReader.KeyEntry entry = readKeyEntry(i);
-      if ( entry.name.startsWith("c_") && ResourceType.getType(entry.type) == ResourceType.MDL ) {
+      if ( ResourceType.getType(entry.type) == ResourceType.MDL ) {
         logger.info("model " + entry.name + " type " + ResourceType.getType(entry.type));
       }
       keyIndex.put(entry.name, createResource(entry));
@@ -59,7 +60,6 @@ public class KeyReader {
     Image image = imageMap.get(name);
     if ( image == null ) {
       Resource r = getResource(name, ResourceType.TGA);
-      r.writeEntry(new File(name + ".tga"));
       TgaLoader imageLoader = new TgaLoader();
       image = imageLoader.readImage(r.reader.inp, r.offset, r.length);
       imageMap.put(name, image);
@@ -72,7 +72,7 @@ public class KeyReader {
     return mdlReader;
   }
   
-  private Resource getResource(String name, ResourceType type) {
+  public Resource getResource(String name, ResourceType type) {
     for(Resource r: keyIndex.get(name.toLowerCase())) {
       if (r.entry.type == type.getId()) {
         return r;
@@ -160,6 +160,16 @@ public class KeyReader {
     fileEntry.type = inp.readShort();
     fileEntry.ids = inp.readWord();
     return fileEntry;
+  }
+
+  public MdlModel getModel(String modelName) {
+    MdlModel model = modelMap.get(modelName);
+    if ( model == null ) {
+      MdlReader modelReader = new MdlReader(this, getResource(modelName, ResourceType.MDL));
+      model = modelReader.readModel();
+      modelMap.put(modelName, model);
+    }
+    return model;
   }
 
 }

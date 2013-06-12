@@ -43,9 +43,9 @@ public class Main {
       context.getSkyBox();
       context.getScene().register(context.getBigCube());
       context.getScene().register(context.getSkyBox());
-      context.getScene().register(context.getRat());
-      context.getScene().register(context.getRat());
-      context.getSimulator().register(context.getRat());
+      context.getScene().register(context.getCreature());
+      context.getScene().register(context.getTerrain());
+      context.getSimulator().register(context.getCreature());
       context.getSimulator().register(context.getPlayer());
       while (! context.getInputDevice().getQuit()) {
         long before = System.currentTimeMillis();

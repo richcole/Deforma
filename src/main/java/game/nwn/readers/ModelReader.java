@@ -13,7 +13,7 @@ public class ModelReader {
   
   Mesh readModel(String name) {
     MdlReader mdlReader = context.getKeyReader().getMdlReader("rat");
-    return new Mesh(context, mdlReader.header, 0);
+    return new Mesh(context, mdlReader.readMdlModel(), 0);
   }
 
 }

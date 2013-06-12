@@ -14,9 +14,13 @@ import game.nwn.readers.MdlNodeHeader;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.collect.Lists;
 
 public class PlaneCollector implements Visitor {
+  
+  private static Logger logger = Logger.getLogger(PlaneCollector.class);
   
   List<Face>   faces = Lists.newArrayList();
   Stack<Matrix> trFroms = new Stack<Matrix>();
@@ -54,7 +58,7 @@ public class PlaneCollector implements Visitor {
       tr = tr.times(node.getOrientation()[0].toMatrix());
     }
     
-    if ( meshHeader != null ) {
+    if ( meshHeader != null && meshHeader.getRender() != 0 ) {
       Vector[] vertexes = meshHeader.getVertices();
       Vector diffuse = meshHeader.getDiffuse();
       Vector specular = meshHeader.getSpecular();
@@ -65,7 +69,7 @@ public class PlaneCollector implements Visitor {
         if ( textureName.length() > 0 && ! textureName.equals("NULL") ) {
           textures[i] = context.getTextures().getTexture(textureName, new NwnTextureProvider(context, textureName));
           if ( i > 0 ) {
-            int a = 1;
+            logger.info("Secondary texture");
           }
         }
       }
