@@ -103,11 +103,8 @@ public class Context {
     return bigCube;
   }
 
-  public Creature getCreature() {
-    if ( creature == null ) {
-      creature = new Creature(this, "c_wererat", "cwalk", 10);
-    }
-    return creature;
+  public Creature newCreature() {
+    return new Creature(this, "c_wererat", "cwalk", 10);
   }
 
   public SkyBox getSkyBox() {

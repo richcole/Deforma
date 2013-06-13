@@ -36,17 +36,14 @@ public class Main {
     context.getView().init();
     context.getLogPanel();
     
-    context.getSimulator().start();
     try {
       int lastTick = 0;
-      context.getBigCube();
-      context.getSkyBox();
-      context.getScene().register(context.getBigCube());
       context.getScene().register(context.getSkyBox());
-      context.getScene().register(context.getCreature());
-      context.getScene().register(context.getTerrain());
-      context.getSimulator().register(context.getCreature());
-      context.getSimulator().register(context.getPlayer());
+      context.newCreature().register();
+      context.getTerrain().register();
+      context.getPlayer().register();
+
+      context.getSimulator().start();
       while (! context.getInputDevice().getQuit()) {
         long before = System.currentTimeMillis();
         if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {

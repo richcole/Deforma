@@ -8,6 +8,8 @@ import game.math.Vector;
 
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.Lists;
 
 
@@ -36,12 +38,12 @@ public class Cube implements Renderable {
     this.material = context.getMaterial();
     this.textures = getTextures();
     this.rects = Lists.newArrayList(
-      new Rect(pos.plus(normal),  up,      left,           getTexture(0)), // front
-      new Rect(pos.minus(normal), up,      left.minus(),   getTexture(1)), // back
-      new Rect(pos.plus(left),    up,      normal.minus(), getTexture(3)), // left
-      new Rect(pos.minus(left),   up,      normal,         getTexture(2)), // right
-      new Rect(pos.plus(up),      left.minus(),  normal.minus(),           getTexture(4)), // top
-      new Rect(pos.minus(up),     left,    normal.minus(), getTexture(5))  // bottom
+      new Rect(normal,          up,            left,           getTexture(0)), // front
+      new Rect(normal.minus(),  up,            left.minus(),   getTexture(1)), // back
+      new Rect(left,            up,            normal.minus(), getTexture(3)), // left
+      new Rect(left.minus(),    up,            normal,         getTexture(2)), // right
+      new Rect(up,              left.minus(),  normal.minus(), getTexture(4)), // top
+      new Rect(up.minus(),      left,          normal.minus(), getTexture(5))  // bottom
     );
   }
 
@@ -54,10 +56,13 @@ public class Cube implements Renderable {
   }
 
   public void render() {
+    GL11.glPushMatrix();
+    GL11.glTranslated(pos.x(), pos.y(), pos.z());
     material.render();
     for(Rect rect: rects) {
       rect.render();
     }
+    GL11.glPopMatrix();
   }
 
   public void setPos(Vector pos) {

@@ -3,6 +3,7 @@ package game;
 import game.base.SimObject;
 import game.math.Matrix;
 import game.math.Vector;
+import game.models.Creature;
 import game.models.LittleCube;
 import game.models.LittleLight;
 
@@ -114,8 +115,8 @@ public class Player implements SimObject {
   }
 
   public void fire() {
-    LittleCube littleCube = new LittleCube(context, forward().scaleTo(20), pos.plus(forward().scaleTo(10)));
-    littleCube.register();
+    Creature creature = context.newCreature();
+    creature.register();
   }
 
   public void fireLight() {
@@ -131,6 +132,10 @@ public class Player implements SimObject {
   @Override
   public double getMass() {
     return 100;
+  }
+
+  public void register() {
+    context.getSimulator().register(this);
   }
   
   
