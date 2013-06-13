@@ -162,6 +162,24 @@ public class Matrix {
     return tr;
   }
   
+  public static Matrix scale(double x) {
+    Matrix tr = new Matrix(Matrix.ZERO);
+    for(int i=0;i<4;++i) {
+      tr.v[i*4] = x;
+    }
+    tr.v[15] = 1.0;
+    return tr;
+
+  }
+  
+  public static Matrix scale(Vector x) {
+    Matrix tr = new Matrix(Matrix.ZERO);
+    for(int i=0;i<4;++i) {
+      tr.v[i*4] = x.v[i];
+    }
+    return tr;
+  }
+
   public String toString() {
     StringBuffer b = new StringBuffer();
     b.append("[ ");

@@ -1,6 +1,8 @@
 package game.math;
 
 public class Quaternion extends Vector {
+  
+  public final static Quaternion ZERO = new Quaternion(0, 0, 0, 1);
 
   public Quaternion() {
     super();
@@ -14,6 +16,10 @@ public class Quaternion extends Vector {
     super(o);
   }
   
+  public Quaternion(double[] v) {
+    this.v = v;
+  }
+
   public Matrix toMatrix() {
     double qx = v[0];
     double qy = v[1];
@@ -87,5 +93,10 @@ public class Quaternion extends Vector {
 
   public double dot(Quaternion o) {
     return v[0]*o.v[0] + v[1]*o.v[1] + v[2]*o.v[2] + v[3]*o.v[3];
+  }
+  
+  public Quaternion scaleTo(double length) {
+    double l = length;
+    return new Quaternion(v[0]/l, v[1]/l, v[2]/l, v[3]);
   }
 }

@@ -9,16 +9,19 @@ public class Face {
   Vector   specular;
   Vector   diffuse;
   Vector   normal;
-  Texture texture;
+  String   textureName;
   Vector[] texturePoints;
+  
+  public Face() {
+  }
 
-  public Face(Vector[] vertices, Vector[] colors, Vector diffuse, Vector specular, Vector normal, Texture texture, Vector[] tps) {
+  public Face(Vector[] vertices, Vector[] colors, Vector diffuse, Vector specular, Vector normal, String textureName, Vector[] tps) {
     this.vertices = vertices;
     this.colors = colors;
     this.diffuse = diffuse;
     this.specular = specular;
     this.normal = normal;
-    this.texture = texture;
+    this.textureName = textureName;
     this.texturePoints = tps;
   }
 
@@ -54,8 +57,8 @@ public class Face {
     this.vertices = vertices;
   }
   
-  public Texture getTexture() {
-    return this.texture;
+  public String getTextureName() {
+    return this.textureName;
   }
 
   public Vector[] getTexturePoints() {

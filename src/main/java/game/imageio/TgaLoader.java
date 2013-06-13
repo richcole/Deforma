@@ -26,7 +26,7 @@ public class TgaLoader {
     public byte[] pixels;
   }
   
-  public Image readImage(BinaryFileReader inp, long offset, int length) {
+  public Image readImage(BinaryFileReader inp, long offset) {
     long mark = inp.pos();
     inp.seek(offset);
 

@@ -3,7 +3,6 @@ package game.nwn.readers;
 import game.math.Quaternion;
 import game.math.Vector;
 
-import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
@@ -637,34 +636,9 @@ public class MdlReader {
           }
         }
       }
-      if ( false && parent.getGeometryHeader() != null ) {
-        MdlGeometryHeader pg = parent.getGeometryHeader();
-        MdlGeometryHeader mg = m.getGeometryHeader();
-        for(MdlNodeHeader pc: pg.geometry.children) {
-          for(MdlNodeHeader mc: mg.geometry.children) {
-            if ( pc.name.equalsIgnoreCase(pc.name) ) {
-              mix(mc, pc);
-            }
-          }
-        }
-      }
     }
   }
 
-  private void mix(MdlNodeHeader m, MdlNodeHeader p) {
-    for(MdlNodeHeader mc : m.getChildren()) {
-      for(MdlNodeHeader pc : p.getChildren()) {
-        if ( pc.name.equalsIgnoreCase(pc.name) ) {
-          mix(mc, pc);
-        }
-      }
-    }
-  }
-
-  private boolean isAnUnknownModelFormat(MdlModel r) {
-    return isAnUnknownModelFormat(r.getGeometryHeader());
-  }
-  
   private boolean isAnUnknownModelFormat(MdlGeometryHeader h) {
     return h.aulGeomRoutines[0] < 1000;
   }

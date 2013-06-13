@@ -61,7 +61,7 @@ public class KeyReader {
     if ( image == null ) {
       Resource r = getResource(name, ResourceType.TGA);
       TgaLoader imageLoader = new TgaLoader();
-      image = imageLoader.readImage(r.reader.inp, r.offset, r.length);
+      image = imageLoader.readImage(r.reader.inp, r.offset);
       imageMap.put(name, image);
     }
     return image;

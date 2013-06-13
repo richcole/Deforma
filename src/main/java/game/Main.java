@@ -1,5 +1,11 @@
 package game;
 
+import game.base.Face;
+import game.nwn.NwnMesh;
+import game.nwn.readers.MdlReader;
+
+import java.util.List;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -35,7 +41,7 @@ public class Main {
   private void run() {
     context.getView().init();
     context.getLogPanel();
-
+    
     context.getSimulator().start();
     try {
       int lastTick = 0;

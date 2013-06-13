@@ -10,7 +10,9 @@ import game.models.Terrain;
 import game.nwn.readers.KeyReader;
 
 import java.io.File;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -32,9 +34,13 @@ public class Context {
   Colors colors;
   Creature creature;
   Terrain terrain;
+  File root;
   
   Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-  File root = new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/");
+  List<File> roots = Lists.newArrayList(
+    new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
+    new File("/mnt/nwn/")
+  );
   KeyReader keyReader;
   Textures textures;
 
@@ -146,6 +152,16 @@ public class Context {
   }
   
   public File getNwnRoot() {
+    if ( root == null ) {
+      for(File cand: roots) {
+        if ( cand.exists() ) {
+          root = cand;
+        }
+      }
+    }
+    if ( root == null ) {
+      throw new RuntimeException("Unable to locate nwn root directory");
+    }
     return root;
   }
   

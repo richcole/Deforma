@@ -1,7 +1,7 @@
 package game.nwn.readers;
 
 import game.Context;
-import game.nwn.Mesh;
+import game.nwn.NwnMesh;
 
 public class ModelReader {
   
@@ -11,9 +11,9 @@ public class ModelReader {
     this.context = context;
   }
   
-  Mesh readModel(String name) {
+  NwnMesh readModel(String name) {
     MdlReader mdlReader = context.getKeyReader().getMdlReader("rat");
-    return new Mesh(context, mdlReader.readMdlModel(), 0);
+    return new NwnMesh(context, mdlReader.readMdlModel(), 0);
   }
 
 }

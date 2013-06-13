@@ -6,7 +6,7 @@ import game.base.Texture;
 import game.math.Matrix;
 import game.math.Quaternion;
 import game.math.Vector;
-import game.nwn.Mesh.Visitor;
+import game.nwn.NwnMesh.Visitor;
 import game.nwn.readers.MdlFace;
 import game.nwn.readers.MdlMeshHeader;
 import game.nwn.readers.MdlNodeHeader;
@@ -34,11 +34,11 @@ public class PlaneCollector implements Visitor {
   
   static class FrameInterp {
     int i1, i2;
-    float delta;
+    double delta;
   }
   
   @Override
-  public void preVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha) {
+  public void preVisit(MdlNodeHeader node, MdlNodeHeader fromNode, double alpha) {
     MdlMeshHeader meshHeader = node.getMeshHeader();
     trFroms.push(tr);
     
@@ -83,12 +83,12 @@ public class PlaneCollector implements Visitor {
            vs[i] = tr.times(vx);
            tps[i] = texturePoints[0][vertex[i]];
          }
-         faces.add(new Face(vs, colors, diffuse, specular, mdlFace.getPlaneNormal(), textures[0], tps));
+         faces.add(new Face(vs, colors, diffuse, specular, mdlFace.getPlaneNormal(), meshHeader.getTextures()[0], tps));
       }
     }
   }
 
-  private FrameInterp getInterp(float alpha, float[] timings) {
+  private FrameInterp getInterp(double alpha, float[] timings) {
     FrameInterp i = new FrameInterp();
     i.i1 = getUpperBound(alpha, timings);
     i.i2 = (i.i1 + 1) % timings.length;
@@ -96,11 +96,11 @@ public class PlaneCollector implements Visitor {
     return i;
   }
 
-  private Vector mixPosition(Vector v1, Vector v2, float delta) {
+  private Vector mixPosition(Vector v1, Vector v2, double delta) {
     return v1.times(1 - delta).plus(v2.times(delta));
   }
 
-  private Quaternion mixOrientation(Quaternion v1, Quaternion v2, float delta) {
+  private Quaternion mixOrientation(Quaternion v1, Quaternion v2, double delta) {
     double a = v1.minus(v2).lengthSquared();
     double b = v1.plus(v2).lengthSquared();
     double sign = 1;
@@ -130,8 +130,8 @@ public class PlaneCollector implements Visitor {
     }
   }
 
-  private float getDelta(float alpha, int i1, int i2, float[] positionTimings) {
-    float delta;
+  private double getDelta(double alpha, int i1, int i2, float[] positionTimings) {
+    double delta;
     if ( i2 > i1) {
       delta =
         (alpha - positionTimings[i1]) / (positionTimings[i2] - positionTimings[i1]);
@@ -147,7 +147,7 @@ public class PlaneCollector implements Visitor {
    
   }
 
-  private int getUpperBound(float alpha, float[] positionTimings) {
+  private int getUpperBound(double alpha, float[] positionTimings) {
     for(int i=1; i<positionTimings.length; ++i) {
       if ( positionTimings[i] > alpha ) {
         return i - 1;
@@ -161,7 +161,7 @@ public class PlaneCollector implements Visitor {
   }
 
   @Override
-  public void postVisit(MdlNodeHeader node, MdlNodeHeader fromNode, float alpha) {
+  public void postVisit(MdlNodeHeader node, MdlNodeHeader fromNode, double alpha) {
     tr = trFroms.pop();
   }
   

@@ -40,6 +40,10 @@ public class Vector {
     }
   }
 
+  public Vector(double[] v) {
+    this.v = v;
+  }
+
   public Vector times(double s) {
     return new Vector(v[0], v[1], v[2], v[3] / s);
   }
@@ -190,6 +194,10 @@ public class Vector {
     double x1 = dot(u1) / (length()*u1.length());
     double x2 = dot(u2) / (length()*u2.length());
     return Math.atan2(x2, x1);
+  }
+
+  public double[] toDoubleArray() {
+    return v;
   }
   
 }
