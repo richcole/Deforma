@@ -4,6 +4,7 @@ import game.Context;
 import game.base.Face;
 import game.base.io.Serializer;
 import game.models.AnimMesh;
+import game.models.Model;
 import game.nwn.NwnMesh;
 
 import java.io.File;
@@ -45,14 +46,26 @@ public class ExtractModels {
   }
   
   public void run() {
-    MdlReader mdlReader = context.getKeyReader().getMdlReader("c_wererat");
-    NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
-    AnimMesh animMesh = mesh.getAnimMesh();
-    Serializer serializer = new Serializer();
-    serializer.serialize(animMesh, new File("res/wererat.mdl.gz"));
-    for(String textureName: animMesh.getTextures()) {
-      Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
-      textureResource.writeEntry(new File("res/" + textureName + ".tga"));
+    for(Model model: Model.values()) {
+      String resName = model.getResName();
+      MdlReader mdlReader = context.getKeyReader().getMdlReader(resName);
+      String resFileName = "res/" + resName + ".mdl.gz";
+      NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
+      AnimMesh animMesh = mesh.getAnimMesh();
+      Serializer serializer = new Serializer();
+      logger.info("Writing " + resFileName);
+      serializer.serialize(animMesh, new File(resFileName));
+      for(String textureName: animMesh.getTextures()) {
+        try {
+          Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
+          String textureResFileName = "res/" + textureName + ".tga";
+          logger.info("Writing " + textureResFileName);
+          textureResource.writeEntry(new File(textureResFileName));
+        }
+        catch(Exception e) {
+          logger.error("Unable to locate texture: " + textureName);
+        }
+      }
     }
   }
 

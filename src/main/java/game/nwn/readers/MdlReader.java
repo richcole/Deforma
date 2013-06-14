@@ -390,14 +390,29 @@ public class MdlReader {
         r.scale = getControllerFloat(key.dataOffset, r.controllerData, key.rows);
       }
     }
+    if ( r.nodeType.hasLight() ) {
+      inp.readBytes(0x5C);
+    }
+    if ( r.nodeType.hasEmitter() ) {
+      inp.readBytes(0xD8);
+    }
+    if ( r.nodeType.hasRef() ) {
+      r.referenceNode = readMdlReferenceNode();
+    }
     if ( r.nodeType.hasMesh() ) {
       r.meshHeader = readMdlMeshHeader();
     }
-    if ( r.nodeType == MdlNodeType.Ref ) {
-      r.referenceNode = readMdlReferenceNode();
+    if ( r.nodeType.hasSkin() ) {
+      inp.readBytes(0x64);
     }
     if ( r.nodeType.hasAnim() ) {
       r.animMeshNode = readMdlAnimMeshNode();
+    }
+    if ( r.nodeType.hasDangly() ) {
+      inp.readBytes(0x18);
+    }
+    if ( r.nodeType.hasAABB() ) {
+      inp.readBytes(0x4);
     }
     return r;
   }
@@ -579,7 +594,6 @@ public class MdlReader {
   public MdlGeometryHeader readMdlGeometryHeader() {
     MdlGeometryHeader r = new MdlGeometryHeader();
     r.aulGeomRoutines = inp.readWords(2);
-    logger.info("geomRoutines=" + r.aulGeomRoutines[0] + " " + r.aulGeomRoutines[1]);
     if ( isAnUnknownModelFormat(r) ) {
       throw new RuntimeException("Unknown model format");
     }

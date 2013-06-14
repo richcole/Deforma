@@ -4,13 +4,16 @@ import game.Context;
 import game.base.Image;
 import game.imageio.TgaLoader;
 import game.nwn.readers.BifReader.EntryHeader;
+import game.nwn.readers.KeyReader.Header;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -20,35 +23,44 @@ public class KeyReader {
   private static Logger logger = Logger.getLogger(KeyReader.class);
   
   Context context;
-  Map<Integer, BifReader> bifReaders = Maps.newHashMap();
-  BinaryFileReader inp;
-  Header header;
-  Multimap<String, Resource> keyIndex;
+  Map<String, Map<Integer, BifReader>> bifReaders = Maps.newHashMap();
+  Multimap<String, Resource> keyIndex = Multimaps.newListMultimap(Maps.<String, Collection<Resource>>newHashMap(), new ListSupplier<Resource>());
   Map<String, Image> imageMap = Maps.newHashMap();
   Map<String, MdlModel> modelMap = Maps.newHashMap();
 
-  public KeyReader(Context context, String keyFileName) {
+  public KeyReader(Context context) {
     this.context = context;
-    this.inp = new BinaryFileReader(new File(context.getNwnRoot(), keyFileName));
-    this.header = readHeader();
-    readKeyIndex();
+    try {
+      for(File keyFile: context.getNwnRoot().listFiles()) {
+        String keyFileName = keyFile.getName();
+        if ( keyFileName.endsWith(".key") ) {
+          Map<Integer, BifReader> emptyMap = Maps.newHashMap();
+          bifReaders.put(keyFileName, emptyMap);
+          BinaryFileReader inp = new BinaryFileReader(keyFile);
+          Header header = readHeader(inp);
+          readKeyIndex(keyFileName, header, inp);
+        }
+      }
+    } catch(Exception e) {
+      Throwables.propagate(e);
+    }
   }
   
-  private void readKeyIndex() {
-    keyIndex = Multimaps.newListMultimap(Maps.<String, Collection<Resource>>newHashMap(), new ListSupplier<Resource>());
+  private void readKeyIndex(String keyName, Header header, BinaryFileReader inp) {
     for(int i=0;i<header.numKeys;++i) {
-      KeyReader.KeyEntry entry = readKeyEntry(i);
-      keyIndex.put(entry.name, createResource(entry));
+      KeyReader.KeyEntry entry = readKeyEntry(header, inp, i);
+      keyIndex.put(entry.name, createResource(keyName, header, inp, entry));
     }
   }
 
-  public BifReader getBifReader(int i) {
-    BifReader bifReader = bifReaders.get(i);
+  public BifReader getBifReader(String keyName, Header header, BinaryFileReader inp, int i) {
+    Map<Integer, BifReader> bifReadersForKey = bifReaders.get(keyName);
+    BifReader bifReader = bifReadersForKey.get(i);
     if ( bifReader == null ) {
-      KeyReader.BifEntry entry = readBifEntry(i);
+      KeyReader.BifEntry entry = readBifEntry(header, inp, i);
       File bifFile = new File(context.getNwnRoot(), entry.name);
-      bifReader = new BifReader(bifFile);
-      bifReaders.put(i, bifReader);
+      bifReader = new BifReader(entry, bifFile);
+      bifReadersForKey.put(i, bifReader);
     }
     return bifReader;
   }
@@ -83,10 +95,10 @@ public class KeyReader {
     throw new RuntimeException("Unable to find resource with name " + name + " and type " + type);
   }
   
-  private Resource createResource(KeyReader.KeyEntry entry) {
+  private Resource createResource(String keyName, Header header, BinaryFileReader inp, KeyReader.KeyEntry entry) {
     int bifIndex = entry.getBifIndex();
     int resourceIndex = entry.getResourceIndex();
-    BifReader bifReader = getBifReader(bifIndex);
+    BifReader bifReader = getBifReader(keyName, header, inp, bifIndex);
     EntryHeader entryHeader = bifReader.readEntryHeader(resourceIndex); 
     return new Resource(bifReader, entryHeader.offset, (int)entryHeader.size, entry);
   }
@@ -125,7 +137,7 @@ public class KeyReader {
     }
   }
   
-  public Header readHeader() {
+  public Header readHeader(BinaryFileReader inp) {
     Header header = new Header();
     header.type = inp.readString(4);
     header.version = inp.readString(4);
@@ -139,7 +151,7 @@ public class KeyReader {
     return header;
   }
   
-  public BifEntry readBifEntry(int i) {
+  public BifEntry readBifEntry(Header header, BinaryFileReader inp, int i) {
     inp.seek(header.fileTableOffset + i*12);
     BifEntry fileEntry = new BifEntry();
     fileEntry.fileSize = inp.readWord();
@@ -150,7 +162,7 @@ public class KeyReader {
     return fileEntry;
   }
   
-  public KeyEntry readKeyEntry(int i) {
+  public KeyEntry readKeyEntry(Header header, BinaryFileReader inp, int i) {
     inp.seek(header.keyTableOffset + i*22);
     KeyEntry fileEntry = new KeyEntry();
     fileEntry.name = inp.readNullString(16);

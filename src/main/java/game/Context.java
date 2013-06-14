@@ -2,11 +2,15 @@ package game;
 
 import game.base.Texture;
 import game.base.Textures;
+import game.math.Vector;
 import game.models.BigCube;
 import game.models.Light;
 import game.models.Creature;
+import game.models.Model;
+import game.models.Models;
 import game.models.SkyBox;
 import game.models.Terrain;
+import game.models.TerrainTile;
 import game.nwn.readers.KeyReader;
 
 import java.io.File;
@@ -42,6 +46,7 @@ public class Context {
   KeyReader keyReader;
   Textures textures;
   SelectionRay selectionRay;
+  Models models;
 
   List<File> roots = Lists.newArrayList(
     new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
@@ -109,7 +114,11 @@ public class Context {
   }
 
   public Creature newCreature() {
-    return new Creature(this, "c_wererat", "cwalk", 10);
+    return new Creature(this, Model.Wererat);
+  }
+
+  public TerrainTile newTile() {
+    return new TerrainTile(this, new Vector(-20, -20, 0, 1), Model.Tcn01_r10_01);
   }
 
   public SkyBox getSkyBox() {
@@ -169,7 +178,7 @@ public class Context {
   
   public KeyReader getKeyReader() {
     if ( keyReader == null ) {
-      keyReader = new KeyReader(this, "chitin.key");
+      keyReader = new KeyReader(this);
     }
     return keyReader;
   }
@@ -197,5 +206,16 @@ public class Context {
       selectionRay = new SelectionRay(this);
     }
     return selectionRay;
+  }
+
+  public Models getModels() {
+    if ( models == null ) {
+      models = new Models(this);
+    }
+    return models;
+  }
+
+  public double getScale() {
+    return 10;
   }
 }

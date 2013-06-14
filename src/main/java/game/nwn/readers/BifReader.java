@@ -1,16 +1,21 @@
 package game.nwn.readers;
 
+import game.nwn.readers.KeyReader.BifEntry;
+
 import java.io.Closeable;
 import java.io.File;
 
 public class BifReader implements Closeable {
   
+  String bifFileName;
   BinaryFileReader inp;
   Header header;
+  BifEntry entry;
 
-  BifReader(File bifFile) {
-    inp = new BinaryFileReader(bifFile);
-    header = readHeader();
+  BifReader(BifEntry entry, File bifFile) {
+    this.entry = entry;
+    this.inp = new BinaryFileReader(bifFile);
+    this.header = readHeader();
   }
   
   static public class Header {

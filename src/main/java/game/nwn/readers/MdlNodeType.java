@@ -1,40 +1,68 @@
 package game.nwn.readers;
 
-public enum MdlNodeType {
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
+public class MdlNodeType {
   
-  Dummy(  0x1   | 0x1),
-  Light(  0x1   | 0x2),
-  Emitter(0x1   | 0x4),
-  Camera( 0x1   | 0x8),
-  Ref(    0x1   | 0x10),
-  Mesh(   0x1   | 0x20),
-  Skin(   0x21  | 0x40),
-  Anim(   0x21  | 0x80),
-  Dangly( 0x21  | 0x100),
-  AABB(   0x21  | 0x200),
-  UNKNOWN(0x21  | 0x400),
-  ;
+  static final int HAS_DUMMY   = 0x001;
+  static final int HAS_LIGHT   = 0x002;
+  static final int HAS_EMITTER = 0x004;
+  static final int HAS_CAMERA  = 0x008;
+  static final int HAS_REF     = 0x010;
+  static final int HAS_MESH    = 0x020;
+  static final int HAS_SKIN    = 0x040;
+  static final int HAS_ANIM    = 0x080;
+  static final int HAS_DANGLY  = 0x100;
+  static final int HAS_AABB    = 0x200;
+  static final int HAS_UNKNONW = 0x400;
 
   private long id;
+  
+  private static Map<Long, MdlNodeType> types = Maps.newHashMap();
 
   MdlNodeType(long id) {
     this.id = id;
   }
   
   public static MdlNodeType getMdlNodeType(long flags) {
-    for(MdlNodeType type: values()) {
-      if ( flags == type.id ) {
-        return type;
-      }
-    }
-    return UNKNOWN;
+    return new MdlNodeType(flags);
+  }
+
+  public boolean hasLight() {
+    return (id & HAS_LIGHT) != 0;
+  }
+
+  public boolean hasEmitter() {
+    return (id & HAS_EMITTER) != 0;
   }
 
   public boolean hasMesh() {
-    return (id & 0x21) == 0x21;
+    return (id & HAS_MESH) != 0;
+  }
+
+  public boolean hasSkin() {
+    return (id & HAS_SKIN) != 0;
   }
 
   public boolean hasAnim() {
-    return (id & 0x80) == 0x80;
+    return (id & HAS_ANIM) != 0;
+  }
+  
+  public boolean hasCamera() {
+    return (id & HAS_CAMERA) != 0;
+  }
+
+  public boolean hasDangly() {
+    return (id & HAS_CAMERA) != 0;
+  }
+
+  public boolean hasAABB() {
+    return (id & HAS_AABB) != 0;
+  }
+
+  public boolean hasRef() {
+    return (id & HAS_REF) != 0;
   }
 }

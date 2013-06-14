@@ -1,8 +1,16 @@
 package game.nwn.readers;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.Writer;
+
 import game.Context;
 
 import org.apache.log4j.Logger;
+
+import com.google.common.base.Throwables;
 
 public class ListModels {
   
@@ -29,10 +37,18 @@ public class ListModels {
   public void run() {
     logger.info("Starting");
     KeyReader keyReader = context.getKeyReader();
-    for(Resource resource: keyReader.getKeyIndex().values()) {
-      if ( resource.entry.name.contains("tree") && ResourceType.MDL.id == resource.entry.type ) {
-        logger.info(resource.entry.name);
+    try {
+      PrintStream out = new PrintStream(new FileOutputStream(new File("list")));
+      try {
+        for(Resource resource: keyReader.getKeyIndex().values()) {
+          ResourceType type = ResourceType.getType(resource.entry.type);
+          out.println(resource.entry.name + " " + (type != null ? type.name() : resource.entry.type));
+        }
+      } finally {
+        out.close();
       }
+    } catch(Exception e) {
+      Throwables.propagate(e);
     }
   }
 

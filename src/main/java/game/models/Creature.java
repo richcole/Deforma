@@ -1,5 +1,6 @@
 package game.models;
 
+import game.Anim;
 import game.Context;
 import game.Renderable;
 import game.base.Face;
@@ -38,35 +39,32 @@ public class Creature implements Renderable, SimObject {
   Creature target;
   boolean selected;
   
-  private String animName;
   private AnimMesh animMesh;
-  private String modelName;
+  private Model model;
   
   enum State {
-    WAITING("cpause1"),
-    TRAVELLING("cwalk"),
-    ATTACKING("ca1stab");
+    WAITING(Anim.CPAUSE1),
+    TRAVELLING(Anim.CWALK),
+    ATTACKING(Anim.CA1STAB);
     
-    String animName;
+    Anim anim;
     
-    State(String animName) {
-      this.animName = animName;
+    State(Anim anim) {
+      this.anim = anim;
     }
     
-    String getAnimName() {
-      return animName;
+    Anim getAnim() {
+      return anim;
     }
   }
   
   State state = State.WAITING;
 
-  public Creature(Context context, String modelName, String animName, double scale) {
+  public Creature(Context context, Model model) {
     this.context = context;
-    this.modelName = modelName;
-    Serializer serializer = new Serializer();
-    this.animMesh = serializer.deserialize(new File("res/wererat.mdl.gz"), AnimMesh.class);
-    this.scale = scale;
-    this.animName = animName;
+    this.model = model;
+    this.animMesh = context.getModels().getAnimMesh(model);
+    this.scale = context.getScale();
   }
 
   @Override
@@ -77,7 +75,7 @@ public class Creature implements Renderable, SimObject {
     GL11.glScaled(scale, scale, scale);
     double theta = MathUtils.toDegrees(velocity.theta(Vector.NORMAL, Vector.LEFT));
     GL11.glRotated(theta, 0, 0, 1d);
-    renderer.render(animMesh, state.getAnimName(), alpha);
+    renderer.render(animMesh, state.getAnim().getName(), alpha);
     if ( selected ) {
       renderSelection();
     }

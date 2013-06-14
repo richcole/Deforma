@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
+import game.Anim;
 import game.Context;
 import game.base.Face;
 import game.base.Texture;
@@ -17,7 +18,6 @@ import game.models.AnimMesh.Node;
 import game.models.AnimMesh.PositionTiming;
 import game.models.AnimMesh.RotationTiming;
 import game.models.AnimMesh.Timing;
-import game.nwn.NwnTextureProvider;
 
 public class AnimMeshRenderer {
   
@@ -40,6 +40,10 @@ public class AnimMeshRenderer {
     renderNode(m.getRoot(), animName, alpha, Matrix.IDENTITY);
   }
 
+  public void render(AnimMesh animMesh) {
+    render(animMesh, Anim.NONE.getName(), 0);
+  }
+  
   private void renderNode(Node node, String animName, double alpha, Matrix tr) {
     AnimationNode animationNode = node.getAnimations().get(animName);
     Vector position = Vector.ZERO;
@@ -178,4 +182,5 @@ public class AnimMeshRenderer {
     i.delta = getDelta(alpha, i.i1, i.i2, timings);
     return i;
   }
+
 }
