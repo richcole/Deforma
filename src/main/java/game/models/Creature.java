@@ -36,6 +36,7 @@ public class Creature implements Renderable, SimObject {
   Vector dest;
   Tile tile;
   Creature target;
+  boolean selected;
   
   private String animName;
   private AnimMesh animMesh;
@@ -77,6 +78,9 @@ public class Creature implements Renderable, SimObject {
     double theta = MathUtils.toDegrees(velocity.theta(Vector.NORMAL, Vector.LEFT));
     GL11.glRotated(theta, 0, 0, 1d);
     renderer.render(animMesh, state.getAnimName(), alpha);
+    if ( selected ) {
+      renderSelection();
+    }
     GL11.glPopMatrix();
   }
   
@@ -158,4 +162,23 @@ public class Creature implements Renderable, SimObject {
     context.getSimulator().register(this);
     context.getScene().register(this);
   }
+
+  public void renderSelection() {
+    GL11.glBegin(GL11.GL_TRIANGLES);
+    GL11.glColor3f(1, 1, 1);
+    GL11.glVertex3d(0, 1, 0.1);
+    GL11.glVertex3d(-1, -1, 0.1);
+    GL11.glVertex3d(1, -1, 0.1);
+    GL11.glEnd();
+  }
+
+  public boolean getSelected() {
+    return selected;
+  }
+
+  public void setSelected(boolean selected) {
+    this.selected = selected;
+  }
+  
+  
 }

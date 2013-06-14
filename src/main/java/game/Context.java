@@ -12,6 +12,8 @@ import game.nwn.readers.KeyReader;
 import java.io.File;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
+
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,14 +39,17 @@ public class Context {
   File root;
   
   Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+  KeyReader keyReader;
+  Textures textures;
+  SelectionRay selectionRay;
+
   List<File> roots = Lists.newArrayList(
     new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
     new File("/mnt/nwn/")
   );
-  KeyReader keyReader;
-  Textures textures;
 
   public Context() {
+    configureLoghing();
   }
   
   public Scene getScene() {
@@ -181,5 +186,16 @@ public class Context {
       terrain = new Terrain(this, 20, 20, 20f);
     }
     return terrain;
+  }
+
+  public void configureLoghing() {
+    BasicConfigurator.configure();
+  }
+  
+  public SelectionRay getSelectionRay() {
+    if ( selectionRay == null ) {
+      selectionRay = new SelectionRay(this);
+    }
+    return selectionRay;
   }
 }

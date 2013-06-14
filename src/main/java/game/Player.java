@@ -30,6 +30,7 @@ public class Player implements SimObject {
   boolean movingRight = false;
 
   private Context context;
+  private Creature selectedCreature;
   
   public Player(Context context) {
     this.context = context;
@@ -38,15 +39,15 @@ public class Player implements SimObject {
     this.theta2 = 0;
   }
 
-  Vector left() {
+  Vector getLeft() {
     return left;
   }
   
-  Vector up() {
+  Vector getUp() {
     return up;
   }
 
-  Vector forward() {
+  Vector getNormal() {
     return normal;
   }
 
@@ -62,31 +63,32 @@ public class Player implements SimObject {
     normal = rotLeft.times(normal);
     up = rotLeft.times(UP);
     
-    Vector a = pos.plus(forward());
-    Vector u = up();
+    Vector a = pos.plus(getNormal());
+    Vector u = getUp();
     GLU.gluLookAt((float)pos.x(), (float)pos.y(), (float)pos.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)u.x(), (float)u.y(), (float)u.z());
+    context.getSelectionRay().updateViewMatrix();
   }
 
   @Override
   public void tick() {
     float velocity = 2;
     if ( movingForward ) {
-      pos = pos.plus(forward().scaleTo(velocity));
+      pos = pos.plus(getNormal().scaleTo(velocity));
     }
     if ( movingBackward ) {
-      pos = pos.plus(forward().scaleTo(-velocity));
+      pos = pos.plus(getNormal().scaleTo(-velocity));
     }
     if ( movingLeft ) {
-      pos = pos.plus(left().scaleTo(velocity));
+      pos = pos.plus(getLeft().scaleTo(velocity));
     }
     if ( movingRight ) {
-      pos = pos.plus(left().scaleTo(-velocity));
+      pos = pos.plus(getLeft().scaleTo(-velocity));
     }
     if ( movingUpward ) {
-      pos = pos.plus(up().scaleTo(velocity));
+      pos = pos.plus(getUp().scaleTo(velocity));
     }
     if ( movingDownward ) {
-      pos = pos.plus(up().scaleTo(-velocity));
+      pos = pos.plus(getUp().scaleTo(-velocity));
     }
   }
 
@@ -120,7 +122,7 @@ public class Player implements SimObject {
   }
 
   public void fireLight() {
-    LittleLight littleLight = new LittleLight(context, forward().scaleTo(20), pos.plus(forward().scaleTo(10)));
+    LittleLight littleLight = new LittleLight(context, getNormal().scaleTo(20), pos.plus(getNormal().scaleTo(10)));
     littleLight.register();
   }
 
@@ -137,6 +139,12 @@ public class Player implements SimObject {
   public void register() {
     context.getSimulator().register(this);
   }
-  
-  
+
+  public void setSelectedCreature(Creature selectedCreature) {
+    this.selectedCreature = selectedCreature;
+  }
+
+  public Creature getSelectedCreature() {
+    return selectedCreature;
+  }
 }

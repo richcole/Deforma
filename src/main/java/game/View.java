@@ -35,9 +35,17 @@ import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
 
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+import game.math.Vector;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 
 public class View {
 
@@ -127,7 +135,7 @@ public class View {
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glViewport(0, 0, (int)getWidth(), (int)getHeight());
     
-    glLightModel(GL_LIGHT_MODEL_AMBIENT, context.getColors().getGray9());                 
+    glLightModel(GL_LIGHT_MODEL_AMBIENT, context.getColors().getGray9());
   }
 
   public void perspectiveView() {
@@ -137,7 +145,7 @@ public class View {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   }
-
+  
   public void orthoView() {
     GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
     glMatrixMode(GL_PROJECTION);

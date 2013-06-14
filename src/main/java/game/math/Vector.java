@@ -31,6 +31,13 @@ public class Vector {
     v[3] = x4;
   }
   
+  public Vector(float x1, float x2, float x3) {
+    v[0] = x1;
+    v[1] = x2;
+    v[2] = x3;
+    v[3] = 1;
+  }
+
   public Vector() {
   }
 

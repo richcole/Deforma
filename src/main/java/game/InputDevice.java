@@ -1,10 +1,19 @@
 package game;
 
+import game.math.Vector;
+import game.models.Creature;
+import game.models.Terrain.Tile;
+
+import org.apache.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 
 public class InputDevice {
+  
+  private static Logger logger = Logger.getLogger(InputDevice.class);
   
   float mx = 0, my = 0;
   float x = 0, y = 0;
@@ -82,32 +91,61 @@ public class InputDevice {
   }
 
   private boolean processMouse() {
+    boolean eventProcessed = false;
     if ( ! grabbed ) {
-      while( Mouse.next() );
+      while( Mouse.next() ) {
+        boolean pressed = Mouse.getEventButtonState();
+        if ( pressed ) {
+          int button = Mouse.getEventButton();
+          switch( button ) {
+          case 0:
+            selectTerrainCreature(Mouse.getX(), Mouse.getY());
+            break;
+          }
+        }
+      }
       return false;
     }
-    boolean eventProcessed = false;
-    while( Mouse.next() ) {
-      if ( haveMouseCoords ) {
-        x += Mouse.getX() - mx;
-        y += Mouse.getY() - my;
+    else {
+      while( Mouse.next() ) {
+        if ( haveMouseCoords ) {
+          x += Mouse.getX() - mx;
+          y += Mouse.getY() - my;
+        }
+        haveMouseCoords = true;
+        mx = Mouse.getX();
+        my = Mouse.getY();
+        float minX = context.getView().getWidth() / 5;
+        float minY = context.getView().getHeight() / 5;
+        float maxX = context.getView().getWidth() - minX;
+        float maxY = context.getView().getHeight() - minY;
+        if ( mx <= minX || mx >= maxX || my <= minY || my >= maxY ) {
+          haveMouseCoords = false;
+          Mouse.setCursorPosition((int)context.getView().getWidth()/2, (int)context.getView().getHeight()/2);
+        }
+        eventProcessed = true;
       }
-      haveMouseCoords = true;
-      mx = Mouse.getX();
-      my = Mouse.getY();
-      float minX = context.getView().getWidth() / 5;
-      float minY = context.getView().getHeight() / 5;
-      float maxX = context.getView().getWidth() - minX;
-      float maxY = context.getView().getHeight() - minY;
-      if ( mx <= minX || mx >= maxX || my <= minY || my >= maxY ) {
-        haveMouseCoords = false;
-        Mouse.setCursorPosition((int)context.getView().getWidth()/2, (int)context.getView().getHeight()/2);
-      }
-      eventProcessed = true;
     }
     return eventProcessed;
   }
   
+  private void selectTerrainCreature(int x2, int y2) {
+    Vector f = context.getSelectionRay().getSelectionRay((float)x2, (float)y2);
+    Player player = context.getPlayer();
+    Vector p = player.getPos();
+    double s = -p.z() / f.z();
+    Vector x = p.plus(f.times(s));
+    Tile tile = context.getTerrain().tileAt(x);
+    Creature selectedCreature = tile.getCreature();
+    if ( player.getSelectedCreature() != null ) {
+      player.getSelectedCreature().setSelected(false);
+    }
+    player.setSelectedCreature(selectedCreature);
+    if ( selectedCreature != null ) {
+      selectedCreature.setSelected(true);
+    }
+  }
+
   boolean getQuit() {
     return quit;
   }

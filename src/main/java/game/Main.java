@@ -1,6 +1,5 @@
 package game;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -15,10 +14,10 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    BasicConfigurator.configure();
+    Context context = new Context();
     openDisplay();
     try {
-      new Context().getMain().run();
+      context.getMain().run();
     }
     catch(RuntimeException e) {
       logger.info("Exception raised in main", e);

@@ -38,9 +38,6 @@ public class KeyReader {
     keyIndex = Multimaps.newListMultimap(Maps.<String, Collection<Resource>>newHashMap(), new ListSupplier<Resource>());
     for(int i=0;i<header.numKeys;++i) {
       KeyReader.KeyEntry entry = readKeyEntry(i);
-      if ( ResourceType.getType(entry.type) == ResourceType.MDL ) {
-        logger.info("model " + entry.name + " type " + ResourceType.getType(entry.type));
-      }
       keyIndex.put(entry.name, createResource(entry));
     }
   }
@@ -170,6 +167,10 @@ public class KeyReader {
       modelMap.put(modelName, model);
     }
     return model;
+  }
+  
+  public Multimap<String, Resource> getKeyIndex() {
+    return keyIndex;
   }
 
 }

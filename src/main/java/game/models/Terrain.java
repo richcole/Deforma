@@ -21,17 +21,28 @@ public class Terrain implements Renderable {
   
   Rect rect;
   
-  static class Tile {
+  public static class Tile {
 
-    private int x;
-    private int y;
-    Creature creature;
+    public int x;
+    public int y;
+    public Creature creature;
 
     public Tile(int x, int y) {
       this.x = x;
       this.y = y;
     }
 
+    public Creature getCreature() {
+      return creature;
+    }
+
+    public int getX() {
+      return x;
+    }
+
+    public int getY() {
+      return y;
+    }
   }
   
   public Terrain(Context context, int dx, int dy, double size) {
