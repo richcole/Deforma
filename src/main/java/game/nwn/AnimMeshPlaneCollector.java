@@ -2,9 +2,6 @@ package game.nwn;
 
 import game.Context;
 import game.base.Face;
-import game.base.Texture;
-import game.math.Matrix;
-import game.math.Quaternion;
 import game.math.Vector;
 import game.models.AnimMesh;
 import game.nwn.NwnMesh.Visitor;
@@ -12,12 +9,9 @@ import game.nwn.readers.MdlFace;
 import game.nwn.readers.MdlMeshHeader;
 import game.nwn.readers.MdlNodeHeader;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-
-import com.google.common.collect.Lists;
 
 public class AnimMeshPlaneCollector implements Visitor {
   

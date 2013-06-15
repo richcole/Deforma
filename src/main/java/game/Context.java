@@ -4,13 +4,14 @@ import game.base.Texture;
 import game.base.Textures;
 import game.math.Vector;
 import game.models.BigCube;
-import game.models.Light;
 import game.models.Creature;
+import game.models.Light;
 import game.models.Model;
 import game.models.Models;
 import game.models.SkyBox;
 import game.models.Terrain;
 import game.models.TerrainTile;
+import game.nwn.main.Main;
 import game.nwn.readers.KeyReader;
 
 import java.io.File;
@@ -78,7 +79,7 @@ public class Context {
     return simulator;
   }
 
-  View getView() {
+  public View getView() {
     if ( view == null ) {
       view = new View(this);
     }

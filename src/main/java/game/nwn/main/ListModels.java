@@ -1,12 +1,13 @@
-package game.nwn.readers;
+package game.nwn.main;
 
-import java.io.BufferedWriter;
+import game.Context;
+import game.nwn.readers.KeyReader;
+import game.nwn.readers.Resource;
+import game.nwn.readers.ResourceType;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.io.Writer;
-
-import game.Context;
 
 import org.apache.log4j.Logger;
 
@@ -22,14 +23,6 @@ public class ListModels {
     this.context = context;
   }
 
-  public void println(String string) {
-    System.out.println(string);
-  }
-  
-  public void printlnJson(Object obj) {
-    System.out.println(context.getGson().toJson(obj));
-  }
-  
   public static void main(String[] args) {
     new ListModels(new Context()).run();
   }
@@ -41,8 +34,8 @@ public class ListModels {
       PrintStream out = new PrintStream(new FileOutputStream(new File("list")));
       try {
         for(Resource resource: keyReader.getKeyIndex().values()) {
-          ResourceType type = ResourceType.getType(resource.entry.type);
-          out.println(resource.entry.name + " " + (type != null ? type.name() : resource.entry.type));
+          ResourceType type = ResourceType.getType(resource.getEntry().getType());
+          out.println(resource.getEntry().getName() + " " + (type != null ? type.name() : resource.getEntry().getType()));
         }
       } finally {
         out.close();

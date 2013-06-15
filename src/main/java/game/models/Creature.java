@@ -3,19 +3,12 @@ package game.models;
 import game.Anim;
 import game.Context;
 import game.Renderable;
-import game.base.Face;
 import game.base.SimObject;
-import game.base.Texture;
-import game.base.io.Serializer;
 import game.math.MathUtils;
 import game.math.Vector;
 import game.models.Terrain.Tile;
 import game.nwn.NwnMesh;
-import game.nwn.NwnTextureProvider;
-import game.nwn.readers.MdlModel;
 
-import java.io.File;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;

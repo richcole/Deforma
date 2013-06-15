@@ -1,4 +1,6 @@
-package game;
+package game.nwn.main;
+
+import game.Context;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;

@@ -1,10 +1,5 @@
 package game.models;
 
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.lwjgl.opengl.GL11;
-
 import game.Anim;
 import game.Context;
 import game.base.Face;
@@ -18,6 +13,11 @@ import game.models.AnimMesh.Node;
 import game.models.AnimMesh.PositionTiming;
 import game.models.AnimMesh.RotationTiming;
 import game.models.AnimMesh.Timing;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 public class AnimMeshRenderer {
   

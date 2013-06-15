@@ -1,10 +1,10 @@
 package game.models;
 
-import org.lwjgl.opengl.GL11;
-
 import game.Context;
 import game.Renderable;
 import game.math.Vector;
+
+import org.lwjgl.opengl.GL11;
 
 public class TerrainTile implements Renderable {
   

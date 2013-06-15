@@ -8,13 +8,13 @@ import java.io.File;
 public class BifReader implements Closeable {
   
   String bifFileName;
-  BinaryFileReader inp;
+  private BinaryFileReader inp;
   Header header;
   BifEntry entry;
 
   BifReader(BifEntry entry, File bifFile) {
     this.entry = entry;
-    this.inp = new BinaryFileReader(bifFile);
+    this.setInp(new BinaryFileReader(bifFile));
     this.header = readHeader();
   }
   
@@ -35,28 +35,36 @@ public class BifReader implements Closeable {
   }
 
   public Header readHeader() {
-    inp.seek(0);
+    getInp().seek(0);
     Header header = new Header();
-    header.sig = inp.readString(4);
-    header.version = inp.readString(4);
-    header.entries = inp.readWord();
-    header.tiles = inp.readWord();
-    header.entryOffset = inp.readWord();
+    header.sig = getInp().readString(4);
+    header.version = getInp().readString(4);
+    header.entries = getInp().readWord();
+    header.tiles = getInp().readWord();
+    header.entryOffset = getInp().readWord();
     return header;
   }
   
   public EntryHeader readEntryHeader(int i) {
-    inp.seek(header.entryOffset + i*16);
+    getInp().seek(header.entryOffset + i*16);
     EntryHeader entryHeader = new EntryHeader();
-    entryHeader.ids = inp.readWord();
-    entryHeader.offset = inp.readWord();
-    entryHeader.size = inp.readWord();
-    entryHeader.type = inp.readWord();
+    entryHeader.ids = getInp().readWord();
+    entryHeader.offset = getInp().readWord();
+    entryHeader.size = getInp().readWord();
+    entryHeader.type = getInp().readWord();
     return entryHeader;
   }
 
   public void close() {
-    inp.close();
+    getInp().close();
+  }
+
+  public BinaryFileReader getInp() {
+    return inp;
+  }
+
+  public void setInp(BinaryFileReader inp) {
+    this.inp = inp;
   }
   
 }

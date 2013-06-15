@@ -90,7 +90,7 @@ public enum ResourceType {
     }
   }
   
-  static ResourceType getType(int id) {
+  public static ResourceType getType(int id) {
     return idMap.get(id);
   }
 

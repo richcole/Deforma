@@ -1,27 +1,20 @@
-package game.nwn.readers;
+package game.nwn.main;
 
 import game.Context;
-import game.base.Face;
 import game.base.io.Serializer;
 import game.models.AnimMesh;
 import game.models.Model;
 import game.nwn.NwnMesh;
+import game.nwn.readers.MdlReader;
+import game.nwn.readers.Resource;
+import game.nwn.readers.ResourceType;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import com.google.gson.GsonBuilder;
 
 public class ExtractModels {
   
@@ -33,14 +26,6 @@ public class ExtractModels {
     this.context = context;
   }
 
-  public void println(String string) {
-    System.out.println(string);
-  }
-  
-  public void printlnJson(Object obj) {
-    System.out.println(context.getGson().toJson(obj));
-  }
-  
   public static void main(String[] args) {
     new ExtractModels(new Context()).run();
   }
@@ -70,7 +55,7 @@ public class ExtractModels {
   }
 
   public void writeEntry(Resource resource, File out) {
-    byte[] bytes = resource.reader.inp.readBytes(resource.offset, resource.length);
+    byte[] bytes = resource.getReader().getInp().readBytes(resource.getOffset(), resource.getLength());
     try {
       Files.write(bytes, out);
     }

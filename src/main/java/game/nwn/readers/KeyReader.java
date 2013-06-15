@@ -4,10 +4,8 @@ import game.Context;
 import game.base.Image;
 import game.imageio.TgaLoader;
 import game.nwn.readers.BifReader.EntryHeader;
-import game.nwn.readers.KeyReader.Header;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Map;
 
@@ -49,7 +47,7 @@ public class KeyReader {
   private void readKeyIndex(String keyName, Header header, BinaryFileReader inp) {
     for(int i=0;i<header.numKeys;++i) {
       KeyReader.KeyEntry entry = readKeyEntry(header, inp, i);
-      keyIndex.put(entry.name, createResource(keyName, header, inp, entry));
+      keyIndex.put(entry.getName(), createResource(keyName, header, inp, entry));
     }
   }
 
@@ -70,7 +68,7 @@ public class KeyReader {
     if ( image == null ) {
       Resource r = getResource(name, ResourceType.TGA);
       TgaLoader imageLoader = new TgaLoader();
-      image = imageLoader.readImage(r.reader.inp, r.offset);
+      image = imageLoader.readImage(r.getReader().getInp(), r.getOffset());
       imageMap.put(name, image);
     }
     return image;
@@ -83,13 +81,13 @@ public class KeyReader {
   
   public Resource getResource(String name, ResourceType type) {
     for(Resource r: keyIndex.get(name.toLowerCase())) {
-      if (r.entry.type == type.getId()) {
+      if (r.getEntry().getType() == type.getId()) {
         return r;
       }
     }
     for(Resource r: keyIndex.values()) {
       if ( r.getName().equalsIgnoreCase(name) ) {
-        logger.info("File " + r.getName() + " type=" + r.entry.type);
+        logger.info("File " + r.getName() + " type=" + r.getEntry().getType());
       }
     }
     throw new RuntimeException("Unable to find resource with name " + name + " and type " + type);
@@ -124,8 +122,8 @@ public class KeyReader {
   }
 
   static public class KeyEntry {
-    String name;
-    int    type;
+    private String name;
+    private int    type;
     long   ids;
     
     int getBifIndex() {
@@ -134,6 +132,22 @@ public class KeyReader {
     
     int getResourceIndex() {
       return (int)(ids & 0xfffff);
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public int getType() {
+      return type;
+    }
+
+    public void setType(int type) {
+      this.type = type;
     }
   }
   
@@ -165,8 +179,8 @@ public class KeyReader {
   public KeyEntry readKeyEntry(Header header, BinaryFileReader inp, int i) {
     inp.seek(header.keyTableOffset + i*22);
     KeyEntry fileEntry = new KeyEntry();
-    fileEntry.name = inp.readNullString(16);
-    fileEntry.type = inp.readShort();
+    fileEntry.setName(inp.readNullString(16));
+    fileEntry.setType(inp.readShort());
     fileEntry.ids = inp.readWord();
     return fileEntry;
   }

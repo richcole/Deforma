@@ -144,7 +144,7 @@ public class InputDevice {
     }
   }
 
-  boolean getQuit() {
+  public boolean getQuit() {
     return quit;
   }
 

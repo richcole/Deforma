@@ -4,7 +4,6 @@ import game.base.SimObject;
 import game.math.Matrix;
 import game.math.Vector;
 import game.models.Creature;
-import game.models.LittleCube;
 import game.models.LittleLight;
 
 import org.lwjgl.util.glu.GLU;

@@ -11,8 +11,6 @@ import org.apache.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-// note that this model reader is not correct I couldn't find an accurate description
-// of the NWN model format
 public class MdlReader {
   
   private static Logger logger = Logger.getLogger(MdlReader.class);
@@ -28,11 +26,11 @@ public class MdlReader {
   public MdlReader(KeyReader keyReader, Resource resource) {
     this.keyReader = keyReader;
     this.resource = resource;
-    this.inp = resource.reader.inp;
+    this.inp = resource.getReader().getInp();
   }
   
   public MdlModel readModel() {
-    inp.seek(resource.offset);
+    inp.seek(resource.getOffset());
     this.header = readHeader();
     this.header.setModel(readMdlModel());
     return header.getModel();
@@ -320,7 +318,7 @@ public class MdlReader {
   }
 
   public Header readHeader() {
-    inp.seek(resource.offset);
+    inp.seek(resource.getOffset());
     Header r = new Header();
     r.zero = inp.readWord();
     if ( r.zero != 0 ) {
@@ -333,17 +331,17 @@ public class MdlReader {
   
   long seekOffset(long offset) {
     long mark = inp.pos();
-    if ( offset >= resource.length ) {
+    if ( offset >= resource.getLength() ) {
       throw new RuntimeException("Overrun offset=" + offset);
     }
-    long seekPos = offset + resource.offset + 12;
+    long seekPos = offset + resource.getOffset() + 12;
     inp.seek(seekPos);
     return mark;
   }
   
   long seekExternalOffset(long offset) {
     long mark = inp.pos();
-    long seekPos = offset + resource.offset + 12;
+    long seekPos = offset + resource.getOffset() + 12;
     inp.seek(seekPos);
     return mark;
   }

@@ -3,8 +3,6 @@ package game.base;
 import game.Context;
 import game.math.Vector;
 
-import org.apache.log4j.Logger;
-
 public class PhysicalObject implements SimObject {
   
   protected Context context;

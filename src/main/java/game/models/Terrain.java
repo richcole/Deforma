@@ -1,15 +1,12 @@
 package game.models;
 
-import java.util.List;
-import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import game.Context;
 import game.Renderable;
 import game.math.Vector;
-import game.models.Terrain.Tile;
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class Terrain implements Renderable {
 
