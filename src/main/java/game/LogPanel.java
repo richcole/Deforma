@@ -7,28 +7,33 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import game.nwn.readers.set.Tile;
+
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.List;
 
 import javax.vecmath.Vector3d;
 
+import com.google.common.collect.Lists;
+
 public class LogPanel {
 
-
   MutableTexture texture;
-  int x, y, width, height;
+  int width, height, lineSpacing, leftMargin, boxHeight;
   double renderSpeed = 0;
   double sleepTime;
   
-  String text;
+  List<String> texts;
 
   private Context context;
 
   public LogPanel(Context context) {
     this.context = context;
-    x = 10;
-    y = 10;
+    leftMargin = 10;
+    lineSpacing = 15;
+    boxHeight = 50;
     width = (int) context.getView().getWidth();
     height = (int) context.getView().getHeight();
     texture = new MutableTexture(width, height);
@@ -37,11 +42,20 @@ public class LogPanel {
   public String format(Vector3d v) {
     return String.format("(%2.2f,%2.2f,%2.2f)", v.x, v.y, v.z);
   }
+  
+  public void reset() {
+    texts = Lists.newArrayList();
+  }
+  
+  public void writeLine(String format, Object ... args) {
+    texts.add(String.format(format, args));
+  }
 
   public void render() {
-    text =  "p=" + context.getPlayer().pos;
-    text += String.format(" rate = %3.2e", 1000.0 / renderSpeed);  
-    text += String.format(" sleep = %3.2e", sleepTime); 
+    Tile tile = context.getPlayer().getTile();
+    reset();
+    writeLine("p=%s rate=%3.2f sleep=%3.2f", context.getPlayer().pos, 1000.0 / renderSpeed,  sleepTime);
+    writeLine("top=%s left=%s bottom=%s right=%s", tile.getTopLeft(), tile.getLeft(), tile.getBottom(), tile.getRight());
     renderFlat();
     renderGL();
   }
@@ -70,10 +84,17 @@ public class LogPanel {
   private void renderFlat() {
     Graphics2D g = texture.getGraphics();
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0));
-    g.clearRect(0, 0, width, height);
-    g.setColor(Color.white);
+    g.clearRect(0, height - boxHeight, width, height);
     g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1));
-    g.drawString(text, x, y);
+    g.setPaint(Color.black);
+    g.fillRect(0, height - boxHeight, width, boxHeight);
+    g.setColor(Color.white);
+    
+    int offset = lineSpacing;
+    for(String text: texts) {
+      g.drawString(text, leftMargin, height - boxHeight + offset);
+      offset += lineSpacing;
+    }
     g.dispose();
   }
 

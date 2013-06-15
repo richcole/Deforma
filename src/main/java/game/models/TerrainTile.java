@@ -2,6 +2,7 @@ package game.models;
 
 import game.Context;
 import game.Renderable;
+import game.enums.Model;
 import game.math.Vector;
 
 import org.lwjgl.opengl.GL11;
@@ -19,7 +20,6 @@ public class TerrainTile implements Renderable {
   public TerrainTile(Context context, Vector pos, Model model) {
     this.context = context;
     this.pos = pos;
-    this.model = model;
     this.scale = context.getScale();
     this.renderer = new AnimMeshRenderer(context);
     this.animMesh = context.getModels().getAnimMesh(model);
@@ -36,6 +36,14 @@ public class TerrainTile implements Renderable {
 
   public void register() {
     context.getScene().register(this);
+  }
+  
+  public void setModel(String modelName) {
+    this.animMesh = context.getModels().getAnimMesh(modelName);
+  }
+
+  public void setPos(Vector pos) {
+    this.pos = pos;
   }
 
 }

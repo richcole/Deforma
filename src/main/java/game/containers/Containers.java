@@ -6,7 +6,7 @@ public class Containers {
     return new TriMap<K1, K2, V>();
   }
 
-  public static <K, V> CacheMap<K, V> newCachMap() {
+  public static <K, V> CacheMap<K, V> newCacheMap() {
     return new CacheMap<K, V>();
   }
 }

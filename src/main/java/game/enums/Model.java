@@ -1,8 +1,6 @@
-package game.models;
+package game.enums;
 
-import java.io.File;
-
-public enum Model {
+public enum Model implements Res {
   
   Wererat("c_wererat"),
   Tcn01_r10_01("tcn01_r10_01");
@@ -17,8 +15,8 @@ public enum Model {
     return resName;
   }
   
-  public File getResFile() {
-    return new File("res/" + resName + ".mdl.gz");
+  public String getResType() {
+    return "mdl";
   }
-
+  
 }

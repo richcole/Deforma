@@ -1,12 +1,13 @@
 package game.models;
 
-import game.Anim;
 import game.Context;
 import game.Renderable;
 import game.base.SimObject;
+import game.enums.Anim;
+import game.enums.Model;
 import game.math.MathUtils;
 import game.math.Vector;
-import game.models.Terrain.Tile;
+import game.models.Grid.GridSquare;
 import game.nwn.NwnMesh;
 
 import java.util.Random;
@@ -28,7 +29,7 @@ public class Creature implements Renderable, SimObject {
   double alpha = 0;
   
   Vector dest;
-  Tile tile;
+  GridSquare tile;
   Creature target;
   boolean selected;
   
@@ -79,7 +80,7 @@ public class Creature implements Renderable, SimObject {
   public void tick() {
     tick = tick + 1;
     incrementAlpha();
-    Terrain terrain = context.getTerrain();
+    Grid terrain = context.getTerrain();
     if ( tile == null ) {
       tile = terrain.addCreature(this, pos);
       pos = terrain.center(tile);
@@ -87,7 +88,7 @@ public class Creature implements Renderable, SimObject {
     if ( state == State.TRAVELLING ) {
       velocity = dest.minus(pos).scaleTo(scale / 500f);
       Vector newPos = pos.plus(velocity);
-      Tile newTile = terrain.tileAt(newPos);
+      GridSquare newTile = terrain.getGridSquareAt(newPos);
       if ( newTile == tile ) {
         pos = newPos;
       } else if (newTile.creature == null) {
@@ -102,15 +103,15 @@ public class Creature implements Renderable, SimObject {
     } else if ( state == State.WAITING ) {
       Random random = new Random();
       if ( random.nextInt(1000) <= 1 ) {
-        int x = random.nextInt(terrain.dx);
-        int y = random.nextInt(terrain.dy);
+        int x = random.nextInt(terrain.gx);
+        int y = random.nextInt(terrain.gy);
         dest = terrain.center(x, y); 
         alpha = 0;
         state = State.TRAVELLING;
       }
     } 
     if ( target == null ) {
-      for(Tile otherTile: terrain.neighbourhood(tile, 1)) {
+      for(GridSquare otherTile: terrain.gridNeighbourhood(tile, 1)) {
         if ( otherTile.creature != null ) {
           target = otherTile.creature;
         }
@@ -127,7 +128,7 @@ public class Creature implements Renderable, SimObject {
     }
   }
 
-  private boolean nearCenterOfTile(Terrain terrain) {
+  private boolean nearCenterOfTile(Grid terrain) {
     return nearPoint(terrain.center(tile));
   }
   

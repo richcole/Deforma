@@ -25,28 +25,32 @@ public class SetReader {
   private static Logger logger = Logger.getLogger(SetReader.class);
   
   Resource resource;
-  BinaryFileReader inp;
   TriMap<String, String, String> trimap = Containers.newTriMap();
-  CacheMap<Class<? extends Object>, Map<String, FieldDescription>> typeMap = Containers.newCachMap();
-  TileSet tileSet = new TileSet();
+  CacheMap<Class<? extends Object>, Map<String, FieldDescription>> typeMap = Containers.newCacheMap();
   
-  public static class TileSet {
+  public static class TileSetDescription {
     General general;
     Grass grass;
     List<TerrainType> terrainTypes = Lists.newArrayList();
     List<CrosserType> crosserTypes = Lists.newArrayList();
     List<PrimaryRule> primaryRules = Lists.newArrayList();
     List<PrimaryRule> secondaryRules = Lists.newArrayList();
-    List<Tile> tiles = Lists.newArrayList();
+    private List<Tile> tiles = Lists.newArrayList();
     List<Group> groups = Lists.newArrayList();
+    public List<Tile> getTiles() {
+      return tiles;
+    }
+    public void setTiles(List<Tile> tiles) {
+      this.tiles = tiles;
+    }
   }
 
-  public SetReader(Resource resource) {
-    this.resource = resource;
-    this.inp = resource.getReader().getInp();
+  public SetReader() {
   }
   
-  public void read() {
+  public TileSetDescription read(Resource resource) {
+    BinaryFileReader inp = resource.getReader().getInp();
+    TileSetDescription tileSet = new TileSetDescription();
     try {
       inp.seek(resource.getOffset());
       byte[] bytes = inp.readBytes(resource.getLength());
@@ -83,7 +87,6 @@ public class SetReader {
             } else {
               --expectedCount;
             }
-            
           } 
           
           shortClassName = getClassName(header);
@@ -119,10 +122,14 @@ public class SetReader {
           if ( target != null ) {
             String fieldName = uncapitalize(shortClassName);
             if ( targetType != null ) {
-              List list = (List) parentTarget.getClass().getDeclaredField(fieldName + "s").get(parentTarget);
+              Field field = parentTarget.getClass().getDeclaredField(fieldName + "s");
+              field.setAccessible(true);
+              List list = (List) field.get(parentTarget);
               list.add(target);
             } else {
-              parentTarget.getClass().getDeclaredField(fieldName).set(parentTarget, target);
+              Field field = parentTarget.getClass().getDeclaredField(fieldName);
+              field.setAccessible(true);
+              field.set(parentTarget, target);
             }
           }   
         } else {
@@ -137,6 +144,7 @@ public class SetReader {
     } catch(Exception e) {
       Throwables.propagate(e);
     }
+    return tileSet;
   }
 
   private String getClassName(String header) {

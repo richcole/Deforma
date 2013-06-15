@@ -1,9 +1,9 @@
 package game.models;
 
-import game.Anim;
 import game.Context;
 import game.base.Face;
 import game.base.Texture;
+import game.enums.Anim;
 import game.math.Matrix;
 import game.math.Quaternion;
 import game.math.Vector;

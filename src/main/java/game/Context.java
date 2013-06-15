@@ -2,15 +2,18 @@ package game;
 
 import game.base.Texture;
 import game.base.Textures;
+import game.base.io.Serializer;
+import game.enums.Model;
 import game.math.Vector;
 import game.models.BigCube;
 import game.models.Creature;
 import game.models.Light;
-import game.models.Model;
 import game.models.Models;
+import game.models.ResFiles;
 import game.models.SkyBox;
-import game.models.Terrain;
+import game.models.Grid;
 import game.models.TerrainTile;
+import game.models.TileSetDescriptions;
 import game.nwn.main.Main;
 import game.nwn.readers.KeyReader;
 
@@ -40,14 +43,17 @@ public class Context {
   Material material;
   Colors colors;
   Creature creature;
-  Terrain terrain;
+  Grid terrain;
   File root;
+  ResFiles resFiles;
   
   Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
   KeyReader keyReader;
   Textures textures;
   SelectionRay selectionRay;
   Models models;
+  Serializer serializer;
+  TileSetDescriptions tileSetDescriptions;
 
   List<File> roots = Lists.newArrayList(
     new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
@@ -191,9 +197,9 @@ public class Context {
     return textures;
   }
   
-  public Terrain getTerrain() {
+  public Grid getTerrain() {
     if ( terrain == null ) {
-      terrain = new Terrain(this, 20, 20, 20f);
+      terrain = new Grid(this, 32, 32);
     }
     return terrain;
   }
@@ -219,4 +225,34 @@ public class Context {
   public double getScale() {
     return 10;
   }
+  
+  public double getGridScale() {
+    return 10;
+  }
+
+  public double getTileScale() {
+    return 80;
+  }
+
+  public ResFiles getResFiles() {
+    if ( resFiles == null ) {
+      resFiles = new ResFiles();
+    }
+    return resFiles;
+  }
+
+  public Serializer getSerializer() {
+    if ( serializer == null ) {
+      serializer = new Serializer();
+    }
+    return serializer;
+  }
+
+  public TileSetDescriptions getTileSetDescriptions() {
+    if ( tileSetDescriptions == null ) {
+      tileSetDescriptions = new TileSetDescriptions(this);
+    }
+    return tileSetDescriptions;
+  }
+
 }

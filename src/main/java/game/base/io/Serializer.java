@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.log4j.Logger;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,6 +32,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class Serializer {
+  
+  private static Logger logger = Logger.getLogger(Serializer.class);
   
   private Gson gson;
   
@@ -112,6 +116,7 @@ public class Serializer {
   }
   
   public void serialize(Object obj, File outputFile) {
+    logger.info("Writing to " + outputFile.getPath());
     try {
       OutputStreamWriter writer = getGzipWriter(outputFile);
       try {

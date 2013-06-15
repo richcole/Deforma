@@ -2,25 +2,29 @@ package game.nwn.main;
 
 import game.Context;
 import game.base.io.Serializer;
+import game.enums.Model;
+import game.enums.TileSet;
 import game.models.AnimMesh;
-import game.models.Model;
 import game.nwn.NwnMesh;
 import game.nwn.readers.MdlReader;
 import game.nwn.readers.Resource;
 import game.nwn.readers.ResourceType;
+import game.nwn.readers.set.SetReader;
+import game.nwn.readers.set.Tile;
 
 import java.io.File;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
+import com.google.common.collect.Sets;
 
 public class ExtractModels {
   
   private static final Logger logger = Logger.getLogger(ExtractModels.class);
 
   Context context;
+  Set<String> visitedResources = Sets.newHashSet();
   
   ExtractModels(Context context) {
     this.context = context;
@@ -31,37 +35,58 @@ public class ExtractModels {
   }
   
   public void run() {
+    Serializer serializer = new Serializer();
     for(Model model: Model.values()) {
-      String resName = model.getResName();
-      MdlReader mdlReader = context.getKeyReader().getMdlReader(resName);
-      String resFileName = "res/" + resName + ".mdl.gz";
-      NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
-      AnimMesh animMesh = mesh.getAnimMesh();
-      Serializer serializer = new Serializer();
-      logger.info("Writing " + resFileName);
-      serializer.serialize(animMesh, new File(resFileName));
-      for(String textureName: animMesh.getTextures()) {
-        try {
-          Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
-          String textureResFileName = "res/" + textureName + ".tga";
-          logger.info("Writing " + textureResFileName);
-          textureResource.writeEntry(new File(textureResFileName));
-        }
-        catch(Exception e) {
-          logger.error("Unable to locate texture: " + textureName);
-        }
+      extractModel(serializer, model);
+    }
+    SetReader setReader = new SetReader();
+    for(TileSet tileSet: TileSet.values()) {
+      Resource res = context.getKeyReader().getResource(tileSet.getResName(), ResourceType.SET);
+      game.nwn.readers.set.SetReader.TileSetDescription ts = setReader.read(res);
+      serializer.serialize(ts, context.getResFiles().getResFile(tileSet));
+      for(Tile tile: ts.getTiles()) {
+        extractModel(serializer, tile.getModel());
       }
     }
   }
 
-  public void writeEntry(Resource resource, File out) {
-    byte[] bytes = resource.getReader().getInp().readBytes(resource.getOffset(), resource.getLength());
-    try {
-      Files.write(bytes, out);
+  private void extractModel(Serializer serializer, Model model) {
+    String resName = model.getResName();
+    extractModel(serializer, resName);
+  }
+
+  private void extractModel(Serializer serializer, String resName) {
+    String resFileName = "res/" + resName + ".mdl.gz";
+    if ( haveVisitedResource(resFileName) ) {
+      return;
     }
-    catch(Exception e) {
-      Throwables.propagate(e);
+    MdlReader mdlReader = context.getKeyReader().getMdlReader(resName);
+    NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
+    AnimMesh animMesh = mesh.getAnimMesh();
+    logger.info("Writing " + resFileName);
+    serializer.serialize(animMesh, new File(resFileName));
+    for(String textureName: animMesh.getTextures()) {
+      try {
+        String textureResFileName = "res/" + textureName + ".tga";
+        if ( haveVisitedResource(textureResFileName) ) {
+          continue;
+        }
+        Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
+        logger.info("Writing " + textureResFileName);
+        textureResource.writeEntry(new File(textureResFileName));
+      }
+      catch(Exception e) {
+        logger.error("Unable to locate texture: " + textureName);
+      }
     }
   }
 
+  public boolean haveVisitedResource(String res) {
+    if ( visitedResources.contains(res) ) {
+      return true;
+    } else {
+      visitedResources.add(res);
+      return false;
+    }
+  }
 }

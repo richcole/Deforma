@@ -32,9 +32,11 @@ public class MutableTexture {
 
   int textureId;
   Image img;
+  ByteBuffer byteBuf;
   
   MutableTexture(int width, int height) {
     img = new Image(width, height);
+    byteBuf = ByteBuffer.allocateDirect(width*height*4);
     allocateTextureId();
     glBindTexture(GL_TEXTURE_2D, textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -45,14 +47,14 @@ public class MutableTexture {
   }
   
   private ByteBuffer getByteBuffer(int[] buf) {
-    ByteBuffer byteBuf = ByteBuffer.allocateDirect(buf.length*4);
+    byteBuf.rewind();
     byteBuf.order(ByteOrder.nativeOrder());
     byteBuf.rewind();
     for(int i=0;i<buf.length;++i) {
+      byteBuf.put((byte)(buf[i] >> 0));
       byteBuf.put((byte)(buf[i] >> 8));
       byteBuf.put((byte)(buf[i] >> 16));
       byteBuf.put((byte)(buf[i] >> 24));
-      byteBuf.put((byte)(buf[i] >> 0));
     }
     byteBuf.flip();
     return byteBuf;

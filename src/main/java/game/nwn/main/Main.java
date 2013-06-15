@@ -41,7 +41,6 @@ public class Main {
       int lastTick = 0;
       context.getScene().register(context.getSkyBox());
       context.newCreature().register();
-      context.newTile().register();
       context.getTerrain().register();
       context.getPlayer().register();
 

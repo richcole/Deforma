@@ -1,6 +1,7 @@
 package game.nwn.main;
 
 import game.Context;
+import game.enums.TileSet;
 import game.nwn.readers.KeyReader;
 import game.nwn.readers.Resource;
 import game.nwn.readers.ResourceType;
@@ -27,11 +28,11 @@ public class ReadTileSet {
   public void run() {
     KeyReader keyReader = context.getKeyReader();
     try {
-      String resourceName = "tin01";
+      String resourceName = TileSet.Tin01.getResName();
       ResourceType resourceType = ResourceType.SET;
       Resource resource = keyReader.getResource(resourceName, resourceType);
-      SetReader setReader = new SetReader(resource);
-      setReader.read();
+      SetReader setReader = new SetReader();
+      setReader.read(resource);
     } catch(Exception e) {
       Throwables.propagate(e);
     }

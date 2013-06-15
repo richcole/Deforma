@@ -1,10 +1,15 @@
 package game;
 
 import game.base.SimObject;
+import game.enums.TileSet;
 import game.math.Matrix;
 import game.math.Vector;
 import game.models.Creature;
+import game.models.Grid.TileSquare;
 import game.models.LittleLight;
+import game.models.TerrainTile;
+import game.nwn.readers.set.SetReader.TileSetDescription;
+import game.nwn.readers.set.Tile;
 
 import org.lwjgl.util.glu.GLU;
 
@@ -30,12 +35,18 @@ public class Player implements SimObject {
 
   private Context context;
   private Creature selectedCreature;
+  private TileSquare selectedTileSquare;
+  private TileSetDescription tileSetDescription;
+  private Integer terrainTileIndex;
   
   public Player(Context context) {
     this.context = context;
     this.pos = Vector.ZERO;
     this.theta1 = 0;
     this.theta2 = 0;
+    this.tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
+    this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
+    this.terrainTileIndex = 0;
   }
 
   Vector getLeft() {
@@ -140,10 +151,44 @@ public class Player implements SimObject {
   }
 
   public void setSelectedCreature(Creature selectedCreature) {
+    if ( this.selectedCreature != null ) {
+      this.selectedCreature.setSelected(false);
+    }
+    if ( selectedCreature != null ) {
+      selectedCreature.setSelected(true);
+    }
     this.selectedCreature = selectedCreature;
   }
 
   public Creature getSelectedCreature() {
     return selectedCreature;
   }
+  
+  public void nextTerrainTileIndex() {
+    terrainTileIndex = (terrainTileIndex + 1) % this.tileSetDescription.getTiles().size();
+    updateSelectedTile();
+  }
+
+  private void updateSelectedTile() {
+    if ( selectedTileSquare != null ) {
+      if ( selectedTileSquare.getTerrainTile() == null ) {
+        selectedTileSquare.setTerrainTile(context.newTile());
+      }
+      selectedTileSquare.getTerrainTile().setModel(tileSetDescription.getTiles().get(terrainTileIndex).getModel());
+    }
+  }
+
+  public void prevTerrainTileIndex() {
+    terrainTileIndex = (terrainTileIndex - 1) % this.tileSetDescription.getTiles().size();
+    updateSelectedTile();
+  }
+
+  public Tile getTile() {
+    return tileSetDescription.getTiles().get(terrainTileIndex);
+  }
+
+  public void setSelectedTileSquare(TileSquare selectedTileSquare) {
+    this.selectedTileSquare = selectedTileSquare;
+  }
+
 }

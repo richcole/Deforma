@@ -2,7 +2,8 @@ package game;
 
 import game.math.Vector;
 import game.models.Creature;
-import game.models.Terrain.Tile;
+import game.models.Grid.GridSquare;
+import game.models.Grid.TileSquare;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -46,9 +47,6 @@ public class InputDevice {
       switch(key) {
       case Keyboard.KEY_RETURN:
         if ( pressed ) {
-          grabbed = ! grabbed;
-          Mouse.setGrabbed(grabbed);
-          haveMouseCoords = false;
         }
         break;
       case Keyboard.KEY_ESCAPE:
@@ -90,8 +88,10 @@ public class InputDevice {
 
   private boolean processMouse() {
     boolean eventProcessed = false;
-    if ( ! grabbed ) {
-      while( Mouse.next() ) {
+    while( Mouse.next() ) {
+      processRightClick();
+      processWheel();
+      if ( ! grabbed ) {
         boolean pressed = Mouse.getEventButtonState();
         if ( pressed ) {
           int button = Mouse.getEventButton();
@@ -102,10 +102,7 @@ public class InputDevice {
           }
         }
       }
-      return false;
-    }
-    else {
-      while( Mouse.next() ) {
+      else {
         if ( haveMouseCoords ) {
           x += Mouse.getX() - mx;
           y += Mouse.getY() - my;
@@ -126,6 +123,22 @@ public class InputDevice {
     }
     return eventProcessed;
   }
+
+  private void processRightClick() {
+    if ( Mouse.getEventButton() == 1 ) {
+      grabbed = Mouse.getEventButtonState();
+      Mouse.setGrabbed(grabbed);
+      haveMouseCoords = false;
+    }
+  }
+
+  private void processWheel() {
+    if ( Mouse.getEventDWheel() > 0 ) {
+      context.getPlayer().nextTerrainTileIndex();
+    } else if ( Mouse.getEventDWheel() < 0 ) {
+      context.getPlayer().nextTerrainTileIndex();
+    }
+  }
   
   private void selectTerrainCreature(int x2, int y2) {
     Vector f = context.getSelectionRay().getSelectionRay((float)x2, (float)y2);
@@ -133,15 +146,10 @@ public class InputDevice {
     Vector p = player.getPos();
     double s = -p.z() / f.z();
     Vector x = p.plus(f.times(s));
-    Tile tile = context.getTerrain().tileAt(x);
-    Creature selectedCreature = tile.getCreature();
-    if ( player.getSelectedCreature() != null ) {
-      player.getSelectedCreature().setSelected(false);
-    }
-    player.setSelectedCreature(selectedCreature);
-    if ( selectedCreature != null ) {
-      selectedCreature.setSelected(true);
-    }
+    GridSquare tile = context.getTerrain().getGridSquareAt(x);
+    player.setSelectedCreature(tile.getCreature());
+    TileSquare tileSquare = context.getTerrain().getTileSquareAt(x);
+    player.setSelectedTileSquare(tileSquare);
   }
 
   public boolean getQuit() {
