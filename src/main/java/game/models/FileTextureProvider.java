@@ -10,17 +10,17 @@ import java.io.File;
 
 public class FileTextureProvider implements TextureProvider {
 
-  private String fileName;
+  private File file;
 
-  public FileTextureProvider(String fileName) {
-    this.fileName = fileName;
+  public FileTextureProvider(File file) {
+    this.file = file;
   }
   
   @Override
   public Texture createTexture() {
-    if ( fileName.endsWith(".tga") ) {
+    if ( file.getName().endsWith(".tga") ) {
       TgaLoader imageLoader = new TgaLoader();
-      BinaryFileReader reader = new BinaryFileReader(new File(fileName));
+      BinaryFileReader reader = new BinaryFileReader(file);
       try {
         Image image = imageLoader.readImage(reader, 0);
         return new Texture(image);
@@ -28,7 +28,7 @@ public class FileTextureProvider implements TextureProvider {
         reader.close();
       }
     } else {
-      return new Texture(new File(fileName));
+      return new Texture(file);
     }
   }
 

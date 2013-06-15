@@ -41,9 +41,9 @@ public class Player implements SimObject {
   
   public Player(Context context) {
     this.context = context;
-    this.pos = Vector.ZERO;
-    this.theta1 = 0;
-    this.theta2 = 0;
+    this.pos = new Vector(-100, -100, 150);
+    this.theta1 = 45;
+    this.theta2 = -45;
     this.tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
     this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
     this.terrainTileIndex = 0;
@@ -62,9 +62,6 @@ public class Player implements SimObject {
   }
 
   public synchronized void render() {
-    theta1 = context.getInputDevice().getX() * 6.283f / 5000.0f;
-    theta2 = context.getInputDevice().getY() * 6.283f / 5000.0f;
-
     Matrix rotUp = Matrix.rot(-theta1, UP);
     left = rotUp.times(LEFT);
     normal = rotUp.times(NORMAL);
@@ -190,5 +187,9 @@ public class Player implements SimObject {
   public void setSelectedTileSquare(TileSquare selectedTileSquare) {
     this.selectedTileSquare = selectedTileSquare;
   }
-
+  
+  public void rotate(double dtheta1, double dtheta2) {
+    theta1 += dtheta1 * 6.283f / 5000.0f;
+    theta2 += dtheta2 * 6.283f / 5000.0f;
+  }
 }

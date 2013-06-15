@@ -1,4 +1,4 @@
-package game.nwn.main;
+package game.main;
 
 import game.Context;
 import game.nwn.readers.KeyReader;

@@ -78,7 +78,7 @@ public class AnimMeshRenderer {
   private void renderFace(Node node, String animName, Face face, Matrix tr) {
     faceCount += 1;
     if ( face.getTextureName() != null ) {
-      Texture texture = context.getTextures().getTexture(face.getTextureName(), new FileTextureProvider("res/" + face.getTextureName() + ".tga"));
+      Texture texture = context.getTextures().getFileTexture(face.getTextureName() + ".tga");
       texture.bind();
     }
     GL11.glMaterial(GL11.GL_FRONT, GL11.GL_DIFFUSE, context.getColors().getColor(face.getDiffuse()));

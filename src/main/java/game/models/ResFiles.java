@@ -14,4 +14,8 @@ public class ResFiles {
     return getResFile(res.getResName(), res.getResType());
   }
 
+  public File getImageRes(String name) {
+    return new File("res/" + name);
+  }
+
 }

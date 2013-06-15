@@ -104,8 +104,11 @@ public class InputDevice {
       }
       else {
         if ( haveMouseCoords ) {
-          x += Mouse.getX() - mx;
-          y += Mouse.getY() - my;
+          float dx = Mouse.getX() - mx;
+          float dy = Mouse.getY() - my;
+          x += dx;
+          y += dy;
+          context.getPlayer().rotate(dx, dy);
         }
         haveMouseCoords = true;
         mx = Mouse.getX();
@@ -147,9 +150,18 @@ public class InputDevice {
     double s = -p.z() / f.z();
     Vector x = p.plus(f.times(s));
     GridSquare tile = context.getTerrain().getGridSquareAt(x);
-    player.setSelectedCreature(tile.getCreature());
+    if ( tile  != null ) {
+      player.setSelectedCreature(tile.getCreature());
+    } else {
+      player.setSelectedCreature(null);
+    }
+    
     TileSquare tileSquare = context.getTerrain().getTileSquareAt(x);
-    player.setSelectedTileSquare(tileSquare);
+    if ( tileSquare != null ) {
+      player.setSelectedTileSquare(tileSquare);
+    } else {
+      player.setSelectedTileSquare(null);
+    }
   }
 
   public boolean getQuit() {
@@ -166,5 +178,9 @@ public class InputDevice {
 
   public void setQuit() {
     quit = true;
+  }
+  
+  public boolean getHaveMouseCoords() {
+    return haveMouseCoords;
   }
 }

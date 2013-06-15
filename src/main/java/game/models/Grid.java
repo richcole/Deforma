@@ -143,15 +143,19 @@ public class Grid implements Renderable {
   public GridSquare getGridSquareAt(Vector pos) {
     int x = (int) Math.floor(pos.x() / gridScale);
     int y = (int) Math.floor(pos.y() / gridScale);
-    GridSquare tile = gridSquares[gridIndex(x,y)];
-    return tile;
+    if ( x >= 0 && x < gx && y >= 0 && y < gy ) {
+      return gridSquares[gridIndex(x,y)];
+    }
+    return null;
   }
   
   public TileSquare getTileSquareAt(Vector pos) {
     int x = (int) Math.floor(pos.x() / tileScale);
     int y = (int) Math.floor(pos.y() / tileScale);
-    TileSquare tile = tileSquares[tileIndex(x,y)];
-    return tile;
+    if ( x >= 0 && x < tx && y >= 0 && y < ty ) {
+      return tileSquares[tileIndex(x,y)];
+    }
+    return null;
   }
 
   List<GridSquare> gridNeighbourhood(GridSquare tile, int i) {

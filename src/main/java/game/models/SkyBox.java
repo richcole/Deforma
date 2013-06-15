@@ -21,12 +21,12 @@ public class SkyBox extends Cube {
   @Override
   protected List<Texture> getTextures() {
     return Lists.newArrayList(
-      loadTexture("res/front.jpg"),
-      loadTexture("res/back.jpg"),
-      loadTexture("res/left.jpg"),
-      loadTexture("res/right.jpg"),
-      loadTexture("res/up.jpg"),
-      loadTexture("res/down.jpg")
+      loadTexture("front.jpg"),
+      loadTexture("back.jpg"),
+      loadTexture("left.jpg"),
+      loadTexture("right.jpg"),
+      loadTexture("up.jpg"),
+      loadTexture("down.jpg")
      );
   }
 

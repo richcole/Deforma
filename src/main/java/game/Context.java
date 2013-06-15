@@ -4,6 +4,7 @@ import game.base.Texture;
 import game.base.Textures;
 import game.base.io.Serializer;
 import game.enums.Model;
+import game.main.Main;
 import game.math.Vector;
 import game.models.BigCube;
 import game.models.Creature;
@@ -14,7 +15,6 @@ import game.models.SkyBox;
 import game.models.Grid;
 import game.models.TerrainTile;
 import game.models.TileSetDescriptions;
-import game.nwn.main.Main;
 import game.nwn.readers.KeyReader;
 
 import java.io.File;
@@ -108,7 +108,7 @@ public class Context {
 
   public Texture getStoneTexture() {
     if ( stoneTexture == null ) {
-      stoneTexture = getTextures().getFileTexture("res/image.jpg");
+      stoneTexture = getTextures().getFileTexture("image.jpg");
     }
     return stoneTexture;
   }
@@ -192,7 +192,7 @@ public class Context {
 
   public Textures getTextures() {
     if ( textures == null ) {
-      textures = new Textures();
+      textures = new Textures(this);
     }
     return textures;
   }

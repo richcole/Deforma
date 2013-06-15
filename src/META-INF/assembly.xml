@@ -40,7 +40,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>res</directory>
+            <directory>target/res</directory>
             <outputDirectory>res</outputDirectory>
             <includes>
                 <include>*</include>
