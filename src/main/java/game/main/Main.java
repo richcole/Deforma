@@ -1,6 +1,7 @@
 package game.main;
 
 import game.Context;
+import game.shaders.Box;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -39,6 +40,7 @@ public class Main {
     
     try {
       int lastTick = 0;
+      context.getScene().register(new Box(context));
       context.getScene().register(context.getSkyBox());
       context.newCreature().register();
       context.getTerrain().register();

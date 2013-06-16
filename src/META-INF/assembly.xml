@@ -13,30 +13,24 @@
 
     <fileSets>
         <fileSet>
-            <directory>src/main/resources</directory>
-            <outputDirectory>resources</outputDirectory>
-        </fileSet>
-
-        <!-- LWJGL natives -->
-        <fileSet>
-            <directory>${natives}</directory>
-            <outputDirectory>${release.natives}</outputDirectory>
-            <includes>
-                <include>*.dll</include>
-                <include>*.so</include>
-                <include>*.jnilib</include>
-            </includes>
+            <directory>src/main/shaders</directory>
+            <outputDirectory>shaders</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>src/main/scripts</directory>
             <outputDirectory></outputDirectory>
-            <includes>
-                <include>*.sh</include>
-                <include>*.bat</include>
-            </includes>
-            <filtered>true</filtered>
             <fileMode>0755</fileMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>target/natives</directory>
+            <outputDirectory>natives</outputDirectory>
+            <includes>
+                <include>*.dll</include>
+                <include>*.so</include>
+                <include>*.jnilib</include>
+            </includes>
         </fileSet>
 
         <fileSet>

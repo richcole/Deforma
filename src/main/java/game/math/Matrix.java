@@ -1,5 +1,7 @@
 package game.math;
 
+import java.nio.FloatBuffer;
+
 
 public class Matrix {
 
@@ -231,6 +233,14 @@ public class Matrix {
 
   public void set(int i, int j, double value) {
     v[i*4+j] = value;
+  }
+
+  public void writeToBuffer(FloatBuffer tr) {
+    tr.rewind();
+    for(int i=0;i<v.length;++i) {
+      tr.put((float)v[i]);
+    }
+    tr.flip();
   }
 
 }

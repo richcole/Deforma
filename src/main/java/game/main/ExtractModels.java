@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 public class ExtractModels {
@@ -31,10 +32,13 @@ public class ExtractModels {
   }
 
   public static void main(String[] args) {
-    new ExtractModels(new Context()).run();
+    new ExtractModels(new Context()).run(args);
   }
   
-  public void run() {
+  public void run(String[] args) {
+    if ( args.length > 0 ) {
+      context.getResFiles().setRootDirectory(new File(args[0]));
+    }
     Serializer serializer = new Serializer();
     for(Model model: Model.values()) {
       extractModel(serializer, model);
@@ -56,28 +60,31 @@ public class ExtractModels {
   }
 
   private void extractModel(Serializer serializer, String resName) {
-    String resFileName = "res/" + resName + ".mdl.gz";
-    if ( haveVisitedResource(resFileName) ) {
-      return;
-    }
-    MdlReader mdlReader = context.getKeyReader().getMdlReader(resName);
-    NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
-    AnimMesh animMesh = mesh.getAnimMesh();
-    logger.info("Writing " + resFileName);
-    serializer.serialize(animMesh, new File(resFileName));
-    for(String textureName: animMesh.getTextures()) {
-      try {
-        String textureResFileName = "res/" + textureName + ".tga";
-        if ( haveVisitedResource(textureResFileName) ) {
-          continue;
+    try {
+      File resFile = context.getResFiles().getResFile(resName, "mdl");
+      if ( haveVisitedResource(resFile.getName()) ) {
+        return;
+      }
+      MdlReader mdlReader = context.getKeyReader().getMdlReader(resName);
+      NwnMesh mesh = new NwnMesh(context, mdlReader.readModel(), 0);
+      AnimMesh animMesh = mesh.getAnimMesh();
+      logger.info("Writing " + resFile.getCanonicalPath());
+      serializer.serialize(animMesh, resFile);
+      for(String textureName: animMesh.getTextures()) {
+        try {
+          String textureResFileName = "res/" + textureName + ".tga";
+          if ( haveVisitedResource(textureResFileName) ) {
+            continue;
+          }
+          Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
+          logger.info("Writing " + textureResFileName);
+          textureResource.writeEntry(new File(textureResFileName));
+        } catch(Exception e) {
+          logger.error("Unable to locate texture: " + textureName);
         }
-        Resource textureResource = context.getKeyReader().getResource(textureName, ResourceType.TGA);
-        logger.info("Writing " + textureResFileName);
-        textureResource.writeEntry(new File(textureResFileName));
       }
-      catch(Exception e) {
-        logger.error("Unable to locate texture: " + textureName);
-      }
+    } catch(Exception e) {
+      Throwables.propagate(e);
     }
   }
 

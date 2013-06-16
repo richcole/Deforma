@@ -12,9 +12,9 @@ distance. A basic floor of tiles, a skybox. The code has the ability
 to import models from Neverwinter nights if you have a copy of the
 game.
 
-Basic movement with the mouse and keyboard. Press <return> to activate
-the mouse. 'a', 's', 'w', 'd' are used to move around. 'q' and 'e'
-move up and down. 'space' shoots a cube.
+Right click and drag to pan the camera. Move using 'a', 's', 'w', 'd'
+are used to move around. 'q' and 'e' move up and down. Left click to
+select a tile or creature on a tile. Use the wheel to modify terrain.
 
 Quick build is via:
 
