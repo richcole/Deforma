@@ -38,6 +38,8 @@ public class AnimMeshRenderer {
       alpha = alpha * animation.getTiming();
     }
     renderNode(m.getRoot(), animName, alpha, Matrix.IDENTITY);
+    
+    int x = 1;
   }
 
   public void render(AnimMesh animMesh) {
@@ -45,6 +47,40 @@ public class AnimMeshRenderer {
   }
   
   private void renderNode(Node node, String animName, double alpha, Matrix tr) {
+    tr = updateTransform(node, animName, alpha, tr, true);
+
+    bindTexture(node);
+    renderMaterial(node);
+
+    for(Face face: node.getFaces()) {
+      renderFace(node, animName, face, tr, node.getTextureName());
+    }
+    
+    for(Node child: node.getChildren()) {
+      renderNode(child, animName, alpha, tr);
+    }   
+  }
+
+  public void renderMaterial(Node node) {
+    renderMaterial(node.getDiffuse(), GL11.GL_DIFFUSE);
+    renderMaterial(node.getSpecular(), GL11.GL_SPECULAR);
+  }
+
+  public void renderMaterial(Vector diffuse, int type) {
+    if ( diffuse != null ) {
+      GL11.glMaterial(GL11.GL_FRONT, type, context.getColors().getColor(diffuse));
+    }
+  }
+
+  public void bindTexture(Node node) {
+    if ( node.getTextureName() != null ) {
+      context.getTextures().getFileTexture(node.getTextureName() + ".tga").bind();
+    } else {
+      GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+    }
+  }
+
+  public Matrix updateTransform(Node node, String animName, double alpha, Matrix tr, boolean includeBaseTransforms) {
     AnimationNode animationNode = node.getAnimations().get(animName);
     Vector position = Vector.ZERO;
     Quaternion rotation = Quaternion.ZERO;
@@ -52,37 +88,23 @@ public class AnimMeshRenderer {
     if ( animationNode != null && animationNode.getPositions().size() > 0) {
       position = position.plus(interpPosition(animationNode.getPositions(), alpha));
     }
-    else if ( node.getPosition() != null ) {
+    else if ( includeBaseTransforms && node.getPosition() != null ) {
       position = position.plus(node.getPosition());
     }
 
     if ( animationNode != null && animationNode.getRotations().size() > 0) {
       rotation = rotation.times(interpRotation(animationNode.getRotations(), alpha));
     }
-    else if ( node.getRotation() != null ) {
+    else if ( includeBaseTransforms && node.getRotation() != null ) {
       rotation = rotation.times(node.getRotation());
     }
     tr = tr.times(Matrix.translate(position));
     tr = tr.times(rotation.toMatrix());
-
-    for(Face face: node.getFaces()) {
-      renderFace(node, animName, face, tr);
-    }
-    
-    for(Node child: node.getChildren()) {
-      renderNode(child, animName, alpha, tr);
-    }
-    
+    return tr;
   }
 
-  private void renderFace(Node node, String animName, Face face, Matrix tr) {
+  private void renderFace(Node node, String animName, Face face, Matrix tr, String textureName) {
     faceCount += 1;
-    if ( face.getTextureName() != null ) {
-      Texture texture = context.getTextures().getFileTexture(face.getTextureName() + ".tga");
-      texture.bind();
-    }
-    GL11.glMaterial(GL11.GL_FRONT, GL11.GL_DIFFUSE, context.getColors().getColor(face.getDiffuse()));
-    GL11.glMaterial(GL11.GL_FRONT, GL11.GL_SPECULAR, context.getColors().getColor(face.getSpecular()));
     GL11.glBegin(GL11.GL_TRIANGLES);
     Vector normal = face.getNormal();
     Vector[] colors = face.getColors();
@@ -91,7 +113,7 @@ public class AnimMeshRenderer {
     for(int i=0;i<vs.length; ++i) {
       GL11.glNormal3d(normal.x(), normal.y(), normal.z());
       GL11.glColor3d(colors[i].x(), colors[i].y(), colors[i].z());
-      if ( tps != null && tps[i] != null ) {
+      if ( tps != null && tps[i] != null && textureName != null ) {
         GL11.glTexCoord2d(tps[i].x(), tps[i].y());
       }
       Vector v = tr.times(vs[i]);

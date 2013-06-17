@@ -2,6 +2,7 @@ package game.models;
 
 import game.Context;
 import game.Renderable;
+import game.enums.Anim;
 import game.enums.Model;
 import game.math.Vector;
 
@@ -14,15 +15,15 @@ public class TerrainTile implements Renderable {
   Context context;
   double scale;
   AnimMeshRenderer renderer;
-  AnimMesh animMesh;
-  
+  CompressedAnimMesh animMesh;
+  int x = 0;
 
   public TerrainTile(Context context, Vector pos, Model model) {
     this.context = context;
     this.pos = pos;
     this.scale = context.getScale();
     this.renderer = new AnimMeshRenderer(context);
-    this.animMesh = context.getModels().getAnimMesh(model);
+    this.animMesh = context.getModels().getCompressedAnimMesh(model);
   }
 
   @Override
@@ -30,7 +31,14 @@ public class TerrainTile implements Renderable {
     GL11.glPushMatrix();
     GL11.glTranslated(pos.x(), pos.y(), pos.z());
     GL11.glScaled(scale, scale, scale);
-    renderer.render(animMesh);
+    x = (x + 1) % 2;
+    if ( x == 0 ) {
+      animMesh.update(renderer, Anim.NONE.getName(), 0.0);
+      animMesh.render(renderer);
+    }
+    else {
+      renderer.render(animMesh.getAnimMesh());
+    }
     GL11.glPopMatrix();
   }
 
@@ -39,7 +47,7 @@ public class TerrainTile implements Renderable {
   }
   
   public void setModel(String modelName) {
-    this.animMesh = context.getModels().getAnimMesh(modelName);
+    this.animMesh = context.getModels().getCompressedAnimMesh(modelName);
   }
 
   public void setPos(Vector pos) {

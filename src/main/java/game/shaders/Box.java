@@ -1,7 +1,5 @@
 package game.shaders;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import game.Context;
 import game.Renderable;
 import game.math.Matrix;
@@ -10,6 +8,7 @@ import game.math.Vector;
 import java.io.File;
 import java.nio.FloatBuffer;
 
+import org.apache.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.ARBFragmentShader;
 import org.lwjgl.opengl.ARBShaderObjects;
@@ -21,16 +20,20 @@ import com.google.common.base.Throwables;
 import com.google.common.io.Files;
 
 public class Box implements Renderable {
+  
+  private static Logger logger = Logger.getLogger(Box.class);
 
-  Context context;
-  int     program = 0;
-  FloatBuffer     tr = BufferUtils.createFloatBuffer(16);
+  Context     context;
+  int         program = 0;
+  FloatBuffer tr = BufferUtils.createFloatBuffer(16);
 
   public Box(Context context) {
     this.context = context;
     
     int vertShader = 0, fragShader = 0;
-    Matrix.rot(Math.PI/2, Vector.UP).writeToBuffer(tr);
+    Matrix rot = Matrix.rot(Math.PI/4, Vector.UP);
+    rot.writeToBuffer(tr);
+    logger.info("rot=" + rot);
 
     try {
       vertShader = createShader("shaders/screen.vert", ARBVertexShader.GL_VERTEX_SHADER_ARB);
@@ -72,7 +75,6 @@ public class Box implements Renderable {
     }
     
     if ( false ) {
-    
       GL11.glPushMatrix();
       GL11.glLoadIdentity();
       GL11.glTranslatef(0.0f, 0.0f, -10.0f);
@@ -84,9 +86,8 @@ public class Box implements Renderable {
       GL11.glVertex3f(-1.0f, -1.0f, 0.0f);
       GL11.glEnd();
       GL11.glPopMatrix();
-      
     }
-
+      
     ARBShaderObjects.glUseProgramObjectARB(0);
   }
 
@@ -118,8 +119,12 @@ public class Box implements Renderable {
   }
 
   private String readFileAsString(String filename) {
+    File file = new File("../src/main/" + filename);
+    if ( ! file.exists() ) {
+      file = new File(filename);
+    }
     try {
-      return Files.toString(new File(filename), Charsets.UTF_8);
+      return Files.toString(file, Charsets.UTF_8);
     } catch(Exception e) {
       Throwables.propagate(e);
       return null;

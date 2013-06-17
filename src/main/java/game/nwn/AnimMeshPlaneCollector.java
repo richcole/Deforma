@@ -52,26 +52,29 @@ public class AnimMeshPlaneCollector implements Visitor {
       if ( animNode.getOrientation() != null ) {
         node.addAnimRotations(animName, animNode.getOrientationTimings(), animNode.getOrientation());
       }
-    } 
+    }
 
     if ( animNode == null ) {
       MdlMeshHeader meshHeader = mdlNode.getMeshHeader();
-      if ( meshHeader != null && meshHeader.getRender() != 0 ) {
-        Vector[] vertexes = meshHeader.getVertices();
-        Vector diffuse = meshHeader.getDiffuse();
-        Vector specular = meshHeader.getSpecular();
-        Vector[] colors = meshHeader.getColors();
-        for(MdlFace mdlFace: meshHeader.getFaces()) {
-           int[] vertex = mdlFace.getVertex();
-           Vector[][] texturePoints = meshHeader.getTexturePoints();
-           Vector[] vs = new Vector[3];
-           Vector[] tps = new Vector[3];
-           for(int i=0;i<3;++i) {
-             Vector vx = vertexes[vertex[i]];
-             vs[i] = vx;
-             tps[i] = texturePoints[0][vertex[i]];
-           }
-           node.addFace(new Face(vs, colors, diffuse, specular, mdlFace.getPlaneNormal(), meshHeader.getTextures()[0], tps));
+      if ( meshHeader != null ) {
+        node.setTextureName(meshHeader.getTextures()[0]);
+        node.setDiffuse(meshHeader.getDiffuse());
+        node.setSpecular(meshHeader.getSpecular());
+        if ( meshHeader.getRender() == 1 ) {
+          Vector[] vertexes = meshHeader.getVertices();
+          Vector[] colors = meshHeader.getColors();
+          for(MdlFace mdlFace: meshHeader.getFaces()) {
+             int[] vertex = mdlFace.getVertex();
+             Vector[][] texturePoints = meshHeader.getTexturePoints();
+             Vector[] vs = new Vector[3];
+             Vector[] tps = new Vector[3];
+             for(int i=0;i<3;++i) {
+               Vector vx = vertexes[vertex[i]];
+               vs[i] = vx;
+               tps[i] = texturePoints[0][vertex[i]];
+             }
+             node.addFace(new Face(vs, colors, mdlFace.getPlaneNormal(), tps));
+          }
         }
       }
     }

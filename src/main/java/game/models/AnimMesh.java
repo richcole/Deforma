@@ -1,6 +1,7 @@
 package game.models;
 
 import game.base.Face;
+import game.math.Matrix;
 import game.math.Quaternion;
 import game.math.Vector;
 
@@ -94,6 +95,9 @@ public class AnimMesh {
     List<Face> faces = Lists.newArrayList();
     Map<String, AnimationNode> animations = Maps.newHashMap();
     List<Node> children = Lists.newArrayList();
+    String textureName;
+    Vector diffuse;
+    Vector specular;
     
     public Node() {
     }
@@ -188,6 +192,45 @@ public class AnimMesh {
       this.children = children;
     }
 
+    public void setTextureName(String textureName) {
+      if ( textureName != null && textureName.length() > 0 && ! textureName.equals("NULL") ) {
+        this.textureName = textureName;
+      } else {
+        this.textureName = null;
+      }
+    }
+
+    public String getTextureName() {
+      return textureName;
+    }
+
+    public void setDiffuse(Vector diffuse) {
+      this.diffuse = diffuse;
+    }
+
+    public void setSpecular(Vector specular) {
+      this.specular = specular;
+    }
+
+    public Vector getDiffuse() {
+      return diffuse;
+    }
+
+    public Vector getSpecular() {
+      return specular;
+    }
+
+    public Matrix getTransform() {
+      Matrix tr = Matrix.IDENTITY;
+      if ( position != null ) {
+        tr = tr.times(Matrix.translate(position));
+      }
+      if ( rotation != null ) {
+        tr = tr.times(rotation.toMatrix());
+      }
+      return tr;
+    }
+
   }
   
   public Node ensureRoot(String name) {
@@ -234,11 +277,10 @@ public class AnimMesh {
   }
 
   private void getTextures(Node node, Set<String> textures) {
-    for(Face face: node.getFaces()) {
-      textures.add(face.getTextureName());
-    }
+    textures.add(node.getTextureName());
     for(Node child: node.getChildren()) {
       getTextures(child, textures);
     }
   }
+  
 }

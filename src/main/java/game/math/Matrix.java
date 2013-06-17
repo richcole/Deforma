@@ -231,6 +231,10 @@ public class Matrix {
     return v[i*4+j];
   }
 
+  public double get(int i) {
+    return v[i];
+  }
+
   public void set(int i, int j, double value) {
     v[i*4+j] = value;
   }

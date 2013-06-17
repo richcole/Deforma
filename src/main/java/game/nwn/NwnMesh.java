@@ -60,21 +60,6 @@ public class NwnMesh {
     visitor.postVisit(geometry, fromGeom, alpha);
   }
 
-  public List<Face> getFaces(String name, double alpha) {
-    MdlAnimation anim = mdl.getAnimMap().get(name);
-    if ( anim != null ) {
-      alpha = alpha * anim.getLength();
-      PlaneCollector planeCollector = new PlaneCollector(context);
-      visit(mdl.getGeometryHeader().getGeometry(), anim.getGeometryHeader().getGeometry(), alpha, planeCollector);
-      return planeCollector.getFaces();
-    }
-    else {
-      PlaneCollector planeCollector = new PlaneCollector(context);
-      visit(mdl.getGeometryHeader().getGeometry(), null, alpha, planeCollector);
-      return planeCollector.getFaces();
-    }
-  }
-  
   public AnimMesh getAnimMesh() {
     AnimMesh animMesh = new AnimMesh();
     double alpha = 0.0;
