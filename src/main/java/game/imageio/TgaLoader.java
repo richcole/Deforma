@@ -1,6 +1,6 @@
 package game.imageio;
 
-import game.base.Image;
+import game.base.textures.Image;
 import game.nwn.readers.BinaryFileReader;
 
 public class TgaLoader {
@@ -60,10 +60,12 @@ public class TgaLoader {
         int r = (header.pixels[x  ] & 0xFF) << 0;
         int g = (header.pixels[x+1] & 0xFF) << 8;
         int b = (header.pixels[x+2] & 0xFF) << 16;
-        image.setRGB(i, j, r | g | b);
+        int a = (0xFF) << 24;
+        image.setRGB(i, j, r | g | b | a);
       }
     }
     inp.seek(mark);
+    image.flush();
     return image;
   }
   

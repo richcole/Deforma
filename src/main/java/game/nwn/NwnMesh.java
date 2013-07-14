@@ -1,14 +1,12 @@
 package game.nwn;
 
 import game.Context;
-import game.base.Face;
 import game.models.AnimMesh;
 import game.nwn.readers.MdlAnimation;
 import game.nwn.readers.MdlGeometryHeader;
 import game.nwn.readers.MdlModel;
 import game.nwn.readers.MdlNodeHeader;
 
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;

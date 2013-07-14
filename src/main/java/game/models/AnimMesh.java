@@ -277,7 +277,10 @@ public class AnimMesh {
   }
 
   private void getTextures(Node node, Set<String> textures) {
-    textures.add(node.getTextureName());
+    String textureName = node.getTextureName();
+    if ( textureName != null ) {
+      textures.add(textureName);
+    }
     for(Node child: node.getChildren()) {
       getTextures(child, textures);
     }

@@ -37,7 +37,6 @@ public class Player implements SimObject {
   private Creature selectedCreature;
   private TileSquare selectedTileSquare;
   private TileSetDescription tileSetDescription;
-  private Integer terrainTileIndex;
   
   public Player(Context context) {
     this.context = context;
@@ -46,7 +45,13 @@ public class Player implements SimObject {
     this.theta2 = -45;
     this.tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
     this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
-    this.terrainTileIndex = 0;
+    
+    // ensure textures for all models are loaded
+    for(Tile tile: tileSetDescription.getTiles()) {
+      for(String textureName: context.getModels().getAnimMesh(tile.getModel()).getTextures()) {
+        context.getTilingTextures().getFileTexture(textureName + ".tga");
+      }
+    }
   }
 
   Vector getLeft() {
@@ -162,26 +167,33 @@ public class Player implements SimObject {
   }
   
   public void nextTerrainTileIndex() {
-    terrainTileIndex = (terrainTileIndex + 1) % this.tileSetDescription.getTiles().size();
-    updateSelectedTile();
+    updateSelectedTile(1);
   }
-
-  private void updateSelectedTile() {
-    if ( selectedTileSquare != null ) {
-      if ( selectedTileSquare.getTerrainTile() == null ) {
-        selectedTileSquare.setTerrainTile(context.newTile());
-      }
-      selectedTileSquare.getTerrainTile().setModel(tileSetDescription.getTiles().get(terrainTileIndex).getModel());
-    }
-  }
-
+  
   public void prevTerrainTileIndex() {
-    terrainTileIndex = (terrainTileIndex - 1) % this.tileSetDescription.getTiles().size();
-    updateSelectedTile();
+    updateSelectedTile(-1);
   }
 
-  public Tile getTile() {
-    return tileSetDescription.getTiles().get(terrainTileIndex);
+  private void updateSelectedTile(int dirn) {
+    if ( selectedTileSquare != null ) {
+      TerrainTile tile = selectedTileSquare.getTerrainTile();
+      if ( tile == null ) {
+        tile = context.newTile();
+        selectedTileSquare.setTerrainTile(tile);
+        tile.setModel(tileSetDescription.getTiles().get(0).getModel());
+        tile.setModelIndex(0);
+      } else {
+        int numTiles = tileSetDescription.getTiles().size();
+        int modelIndex = tile.getModelIndex() + dirn;
+        if ( modelIndex < 0 ) {
+          modelIndex = numTiles + modelIndex;
+        } else if ( modelIndex >= numTiles ) {
+          modelIndex = modelIndex - numTiles;
+        }
+        tile.setModel(tileSetDescription.getTiles().get(modelIndex).getModel());
+        tile.setModelIndex(modelIndex);
+      }
+    }
   }
 
   public void setSelectedTileSquare(TileSquare selectedTileSquare) {

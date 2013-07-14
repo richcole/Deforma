@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
-
 import game.nwn.readers.set.Tile;
 
 import java.awt.AlphaComposite;
@@ -52,10 +51,8 @@ public class LogPanel {
   }
 
   public void render() {
-    Tile tile = context.getPlayer().getTile();
     reset();
     writeLine("p=%s rate=%3.2f sleep=%3.2f", context.getPlayer().pos, 1000.0 / renderSpeed,  sleepTime);
-    writeLine("top=%s left=%s bottom=%s right=%s", tile.getTopLeft(), tile.getLeft(), tile.getBottom(), tile.getRight());
     renderFlat();
     renderGL();
   }
@@ -99,11 +96,11 @@ public class LogPanel {
   }
 
   public void setRenderSpeed(double speed) {
-    renderSpeed = (0.99 * renderSpeed) + (0.01 * speed);
+    renderSpeed = (0.999 * renderSpeed) + (0.001 * speed);
   }
 
   public void setSleepTime(double sleepTime) {
-    this.sleepTime = (0.99 * this.sleepTime) + (0.01 * sleepTime);
+    this.sleepTime = (0.999 * this.sleepTime) + (0.001 * sleepTime);
   }
 
 }

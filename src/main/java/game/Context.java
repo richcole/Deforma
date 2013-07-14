@@ -1,18 +1,20 @@
 package game;
 
-import game.base.Texture;
-import game.base.Textures;
 import game.base.io.Serializer;
+import game.base.textures.Texture;
+import game.base.textures.TextureTile;
+import game.base.textures.Textures;
+import game.base.textures.TilingTextures;
 import game.enums.Model;
 import game.main.Main;
 import game.math.Vector;
 import game.models.BigCube;
 import game.models.Creature;
+import game.models.Grid;
 import game.models.Light;
 import game.models.Models;
 import game.models.ResFiles;
 import game.models.SkyBox;
-import game.models.Grid;
 import game.models.TerrainTile;
 import game.models.TileSetDescriptions;
 import game.nwn.readers.KeyReader;
@@ -35,7 +37,7 @@ public class Context {
   BigCube bigCube;
   LogPanel  logPanel;
   Main      main;
-  Texture stoneTexture;
+  TextureTile stoneTexture;
   Player player;
   SkyBox skyBox;
   Light light;
@@ -46,6 +48,7 @@ public class Context {
   Grid terrain;
   File root;
   ResFiles resFiles;
+  TilingTextures tilingTextures;
   
   Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
   KeyReader keyReader;
@@ -106,9 +109,9 @@ public class Context {
     return main;
   }
 
-  public Texture getStoneTexture() {
+  public TextureTile getStoneTexture() {
     if ( stoneTexture == null ) {
-      stoneTexture = getTextures().getFileTexture("image.jpg");
+      stoneTexture = getTilingTextures().getFileTexture("image.jpg");
     }
     return stoneTexture;
   }
@@ -199,7 +202,7 @@ public class Context {
   
   public Grid getTerrain() {
     if ( terrain == null ) {
-      terrain = new Grid(this, 32, 32);
+      terrain = new Grid(this, 80, 80);
     }
     return terrain;
   }
@@ -231,7 +234,7 @@ public class Context {
   }
 
   public double getTileScale() {
-    return 80;
+    return 100;
   }
 
   public ResFiles getResFiles() {
@@ -253,6 +256,13 @@ public class Context {
       tileSetDescriptions = new TileSetDescriptions(this);
     }
     return tileSetDescriptions;
+  }
+  
+  public TilingTextures getTilingTextures() {
+    if ( tilingTextures == null ) {
+      tilingTextures = new TilingTextures(this);
+    }
+    return tilingTextures;
   }
 
 }

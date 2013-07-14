@@ -1,43 +1,10 @@
 package game;
 
-
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_LIGHT_MODEL_AMBIENT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_NICEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PERSPECTIVE_CORRECTION_HINT;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_SMOOTH;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glClearDepth;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glHint;
-import static org.lwjgl.opengl.GL11.glLightModel;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glPixelStorei;
-import static org.lwjgl.opengl.GL11.glShadeModel;
-import static org.lwjgl.opengl.GL11.glViewport;
-import static org.lwjgl.util.glu.GLU.gluPerspective;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.util.glu.GLU;
 
 public class View {
 
@@ -109,47 +76,52 @@ public class View {
   public void init() {
     mode = Display.getDisplayMode();
 
-    glEnable(GL_TEXTURE_2D);
-    glShadeModel(GL_SMOOTH);       
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    GL11.glEnable(GL12.GL_TEXTURE_3D);    
+    GL11.glShadeModel(GL11.GL_SMOOTH);       
+    GL11.glEnable (GL11.GL_BLEND);
+    GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glDisable(GL_CULL_FACE);
+    GL11.glEnable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthFunc(GL11.GL_LEQUAL);
+    GL11.glDisable(GL11.GL_CULL_FACE);
     
-    glEnable(GL_LIGHTING);
+    GL11.glEnable(GL11.GL_LIGHTING);
     
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);               
-    glClearDepth(1f);
+    GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);               
+    GL11.glClearDepth(1f);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glViewport(0, 0, (int)getWidth(), (int)getHeight());
+    GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+    GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
+    GL11.glViewport(0, 0, (int)getWidth(), (int)getHeight());
     
-    glLightModel(GL_LIGHT_MODEL_AMBIENT, context.getColors().getGray9());
+    GL11.glLightModel(GL11.GL_LIGHT_MODEL_AMBIENT, context.getColors().getGray9());
   }
 
   public void perspectiveView() {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(getPerspAngle(), getAspect(), getZNear(), getZFar());
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    GL11.glEnable(GL12.GL_TEXTURE_3D);
+    GL11.glMatrixMode(GL11.GL_PROJECTION);
+    GL11.glLoadIdentity();
+    GLU.gluPerspective(getPerspAngle(), getAspect(), getZNear(), getZFar());
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glLoadIdentity();
   }
   
   public void orthoView() {
+    GL11.glDisable(GL12.GL_TEXTURE_3D);
+    GL11.glEnable(GL11.GL_TEXTURE_2D);
     GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, getWidth(), getHeight(), 0, 1, -1);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    GL11.glMatrixMode(GL11.GL_PROJECTION);
+    GL11.glLoadIdentity();
+    GL11.glOrtho(0, getWidth(), getHeight(), 0, 1, -1);
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glLoadIdentity();
   }
 
   public void clear() {
-    glMatrixMode(GL_MODELVIEW);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
   }
 
 }

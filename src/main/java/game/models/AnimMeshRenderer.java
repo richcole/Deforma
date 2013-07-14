@@ -2,7 +2,7 @@ package game.models;
 
 import game.Context;
 import game.base.Face;
-import game.base.Texture;
+import game.base.textures.TextureTile;
 import game.enums.Anim;
 import game.math.Matrix;
 import game.math.Quaternion;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 public class AnimMeshRenderer {
   
@@ -74,10 +75,14 @@ public class AnimMeshRenderer {
 
   public void bindTexture(Node node) {
     if ( node.getTextureName() != null ) {
-      context.getTextures().getFileTexture(node.getTextureName() + ".tga").bind();
+      getTextureTile(node).bind();
     } else {
-      GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+      GL11.glBindTexture(GL12.GL_TEXTURE_3D, 0);
     }
+  }
+
+  private TextureTile getTextureTile(Node node) {
+    return context.getTilingTextures().getFileTexture(node.getTextureName() + ".tga");
   }
 
   public Matrix updateTransform(Node node, String animName, double alpha, Matrix tr, boolean includeBaseTransforms) {
@@ -114,7 +119,8 @@ public class AnimMeshRenderer {
       GL11.glNormal3d(normal.x(), normal.y(), normal.z());
       GL11.glColor3d(colors[i].x(), colors[i].y(), colors[i].z());
       if ( tps != null && tps[i] != null && textureName != null ) {
-        GL11.glTexCoord2d(tps[i].x(), tps[i].y());
+        Vector t = tps[i];
+        GL11.glTexCoord3d(t.x(), t.y(), getTextureTile(node).getTextureZ());
       }
       Vector v = tr.times(vs[i]);
       GL11.glVertex3d(v.x(), v.y(), v.z());

@@ -1,7 +1,6 @@
 package game;
 
 import game.math.Vector;
-import game.models.Creature;
 import game.models.Grid.GridSquare;
 import game.models.Grid.TileSquare;
 
@@ -139,7 +138,7 @@ public class InputDevice {
     if ( Mouse.getEventDWheel() > 0 ) {
       context.getPlayer().nextTerrainTileIndex();
     } else if ( Mouse.getEventDWheel() < 0 ) {
-      context.getPlayer().nextTerrainTileIndex();
+      context.getPlayer().prevTerrainTileIndex();
     }
   }
   

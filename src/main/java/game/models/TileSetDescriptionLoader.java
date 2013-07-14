@@ -1,7 +1,6 @@
 package game.models;
 
 import game.Context;
-import game.base.io.Serializer;
 import game.containers.Factory;
 import game.enums.TileSet;
 import game.nwn.readers.set.SetReader.TileSetDescription;

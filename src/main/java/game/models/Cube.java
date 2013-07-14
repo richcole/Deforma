@@ -3,7 +3,8 @@ package game.models;
 import game.Context;
 import game.Material;
 import game.Renderable;
-import game.base.Texture;
+import game.base.textures.Texture;
+import game.base.textures.TextureTile;
 import game.math.Vector;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class Cube implements Renderable {
   Vector normal;
   Material material;
   List<Rect> rects;
-  List<Texture> textures;
+  List<TextureTile> textures;
    
   public Cube(Context context, Vector pos, double size) {
     this(context, pos, Vector.LEFT.scaleTo(size), Vector.UP.scaleTo(size), Vector.NORMAL.scaleTo(size));
@@ -47,11 +48,11 @@ public class Cube implements Renderable {
     );
   }
 
-  private Texture getTexture(int i) {
+  private TextureTile getTexture(int i) {
     return textures.get(i % textures.size());
   }
   
-  protected List<Texture> getTextures() {
+  protected List<TextureTile> getTextures() {
     return Lists.newArrayList(context.getStoneTexture());
   }
 

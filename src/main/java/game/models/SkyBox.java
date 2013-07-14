@@ -1,7 +1,7 @@
 package game.models;
 
 import game.Context;
-import game.base.Texture;
+import game.base.textures.TextureTile;
 import game.math.Vector;
 
 import java.util.List;
@@ -12,14 +12,12 @@ public class SkyBox extends Cube {
   
   final static double SIZE = 10000;
   
-  List<Texture> textures;
-
   public SkyBox(Context context) {
     super(context, Vector.ZERO, SIZE);
   }
 
   @Override
-  protected List<Texture> getTextures() {
+  protected List<TextureTile> getTextures() {
     return Lists.newArrayList(
       loadTexture("front.jpg"),
       loadTexture("back.jpg"),
@@ -30,8 +28,8 @@ public class SkyBox extends Cube {
      );
   }
 
-  private Texture loadTexture(String filename) {
-    return context.getTextures().getFileTexture(filename);
+  private TextureTile loadTexture(String filename) {
+    return context.getTilingTextures().getFileTexture(filename);
   }
 
 }

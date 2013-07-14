@@ -1,8 +1,10 @@
-package game.base;
+package game.base.textures;
 
 import game.nwn.readers.BinaryFileReader;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -89,6 +91,27 @@ public class Image {
   
   public BufferedImage getImage() {
     return img;
+  }
+
+  public void drawImage(Image image, int x, int y) {
+    Graphics g = img.getGraphics();
+    int h = image.getHeight();
+    int w = image.getWidth();
+    g.drawImage(image.getImage(), x, y, x+w, y+h, 0, 0, w, h, null);
+    g.dispose();
+    img.flush();
+  }
+
+  public void write(String name) {
+    try {
+      ImageIO.write(img, "png", new File(name));
+    } catch(Exception e) {
+      Throwables.propagate(e);
+    }
+  }
+
+  public void flush() {
+    img.flush();
   }
 
 }

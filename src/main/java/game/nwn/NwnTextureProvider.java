@@ -1,9 +1,9 @@
 package game.nwn;
 
 import game.Context;
-import game.base.Texture;
+import game.base.textures.Image;
 
-public class NwnTextureProvider implements TextureProvider {
+public class NwnTextureProvider implements ImageProvider {
 
   private Context context;
   private String name;
@@ -13,8 +13,8 @@ public class NwnTextureProvider implements TextureProvider {
     this.name = name;
   }
 
-  public Texture createTexture() {
-    return new Texture(context.getKeyReader().getImage(name));
+  public Image create() {
+    return context.getKeyReader().getImage(name);
   }
 
 }

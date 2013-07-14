@@ -16,10 +16,11 @@ public class TerrainTile implements Renderable {
   double scale;
   AnimMeshRenderer renderer;
   CompressedAnimMesh animMesh;
-  int x = 0;
+  int modelIndex;
 
   public TerrainTile(Context context, Vector pos, Model model) {
     this.context = context;
+    this.modelIndex = 0;
     this.pos = pos;
     this.scale = context.getScale();
     this.renderer = new AnimMeshRenderer(context);
@@ -31,14 +32,8 @@ public class TerrainTile implements Renderable {
     GL11.glPushMatrix();
     GL11.glTranslated(pos.x(), pos.y(), pos.z());
     GL11.glScaled(scale, scale, scale);
-    x = (x + 1) % 2;
-    if ( x == 0 ) {
-      animMesh.update(renderer, Anim.NONE.getName(), 0.0);
-      animMesh.render(renderer);
-    }
-    else {
-      renderer.render(animMesh.getAnimMesh());
-    }
+    animMesh.update(renderer, Anim.NONE.getName(), 0.0);
+    animMesh.render(renderer);
     GL11.glPopMatrix();
   }
 
@@ -48,6 +43,14 @@ public class TerrainTile implements Renderable {
   
   public void setModel(String modelName) {
     this.animMesh = context.getModels().getCompressedAnimMesh(modelName);
+  }
+  
+  public void setModelIndex(int modelIndex) {
+    this.modelIndex = modelIndex;
+  }
+  
+  public int getModelIndex() {
+    return modelIndex;
   }
 
   public void setPos(Vector pos) {

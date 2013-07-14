@@ -1,4 +1,4 @@
-package game.base;
+package game.base.textures;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_MODULATE;
@@ -21,20 +21,24 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import javax.imageio.ImageIO;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-public class Texture {
+import com.google.common.base.Throwables;
 
+public class ImageTexture implements Texture {
   int width;
   int height;
   int textureId;
   
-  public Texture(File file) {
+  public ImageTexture(File file) {
     this(new Image(file));
   }
   
-  public Texture(Image img) {
+  public ImageTexture(Image img) {
+    img.write("out.png");
     width = img.getWidth();
     height = img.getHeight();
     allocateTexture(width, height, img.getByteBuffer());
@@ -63,4 +67,12 @@ public class Texture {
   public void bind() {
     glBindTexture(GL_TEXTURE_2D, textureId);
   }
+
+  public void replaceImage(Image img) {
+    width = img.getWidth();
+    height = img.getHeight();
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img.getByteBuffer());
+  }
+
 }

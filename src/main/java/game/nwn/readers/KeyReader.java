@@ -1,7 +1,7 @@
 package game.nwn.readers;
 
 import game.Context;
-import game.base.Image;
+import game.base.textures.Image;
 import game.imageio.TgaLoader;
 import game.nwn.readers.BifReader.EntryHeader;
 

@@ -1,34 +1,32 @@
 package game.models;
 
-import game.base.Image;
-import game.base.Texture;
+import game.base.textures.Image;
 import game.imageio.TgaLoader;
-import game.nwn.TextureProvider;
+import game.nwn.ImageProvider;
 import game.nwn.readers.BinaryFileReader;
 
 import java.io.File;
 
-public class FileTextureProvider implements TextureProvider {
+public class FileImageProvider implements ImageProvider {
 
   private File file;
 
-  public FileTextureProvider(File file) {
+  public FileImageProvider(File file) {
     this.file = file;
   }
   
   @Override
-  public Texture createTexture() {
+  public Image create() {
     if ( file.getName().endsWith(".tga") ) {
       TgaLoader imageLoader = new TgaLoader();
       BinaryFileReader reader = new BinaryFileReader(file);
       try {
-        Image image = imageLoader.readImage(reader, 0);
-        return new Texture(image);
+        return imageLoader.readImage(reader, 0);
       } finally {
         reader.close();
       }
     } else {
-      return new Texture(file);
+      return new Image(file);
     }
   }
 

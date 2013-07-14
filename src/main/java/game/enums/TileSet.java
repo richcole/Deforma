@@ -1,6 +1,5 @@
 package game.enums;
 
-import java.io.File;
 
 public enum TileSet implements Res {
   
