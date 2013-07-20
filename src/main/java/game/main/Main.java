@@ -39,7 +39,6 @@ public class Main {
     context.getLogPanel();
     
     try {
-      int lastTick = 0;
       context.getScene().register(new Box(context));
       context.getScene().register(context.getSkyBox());
       context.newCreature().register();
@@ -47,13 +46,12 @@ public class Main {
       context.getPlayer().register();
 
       context.getSimulator().start();
+      context.getSimulator().waitForStart();
       while (! context.getInputDevice().getQuit()) {
         long before = System.currentTimeMillis();
-        if ( context.getInputDevice().process() || context.getSimulator().getCurrentTick() != lastTick ) {
-          lastTick = context.getSimulator().getCurrentTick();
-          context.getScene().render();
-          Display.update();
-        }
+        context.getInputDevice().process();
+        context.getScene().render();
+        Display.update();
         long after = System.currentTimeMillis();
         context.getLogPanel().setRenderSpeed(after - before);
       }

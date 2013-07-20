@@ -23,6 +23,7 @@ public class Player implements SimObject {
   Vector left;
   Vector up;
   Vector normal;
+  Vector velocity;
 
   double theta1, theta2;
   
@@ -75,33 +76,37 @@ public class Player implements SimObject {
     normal = rotLeft.times(normal);
     up = rotLeft.times(UP);
     
-    Vector a = pos.plus(getNormal());
+    Vector p = pos.plus(velocity.times(context.getSimulator().getCurrentTickNibble()));
+    Vector a = p.plus(getNormal());
     Vector u = getUp();
-    GLU.gluLookAt((float)pos.x(), (float)pos.y(), (float)pos.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)u.x(), (float)u.y(), (float)u.z());
+    GLU.gluLookAt((float)p.x(), (float)p.y(), (float)p.z(), (float)a.x(), (float)a.y(), (float)a.z(), (float)u.x(), (float)u.y(), (float)u.z());
     context.getSelectionRay().updateViewMatrix();
   }
-
+  
   @Override
   public void tick() {
-    float velocity = 2;
+    velocity = Vector.ZERO;
     if ( movingForward ) {
-      pos = pos.plus(getNormal().scaleTo(velocity));
+      velocity = velocity.plus(getNormal());
     }
     if ( movingBackward ) {
-      pos = pos.plus(getNormal().scaleTo(-velocity));
+      velocity = velocity.plus(getNormal().times(-1));
     }
     if ( movingLeft ) {
-      pos = pos.plus(getLeft().scaleTo(velocity));
+      velocity = velocity.plus(getLeft());
     }
     if ( movingRight ) {
-      pos = pos.plus(getLeft().scaleTo(-velocity));
+      velocity = velocity.plus(getLeft().times(-1));
     }
     if ( movingUpward ) {
-      pos = pos.plus(getUp().scaleTo(velocity));
+      velocity = velocity.plus(getUp());
     }
     if ( movingDownward ) {
-      pos = pos.plus(getUp().scaleTo(-velocity));
+      velocity = velocity.plus(getUp().times(-1));
     }
+    float velocityScale = 2;
+    velocity.scaleTo(velocityScale);
+    pos = pos.plus(velocity);
   }
 
   public void setMovingDownward(boolean movingForward) {

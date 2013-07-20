@@ -15,7 +15,10 @@ public class Simulator implements Runnable {
   Context context;
   
   Thread thread;
-  int tickNumber = 0;
+  volatile int    tickNumber = 0;
+  volatile long   tickOrigin = System.currentTimeMillis();
+
+  long   symInterval = 10;
   List<SimObject> simObjects = Lists.newArrayList();
 
   public Simulator(Context context) {
@@ -32,9 +35,9 @@ public class Simulator implements Runnable {
   public void run() {
     try {
       long lastSymCompleted = System.currentTimeMillis();
-      long symInterval = 10;
       while( ! context.getInputDevice().getQuit() ) {
         tickNumber += 1;
+        tickOrigin = System.currentTimeMillis();
         synchronized(simObjects) {
           for(SimObject o: simObjects) {
             o.tick();
@@ -60,6 +63,10 @@ public class Simulator implements Runnable {
   public int getCurrentTick() {
     return tickNumber;
   }
+  
+  public double getCurrentTickNibble() {
+    return ((System.currentTimeMillis() - tickOrigin) / ( double ) symInterval);    
+  }
 
   public void register(SimObject o) {
     synchronized(simObjects) {
@@ -69,6 +76,13 @@ public class Simulator implements Runnable {
   
   public List<SimObject> getSimObjects() {
     return simObjects;
+  }
+
+  public void waitForStart() {
+    try { Thread.sleep(1000); } catch(InterruptedException e) { };
+    while(tickNumber == 0) {
+      try { Thread.sleep(100); } catch(InterruptedException e) { };
+    }
   }
 
 }

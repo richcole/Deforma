@@ -1,3 +1,9 @@
+Movement is not smooth basically because movement occurs in the
+simulation system and the simulation system is discrete. To smooth out
+the movement things can be done with animation type effects. For
+movement the user can have a direction and velocity, when rendered we
+can take into account the time of the rendering.
+
 Combining the texture together greatly increased the number of models
 which can be rendered at a specific time.
 
