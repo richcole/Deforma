@@ -1,6 +1,13 @@
 package game.main;
 
 import game.Context;
+import game.enums.TileSet;
+import game.nwn.readers.set.SetReader.TileSetDescription;
+import game.nwn.readers.set.Tile;
+import game.proc.HeightMap;
+import game.proc.MidPoint;
+import game.proc.Perlin;
+import game.proc.Perlin2;
 import game.shaders.Box;
 
 import org.apache.log4j.Logger;
@@ -39,11 +46,19 @@ public class Main {
     context.getLogPanel();
     
     try {
-      context.getScene().register(new Box(context));
+      // context.getScene().register(new Box(context));
       context.getScene().register(context.getSkyBox());
-      context.newCreature().register();
-      context.getTerrain().register();
+
+      // loadModels();
+      // context.newCreature().register();
+      // context.getTerrain().register();
+      
       context.getPlayer().register();
+      
+      HeightMap heightMap = context.getHeightMap();
+      new Perlin2(12).generate(heightMap, heightMap.getWidth());
+      heightMap.calculateNormals();
+      heightMap.register();
 
       context.getSimulator().start();
       context.getSimulator().waitForStart();
@@ -62,6 +77,16 @@ public class Main {
     }
     finally {
       context.getInputDevice().setQuit();
+    }
+  }
+
+  private void loadModels() {
+    // ensure textures for all models are loaded
+    TileSetDescription tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
+    for(Tile tile: tileSetDescription.getTiles()) {
+      for(String textureName: context.getModels().getAnimMesh(tile.getModel()).getTextures()) {
+        context.getTilingTextures().getFileTexture(textureName + ".tga");
+      }
     }
   }
 

@@ -9,7 +9,6 @@ import game.models.Grid.TileSquare;
 import game.models.LittleLight;
 import game.models.TerrainTile;
 import game.nwn.readers.set.SetReader.TileSetDescription;
-import game.nwn.readers.set.Tile;
 
 import org.lwjgl.util.glu.GLU;
 
@@ -46,13 +45,6 @@ public class Player implements SimObject {
     this.theta2 = -45;
     this.tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
     this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
-    
-    // ensure textures for all models are loaded
-    for(Tile tile: tileSetDescription.getTiles()) {
-      for(String textureName: context.getModels().getAnimMesh(tile.getModel()).getTextures()) {
-        context.getTilingTextures().getFileTexture(textureName + ".tga");
-      }
-    }
   }
 
   Vector getLeft() {

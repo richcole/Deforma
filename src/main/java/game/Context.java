@@ -18,6 +18,7 @@ import game.models.SkyBox;
 import game.models.TerrainTile;
 import game.models.TileSetDescriptions;
 import game.nwn.readers.KeyReader;
+import game.proc.HeightMap;
 
 import java.io.File;
 import java.util.List;
@@ -57,6 +58,7 @@ public class Context {
   Models models;
   Serializer serializer;
   TileSetDescriptions tileSetDescriptions;
+  HeightMap heightMap;
 
   List<File> roots = Lists.newArrayList(
     new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
@@ -263,6 +265,13 @@ public class Context {
       tilingTextures = new TilingTextures(this);
     }
     return tilingTextures;
+  }
+
+  public HeightMap getHeightMap() {
+    if ( heightMap == null ) {
+      heightMap = new HeightMap(this, 128, 128);
+    }
+    return heightMap;
   }
 
 }

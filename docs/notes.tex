@@ -1,8 +1,96 @@
 \documentclass[12pt]{article}
 
-\usepackage{amstex}
+\usepackage{amsmath}
+\usepackage{fullpage}
+
+\title{OpenGL Game Programming Notes}
+\author{Richard Cole}
+\date{}
 
 \begin{document}
+
+\maketitle
+
+\section{Journal}
+
+\subsection{Sat Jul 20 11:01:34 PDT 2013}
+
+I want to learn more about procedural generation of landscape and
+voxel models. If we have say 100x100x100 region of voxels that works
+out to be 1M voxels. 1000x1000x1000 works out to be 1G of voxels thus
+voxels need to be merged into regions.
+
+Perhaps the an easier place to start is with a height map. The first
+question is how to render a height map. You can make 4 triangles
+around a height map.
+
+Start with a square (0, 0, 256, 256). Randomly assign heights to each
+vertex. Add mid points at 4 midpoints at (128+-128, 128+-128). Assign
+heights that are a pertabation from the mid point by a random
+offset. Continue until width of the square is 1. One needs to ensure
+that points are not written to more than once otherwise cliffs arise.
+
+Another idea is to generate random gradients at different frequencies
+and to then apply these to the terrain. This seems to be the idea of
+perlin noise generators.
+
+
+
+
+
+\subsection{Sat Jul 20 10:34:06 PDT 2013}
+
+Movement is not smooth basically because movement occurs in the
+simulation system and the simulation system is discrete. To smooth out
+the movement things can be done with animation type effects. For
+movement the user can have a direction and velocity, when rendered we
+can take into account the time of the rendering.
+
+This idea is extended to animation transtitions. When transitioning
+from one animtation to the next one needs to interpolate between the
+last active frame of the previous animation and the current animation.
+
+Thus for a model we really want to know the current animation frame
+and the next animation frame to interpolate between the two. The game
+is based on a discrete simulation structure. Animations from models
+need to be mapped onto ticks. A creature can make one decision per
+tick. The players avitar similarly performs at most one action per
+tick. The current simulation rate is 10 ms which seems a reasonable
+rate at which to modify the avitars behaviour.
+
+Currently loading the game artifacts takes quite a while. This is
+actually time spend performing the gson deserialization. Combining the
+texture together greatly increased the number of models which can be
+rendered at a specific time. I need to move to a model where the scene
+graph is loaded in the GPU memory and only small modifications are
+made such as updating rotations of model skeletons.
+
+There needs to be more preprocessing of the models to get them into a
+format that is suitable for rendering. All textures need to be loaded
+ahead of time.
+
+Should add tool selection using the tab key. This will allow more
+tools to be added to the game, so for example one can have a tool that
+modifies the viewport parameters.
+
+Should add gravity to keep the character grounded. Should also modify
+the ground pattern to be a single cube rather than very many small
+cubes.
+
+Models are trees. The nodes have lists of translations and rotations
+associated with them. A value alpha selects between two elements in
+the lists and then interpolation is performed to find the actual
+rotations and translation required.
+
+We'd like this to occur on the GPU. For rendering using shaders there
+are about 15 arrays that we can use. So for each point we'd like to
+pass a single alpha value and then interp the position.
+
+It might be easier to develop this code first in isolation and then
+define a translation into the required format.
+
+The question is then how to pass in the rotation and translation
+matricies.
 
 \section{Basic Mathematics}
 
@@ -11,7 +99,7 @@ This article is trying to get in place the basic mathematics to
 understand how to use OpenGL.
 
 We use row vectors, e.g. $x$, and denote associated column vector
-$x\topT$. We work in a homoginous coorindate system rather than the
+$x\top$. We work in a homoginous coorindate system rather than the
 cartesian space.
 
 \[

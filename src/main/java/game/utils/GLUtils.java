@@ -1,6 +1,7 @@
 package game.utils;
 
 import game.math.Matrix;
+import game.math.Vector;
 
 import java.nio.DoubleBuffer;
 
@@ -19,5 +20,13 @@ public class GLUtils {
     buf.flip();
     GL11.glPushMatrix();
     GL11.glMultMatrix(buf);
+  }
+  
+  public static void glNormal(Vector n) {
+    GL11.glNormal3d(n.x(), n.y(), n.z());
+  }
+
+  public static void glVertex(Vector p) {
+    GL11.glVertex3d(p.x(), p.y(), p.z());
   }
 }
