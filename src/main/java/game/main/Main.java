@@ -2,6 +2,7 @@ package game.main;
 
 import game.Context;
 import game.enums.TileSet;
+import game.math.Vector;
 import game.nwn.readers.set.SetReader.TileSetDescription;
 import game.nwn.readers.set.Tile;
 import game.proc.HeightMap;
@@ -10,6 +11,8 @@ import game.proc.Perlin;
 import game.proc.Perlin2;
 import game.shaders.ProgramRenderer;
 import game.voxel.CubeMap;
+import game.voxel.ScaleTransform;
+import game.voxel.SphereDensity;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -49,7 +52,12 @@ public class Main {
     try {
       context.getSkyBox().register();
       // context.getGrassBox().register();
-      new CubeMap(context, 30, 20).register();
+      
+      int size = 20;
+      Vector topRight = Vector.ONES.times(size);
+      Vector center = topRight.times(0.5);
+      double radius = size * 0.25;
+      new CubeMap(context, Vector.ZERO, topRight, new ScaleTransform(20), new SphereDensity(center, radius)).register();
       
       // context.getGrassSquare().register();
       // context.getBox().register();
