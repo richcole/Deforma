@@ -1,24 +1,33 @@
 package game;
 
 import game.base.io.Serializer;
-import game.base.textures.Texture;
 import game.base.textures.TextureTile;
 import game.base.textures.Textures;
 import game.base.textures.TilingTextures;
 import game.enums.Model;
 import game.main.Main;
+import game.math.Matrix;
 import game.math.Vector;
 import game.models.BigCube;
 import game.models.Creature;
 import game.models.Grid;
 import game.models.Light;
 import game.models.Models;
+import game.models.Rect;
 import game.models.ResFiles;
 import game.models.SkyBox;
 import game.models.TerrainTile;
 import game.models.TileSetDescriptions;
 import game.nwn.readers.KeyReader;
+import game.proc.GrassBox;
+import game.proc.GrassImage;
+import game.proc.GrassSquare;
 import game.proc.HeightMap;
+import game.proc.Perlin2;
+import game.proc.VertexCloud;
+import game.shaders.ProgramRenderer;
+import game.shaders.ShaderArray;
+import game.shaders.ShaderMatrix;
 
 import java.io.File;
 import java.util.List;
@@ -39,6 +48,7 @@ public class Context {
   LogPanel  logPanel;
   Main      main;
   TextureTile stoneTexture;
+  TextureTile grassTexture;
   Player player;
   SkyBox skyBox;
   Light light;
@@ -59,16 +69,40 @@ public class Context {
   Serializer serializer;
   TileSetDescriptions tileSetDescriptions;
   HeightMap heightMap;
+  ProgramRenderer box;
 
   List<File> roots = Lists.newArrayList(
     new File("/home/local/ANT/richcole/clients/other/nwn-stuff/nwn/"),
     new File("/mnt/nwn/")
   );
 
+  GrassSquare grassSquare;
+  GrassBox grassBox;
+
   public Context() {
     configureLoghing();
   }
   
+  public ProgramRenderer getBox() {
+    if ( box == null ) {
+      VertexCloud vCloud = new VertexCloud();
+      getHeightMap().copyTo(vCloud);
+      vCloud.freeze();
+      Perlin2 perlin = new Perlin2(8);
+      box = new ProgramRenderer(this, vCloud, "screen");
+      box.withShaderVariable(new ShaderMatrix("tr", Matrix.rot(Math.PI/4, Vector.U3)));
+      box.withShaderVariable(new ShaderArray("noise", perlin.toFloatArray(16, 16, 3)));
+    }
+    return box;
+  }
+  
+  public GrassBox getGrassBox() {
+    if ( grassBox == null ) {
+      grassBox = new GrassBox(this);
+    }
+    return grassBox;
+  }
+
   public Scene getScene() {
     if ( scene == null ) {
       scene = new Scene(this);
@@ -116,6 +150,13 @@ public class Context {
       stoneTexture = getTilingTextures().getFileTexture("image.jpg");
     }
     return stoneTexture;
+  }
+
+  public TextureTile getGrassTexture() {
+    if ( grassTexture == null ) {
+      grassTexture = getTilingTextures().getFileTexture("grass.jpg");
+    }
+    return grassTexture;
   }
 
   public BigCube getBigCube() {
@@ -270,8 +311,17 @@ public class Context {
   public HeightMap getHeightMap() {
     if ( heightMap == null ) {
       heightMap = new HeightMap(this, 128, 128);
+      new Perlin2(12).generate(heightMap, heightMap.getWidth());
+      heightMap.calculateNormals();
     }
     return heightMap;
+  }
+
+  public GrassSquare getGrassSquare() {
+    if ( grassSquare == null ) {
+      grassSquare = new GrassSquare(this);
+    }
+    return grassSquare;
   }
 
 }

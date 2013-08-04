@@ -19,8 +19,10 @@ public class Rect implements Renderable {
   Vector left;
   TextureTile textureTile;
   List<Vector> textureCoords;
+  double distance;
+  Vector[] corners;
   
-  Rect(Vector pos, Vector up, Vector left, TextureTile textureTile) {
+  public Rect(Vector pos, Vector up, Vector left, TextureTile textureTile) {
     this.pos = pos;
     this.up = up;
     this.left = left;
@@ -32,13 +34,14 @@ public class Rect implements Renderable {
       new Vector(1.0,  1.0, 0.0, 1.0),  
       new Vector(0,    1.0, 0.0, 1.0)  
     );
+    Vector[] c = {
+      pos.plus(up).plus(left), pos.plus(up).minus(left), pos.minus(up).minus(left), pos.minus(up).plus(left)   
+    };
+    this.corners = c;
   }
 
   @Override
   public void render() {
-    Vector[] corners = {
-      pos.plus(up).plus(left), pos.plus(up).minus(left), pos.minus(up).minus(left), pos.minus(up).plus(left)   
-    };
     GL11.glColor3d(1.0f, 1.0f, 1.0f);
     textureTile.bind();
     GL11.glBegin(GL_QUADS);
@@ -55,6 +58,30 @@ public class Rect implements Renderable {
 
   public void setPos(Vector pos) {
     this.pos = pos;
+  }
+  
+  public void setNormal(Vector normal) {
+    this.normal = normal;
+  }
+
+  public Vector getPos() {
+    return this.pos;
+  }
+
+  public Vector getBottomLeft() {
+    return this.pos.plus(left).minus(up);
+  }
+
+  public Vector getBottomRight() {
+    return this.pos.minus(left).minus(up);
+  }
+
+  public void setDistance(double distance) {
+    this.distance = distance;
+  }
+
+  public double getDistance() {
+    return distance;
   }
 
 }

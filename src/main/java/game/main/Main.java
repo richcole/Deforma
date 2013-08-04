@@ -8,7 +8,8 @@ import game.proc.HeightMap;
 import game.proc.MidPoint;
 import game.proc.Perlin;
 import game.proc.Perlin2;
-import game.shaders.Box;
+import game.shaders.ProgramRenderer;
+import game.voxel.CubeMap;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -46,19 +47,20 @@ public class Main {
     context.getLogPanel();
     
     try {
-      // context.getScene().register(new Box(context));
-      context.getScene().register(context.getSkyBox());
-
+      context.getSkyBox().register();
+      // context.getGrassBox().register();
+      new CubeMap(context, 30, 20).register();
+      
+      // context.getGrassSquare().register();
+      // context.getBox().register();
+      
       // loadModels();
       // context.newCreature().register();
       // context.getTerrain().register();
       
       context.getPlayer().register();
-      
-      HeightMap heightMap = context.getHeightMap();
-      new Perlin2(12).generate(heightMap, heightMap.getWidth());
-      heightMap.calculateNormals();
-      heightMap.register();
+
+      // context.getHeightMap().register();
 
       context.getSimulator().start();
       context.getSimulator().waitForStart();

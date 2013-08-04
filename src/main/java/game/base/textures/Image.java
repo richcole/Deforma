@@ -63,7 +63,7 @@ public class Image {
   }
   
   public ByteBuffer getByteBuffer() {
-    ByteBuffer byteBuf = ByteBuffer.allocateDirect(width*height*3);
+    ByteBuffer byteBuf = ByteBuffer.allocateDirect(width*height*4);
     byteBuf.order(ByteOrder.nativeOrder());
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
@@ -71,6 +71,7 @@ public class Image {
         byteBuf.put((byte) ((rgb >> 16) & 0xff));
         byteBuf.put((byte) ((rgb >> 8) & 0xff));
         byteBuf.put((byte) ((rgb >> 0) & 0xff));
+        byteBuf.put((byte) ((rgb >> 24) & 0xff));
       }
     }
     byteBuf.flip();

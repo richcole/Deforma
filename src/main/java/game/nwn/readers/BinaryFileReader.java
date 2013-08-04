@@ -74,6 +74,9 @@ public class BinaryFileReader implements Closeable {
   }
   
   public byte[] readBytes(int num)  {
+    if ( num <= 0 ) {
+      throw new RuntimeException("Cannot read negative number of bytes");
+    }
     byte[] bytes = new byte[num];
     try {
       inp.read(bytes);
@@ -128,6 +131,7 @@ public class BinaryFileReader implements Closeable {
       (c == '+') ||
       (c == '\r') ||
       (c == '\n') ||
+      (c == '#') ||
       (c == ' ');
   }
 
@@ -206,6 +210,15 @@ public class BinaryFileReader implements Closeable {
       r[i] = readNullString(stringLen);
     }
     return r;
+  }
+
+  public long len() {
+    try {
+      return inp.length();
+    } catch (IOException e) {
+      Throwables.propagate(e);
+      return 0;
+    }
   }
 
 }

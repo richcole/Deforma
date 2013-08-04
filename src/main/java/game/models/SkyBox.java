@@ -32,4 +32,7 @@ public class SkyBox extends Cube {
     return context.getTilingTextures().getFileTexture(filename);
   }
 
+  public void register() {
+    context.getScene().register(this);
+  }
 }

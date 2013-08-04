@@ -17,6 +17,7 @@ public class HeightMap implements Renderable {
   int depth;
   Vector normals[];
   Vector pos[];
+  double scale = 10;
 
   private Context context;
   
@@ -83,18 +84,18 @@ public class HeightMap implements Renderable {
     }
     for(int x=1;x<width-1; ++x) {
       for(int y=1;y<depth-1; ++y) {
-        Vector a = new Vector(1, 0, get(x+1, y)-get(x+1, y), 1).normalize();
-        Vector b = new Vector(0, 1, get(x, y+1)-get(x, y-1), 1).normalize();
-        normals[getIndex(x,y)] = a.cross(b);
+        Vector a = new Vector(1, 0, get(x+1, y)-get(x+1, y), 1);
+        Vector b = new Vector(0, 1, get(x, y+1)-get(x, y-1), 1);
+        normals[getIndex(x,y)] = a.cross(b).normalize();
       }
     }
   }
 
   @Override
   public void render() {
-    TextureTile texture = context.getStoneTexture();
+    TextureTile texture = context.getGrassTexture();
     texture.bind();
-    double scale = 10;
+    double z = texture.getTextureZ();
     
     GL11.glBegin(GL11.GL_TRIANGLES);
     double w = width;
@@ -102,70 +103,74 @@ public class HeightMap implements Renderable {
     for(int x=1;x<width-1; ++x) {
       for(int y=1;y<depth-1; ++y) {
         // top left
-        GL11.glTexCoord3d((x-1)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x-1, y).times(scale));
-        GLUtils.glNormal(getNormal(x-1, y));
-
-        GL11.glTexCoord3d((x)/w, (y-1)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y-1).times(scale));
-        GLUtils.glNormal(getNormal(x, y-1));
-
-        GL11.glTexCoord3d((x)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y).times(scale));
-        GLUtils.glNormal(getNormal(x, y));
+        vertex(z, w, d, x, y, -1, 0);
+        vertex(z, w, d, x, y, 0,  -1);
+        vertex(z, w, d, x, y, 0,  0);
 
         // top right
-        GL11.glTexCoord3d((x)/w, (y-1)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y-1).times(scale));
-        GLUtils.glNormal(getNormal(x, y-1));
-
-        GL11.glTexCoord3d((x+1)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x+1, y).times(scale));
-        GLUtils.glNormal(getNormal(x+1, y));
-
-        GL11.glTexCoord3d((x)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y).times(scale));
-        GLUtils.glNormal(getNormal(x, y));
+        vertex(z, w, d, x, y, 0, -1);
+        vertex(z, w, d, x, y, 1,  0);
+        vertex(z, w, d, x, y, 0,  0);
 
         // bottom left
-        GL11.glTexCoord3d((x-1)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x-1, y).times(scale));
-        GLUtils.glNormal(getNormal(x-1, y));
-
-        GL11.glTexCoord3d((x)/w, (y+1)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y+1).times(scale));
-        GLUtils.glNormal(getNormal(x, y+1));
-
-        GL11.glTexCoord3d((x)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y).times(scale));
-        GLUtils.glNormal(getNormal(x, y));
+        vertex(z, w, d, x, y, -1, 0);
+        vertex(z, w, d, x, y,  0, 1);
+        vertex(z, w, d, x, y,  0, 0);
 
         // bottom right
-        GL11.glTexCoord3d((x+1)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x+1, y).times(scale));
-        GLUtils.glNormal(getNormal(x+1, y));
-
-        GL11.glTexCoord3d((x)/w, (y+1)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y+1).times(scale));
-        GLUtils.glNormal(getNormal(x, y+1));
-
-        GL11.glTexCoord3d((x)/w, (y)/d, texture.getTextureZ());
-        GLUtils.glVertex(getPosition(x, y).times(scale));
-        GLUtils.glNormal(getNormal(x, y));
+        vertex(z, w, d, x, y,  1, 0);
+        vertex(z, w, d, x, y,  0, 1);
+        vertex(z, w, d, x, y,  0, 0);
       }
     }
     GL11.glEnd();
   }
 
+  private void vertex(double tz, double w, double d, int x, int y, int dx, int dy) {
+    GL11.glTexCoord3d((x+dx)/w, (y+dy)/d, tz);
+    GLUtils.glVertex(getPosition((x+dx), (y+dy)));
+    GLUtils.glNormal(getNormal((x+dx), (y+dy)));
+  }
+
   private Vector getPosition(int x, int y) {
-    return pos[getIndex(x,y)];
+    return pos[getIndex(x,y)].times(scale);
   }
 
   private Vector getNormal(int x, int y) {
     return normals[getIndex(x, y)];
   }
 
+  private Vector getTexture(int x, int y) {
+    return new Vector(x/(double)width, y/(double)depth, 0, 1);
+  }
+
   public void register() {
     context.getScene().register(this);
+  }
+
+  public void copyTo(VertexCloud vCloud) {
+    for(int x=1;x<width-1; ++x) {
+      for(int y=1;y<depth-1; ++y) {
+        // top left
+        vCloud.addVertex(getPosition(x-1, y), getNormal(x-1, y), getTexture(x-1, y));
+        vCloud.addVertex(getPosition(x, y-1), getNormal(x, y-1), getTexture(x, y-1));
+        vCloud.addVertex(getPosition(x, y),   getNormal(x-1, y), getTexture(x, y));
+
+        // top right
+        vCloud.addVertex(getPosition(x, y-1), getNormal(x, y-1), getTexture(x, y-1));
+        vCloud.addVertex(getPosition(x+1, y), getNormal(x+1, y), getTexture(x+1, y));
+        vCloud.addVertex(getPosition(x, y), getNormal(x, y), getTexture(x, y));
+
+        // bottom left
+        vCloud.addVertex(getPosition(x-1, y), getNormal(x-1, y), getTexture(x-1, y));
+        vCloud.addVertex(getPosition(x, y+1), getNormal(x, y+1), getTexture(x, y+1));
+        vCloud.addVertex(getPosition(x, y), getNormal(x, y), getTexture(x, y));
+
+        // bottom right
+        vCloud.addVertex(getPosition(x+1, y), getNormal(x+1, y), getTexture(x+1, y));
+        vCloud.addVertex(getPosition(x, y+1), getNormal(x, y+1), getTexture(x, y+1));
+        vCloud.addVertex(getPosition(x, y), getNormal(x, y), getTexture(x, y));
+      }
+    }
   }
 }

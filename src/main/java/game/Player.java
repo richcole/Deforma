@@ -47,15 +47,15 @@ public class Player implements SimObject {
     this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
   }
 
-  Vector getLeft() {
+  public Vector getLeft() {
     return left;
   }
   
-  Vector getUp() {
+  public Vector getUp() {
     return up;
   }
 
-  Vector getNormal() {
+  public Vector getNormal() {
     return normal;
   }
 
@@ -200,5 +200,9 @@ public class Player implements SimObject {
   public void rotate(double dtheta1, double dtheta2) {
     theta1 += dtheta1 * 6.283f / 5000.0f;
     theta2 += dtheta2 * 6.283f / 5000.0f;
+  }
+  
+  public double getTheta1() {
+    return theta1;
   }
 }

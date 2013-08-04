@@ -52,7 +52,7 @@ public class ImageTexture implements Texture {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, byteBuf);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, byteBuf);
   }
 
   private void allocateTextureId() {
@@ -72,7 +72,7 @@ public class ImageTexture implements Texture {
     width = img.getWidth();
     height = img.getHeight();
     glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img.getByteBuffer());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img.getByteBuffer());
   }
 
 }

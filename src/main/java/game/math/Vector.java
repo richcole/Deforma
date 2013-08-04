@@ -52,7 +52,7 @@ public class Vector {
   }
 
   public Vector times(double s) {
-    return new Vector(v[0], v[1], v[2], v[3] / s);
+    return new Vector(v[0] * s, v[1] * s, v[2] * s, v[3]);
   }
   
   public Vector project() {
@@ -124,9 +124,13 @@ public class Vector {
   }
 
   public Vector scaleTo(double s) {
-    Vector r = new Vector(this);
-    r.v[3] = unscaledLength() / s;
-    return r;
+    if (s < 1e-6) {
+      return new Vector(0, 0, 0, 1);
+    } else {
+      Vector r = new Vector(this);
+      r.v[3] = unscaledLength() / s;
+      return r;
+    }
   }
 
   public Vector plus(Vector o) {
@@ -205,6 +209,10 @@ public class Vector {
 
   public double[] toDoubleArray() {
     return v;
+  }
+
+  public Vector elementTimes(Vector o) {
+    return new Vector(v[0]*o.x(), v[1]*o.y(), v[2]*o.z(), v[3]);
   }
   
 }

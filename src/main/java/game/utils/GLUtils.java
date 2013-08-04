@@ -4,6 +4,7 @@ import game.math.Matrix;
 import game.math.Vector;
 
 import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -28,5 +29,20 @@ public class GLUtils {
 
   public static void glVertex(Vector p) {
     GL11.glVertex3d(p.x(), p.y(), p.z());
+  }
+
+  public static FloatBuffer toFloatBuffer(Vector pos) {
+    FloatBuffer buf = BufferUtils.createFloatBuffer(4);
+    writeToFloatBuffer(pos, buf);
+    return buf;
+  }
+
+  public static void writeToFloatBuffer(Vector v, FloatBuffer buf) {
+    buf.clear();
+    buf.put((float)v.get(0));
+    buf.put((float)v.get(1));
+    buf.put((float)v.get(2));
+    buf.put((float)v.get(3));
+    buf.flip();
   }
 }

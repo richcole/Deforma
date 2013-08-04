@@ -41,7 +41,7 @@ public class SolidTexture implements Texture {
   }
 
   private void reallocateTexture() {
-    int len = width*height*3*buffers.size();
+    int len = width*height*4*buffers.size();
     ByteBuffer bigBuf = ByteBuffer.allocateDirect(len);
     for(ByteBuffer smallBuf: buffers) {
       smallBuf.position(0);
@@ -49,7 +49,7 @@ public class SolidTexture implements Texture {
     }
     bigBuf.flip();
     bind();
-    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGB, width, height, depth, 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, bigBuf);
+    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bigBuf);
   }
 
   private void allocateTextureId() {

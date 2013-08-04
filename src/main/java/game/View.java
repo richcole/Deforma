@@ -80,11 +80,12 @@ public class View {
     GL11.glEnable(GL12.GL_TEXTURE_3D);    
     GL11.glShadeModel(GL11.GL_SMOOTH);       
     GL11.glEnable (GL11.GL_BLEND);
-    GL11.glBlendFunc (GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     
     GL11.glEnable(GL11.GL_DEPTH_TEST);
-    GL11.glDepthFunc(GL11.GL_LEQUAL);
-    GL11.glDisable(GL11.GL_CULL_FACE);
+    GL11.glDepthFunc(GL11.GL_LESS);
+    GL11.glEnable(GL11.GL_CULL_FACE);
+    GL11.glFrontFace(GL11.GL_CCW);
     
     GL11.glEnable(GL11.GL_LIGHTING);
     
@@ -101,6 +102,11 @@ public class View {
   public void perspectiveView() {
     GL11.glDisable(GL11.GL_TEXTURE_2D);
     GL11.glEnable(GL12.GL_TEXTURE_3D);
+    GL11.glEnable (GL11.GL_BLEND);
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    GL11.glEnable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthFunc(GL11.GL_LEQUAL);
+    GL11.glDisable(GL11.GL_CULL_FACE);
     GL11.glMatrixMode(GL11.GL_PROJECTION);
     GL11.glLoadIdentity();
     GLU.gluPerspective(getPerspAngle(), getAspect(), getZNear(), getZFar());

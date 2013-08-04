@@ -8,7 +8,8 @@ layout(location = 5) in vec4 u;
 varying vec4 offset;
 varying vec4 dx;
 varying vec4 dy;
-varying vec4 normal;
+
+uniform vec4 eye;
 
 void main() {
   gl_Position = gl_ModelViewProjectionMatrix*pos;
@@ -16,5 +17,4 @@ void main() {
   dx = r;
   dy = u;
   offset = o;
-  normal = n;
 }
