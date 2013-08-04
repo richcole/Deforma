@@ -2,6 +2,8 @@ package game.voxel;
 
 import java.util.Map;
 
+import Jama.Matrix;
+
 import com.google.common.collect.Maps;
 
 import game.math.Vector;
@@ -101,7 +103,9 @@ public class DualContouring implements Tessellation {
     double grid[] = new double[8];
     Vector vs[] = new Vector[12];
     Vector ev[] = new Vector[12];
+    Vector edv[] = new Vector[12];
     Map<Vector, Vector> vm = Maps.newHashMap();
+    Map<Vector, Vector> vn = Maps.newHashMap();
     
     for (double x = bottomLeft.x(); x < topRight.x(); ++x) {
       for (double y = bottomLeft.y(); y < topRight.y(); ++y) {
@@ -113,22 +117,30 @@ public class DualContouring implements Tessellation {
           }
           
           int evIndex = 0;
-          Vector q = p;
           for(int i=0; i<EDGES.length; ++i) {
             double d1 = grid[EDGES[i][0]];
             double d2 = grid[EDGES[i][1]];
             if ( d1 * d2 < 0 ) {
               Vector mp = mix(d1, d2, vs[EDGES[i][0]], vs[EDGES[i][1]]);
-              ev[evIndex++] = mp;
-              q = q.plus(mp);
+              ev[evIndex] = mp;
+              edv[evIndex] = densityFunction.getDensityDerivative(mp);
+              evIndex++;
             }
           }
           if ( evIndex > 0 ) {
-            q = q.times(1.0/(1.0+evIndex));
-            if ( q.minus(p).length() > 1.0 ) {
-              throw new RuntimeException("Q moved too far");
+            Matrix A = new Matrix(evIndex, 3);
+            Matrix b = new Matrix(evIndex, 1);
+            for(int i=0;i<evIndex;++i) {
+              A.set(i, 0, edv[i].x());
+              A.set(i, 1, edv[i].y());
+              A.set(i, 2, edv[i].z());
+              b.set(i, 0, ev[i].dot(edv[i]));
             }
-            vm.put(p, q);
+            
+            Matrix s = A.solve(b);
+            Vector sv = new Vector(s.get(0, 0), s.get(1, 0), s.get(2, 0), 1);
+            vm.put(p, sv);
+            vn.put(p, densityFunction.getDensityDerivative(sv).normalize());
           }
           
         }
@@ -146,6 +158,7 @@ public class DualContouring implements Tessellation {
           
           Vector p1 = new Vector(x, y, z, 1);
           Vector q1 = vm.get(p1);
+          Vector n1 = vn.get(p1);
           if ( q1 != null ) {
             for(int i=0; i<EDGES.length; ++i) {
               if ( DRAW_EDGE[i] ) {
@@ -156,10 +169,12 @@ public class DualContouring implements Tessellation {
                   Vector u2 = UNITS[EDGE_UNITS[i][1]];
                   Vector q2 = vm.get(p1.plus(u1));
                   Vector q3 = vm.get(p1.plus(u2));
+                  Vector n2 = vn.get(p1.plus(u1));
+                  Vector n3 = vn.get(p1.plus(u2));
                   if ( q1 != null && q2 != null && q3 != null ) {
-                    cloud.addVertex(tr.transform(q1), Vector.ZERO, Vector.ZERO);
-                    cloud.addVertex(tr.transform(q2), Vector.ZERO, Vector.ZERO);
-                    cloud.addVertex(tr.transform(q3), Vector.ZERO, Vector.ZERO);
+                    cloud.addVertex(tr.transform(q1), n1, Vector.ZERO);
+                    cloud.addVertex(tr.transform(q2), n2, Vector.ZERO);
+                    cloud.addVertex(tr.transform(q3), n3, Vector.ZERO);
                   }
                 }
               }
@@ -168,7 +183,7 @@ public class DualContouring implements Tessellation {
         }      
       }
     }
-    cloud.computeNormals();
+    // cloud.computeNormals();
   }
 
   private Vector mix(double d1, double d2, Vector p1, Vector p2) {
