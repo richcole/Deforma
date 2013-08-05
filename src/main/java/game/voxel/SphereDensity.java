@@ -15,13 +15,15 @@ public class SphereDensity implements DensityFunction {
 
   @Override
   public double getDensity(Vector v) {
-    return v.minus(center).length() - radius;
+    double d = radius - v.minus(center).length();
+    return d;
   }
 
 
   @Override
   public Vector getDensityDerivative(Vector v) {
-    return v.times(2).minus(center.times(2));
+    double d = radius - v.minus(center).length();
+    return center.minus(v).normalize();
   }
   
 }

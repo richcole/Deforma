@@ -9,9 +9,6 @@ import com.google.common.collect.Maps;
 import game.math.Vector;
 import game.proc.VertexCloud;
 
-// the solver for the center point of the cubes in currently
-// avg of center point plus edge crossing. It results in a pretty poor
-// tesselation
 public class DualContouring implements Tessellation {
   
   final static Vector[] UNITS = {
@@ -139,6 +136,9 @@ public class DualContouring implements Tessellation {
             
             Matrix s = A.solve(b);
             Vector sv = new Vector(s.get(0, 0), s.get(1, 0), s.get(2, 0), 1);
+            if ( p.minus(sv).length() > 2 ) {
+              sv = p;
+            }
             vm.put(p, sv);
             vn.put(p, densityFunction.getDensityDerivative(sv).normalize());
           }
@@ -172,9 +172,9 @@ public class DualContouring implements Tessellation {
                   Vector n2 = vn.get(p1.plus(u1));
                   Vector n3 = vn.get(p1.plus(u2));
                   if ( q1 != null && q2 != null && q3 != null ) {
-                    cloud.addVertex(tr.transform(q1), n1, Vector.ZERO);
-                    cloud.addVertex(tr.transform(q2), n2, Vector.ZERO);
-                    cloud.addVertex(tr.transform(q3), n3, Vector.ZERO);
+                    cloud.addVertex(tr.transform(q1), tr.transformNormal(q1, n1), Vector.ZERO);
+                    cloud.addVertex(tr.transform(q2), tr.transformNormal(q2, n2), Vector.ZERO);
+                    cloud.addVertex(tr.transform(q3), tr.transformNormal(q3, n3), Vector.ZERO);
                   }
                 }
               }

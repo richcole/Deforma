@@ -6,4 +6,6 @@ public interface Transform {
 
   Vector transform(Vector vector);
 
+  Vector transformNormal(Vector q1, Vector n1);
+
 }

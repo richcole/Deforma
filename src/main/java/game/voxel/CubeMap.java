@@ -21,13 +21,11 @@ public class CubeMap implements Renderable, Registerable {
   VertexCloud cloud;
   Context context;
   ProgramRenderer program;
-  Tessellation tes;
   
-  public CubeMap(Context context, Vector bottomLeft, Vector topRight, Transform transform, DensityFunction densityFunction) {
+  public CubeMap(Context context, Vector bottomLeft, Vector topRight, Transform transform, DensityFunction densityFunction, Tessellation ts) {
     this.context = context;
     this.cloud = new VertexCloud();
-    this.tes = new DualContouring();
-    tes.genCloud(cloud, bottomLeft, topRight, densityFunction, transform);
+    ts.genCloud(cloud, bottomLeft, topRight, densityFunction, transform);
     cloud.freeze();
     program = new ProgramRenderer(context, cloud, "screen");
   }

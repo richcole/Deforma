@@ -11,8 +11,13 @@ import game.proc.Perlin;
 import game.proc.Perlin2;
 import game.shaders.ProgramRenderer;
 import game.voxel.CubeMap;
+import game.voxel.DensityFunction;
+import game.voxel.DualContouring;
+import game.voxel.MarchingCubes;
 import game.voxel.ScaleTransform;
 import game.voxel.SphereDensity;
+import game.voxel.SumDensity;
+import game.voxel.Tessellation;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -53,11 +58,16 @@ public class Main {
       context.getSkyBox().register();
       // context.getGrassBox().register();
       
-      int size = 20;
+      double size = 20;
       Vector topRight = Vector.ONES.times(size);
       Vector center = topRight.times(0.5);
       double radius = size * 0.25;
-      new CubeMap(context, Vector.ZERO, topRight, new ScaleTransform(20), new SphereDensity(center, radius)).register();
+      SphereDensity s1 = new SphereDensity(center, radius);
+      SphereDensity s2 = new SphereDensity(center.times(0.5), radius);
+      DensityFunction df = new SumDensity(s1, s2);
+      // Tessellation ts = new MarchingCubes();
+      Tessellation ts = new DualContouring();
+      new CubeMap(context, Vector.ZERO, topRight, new ScaleTransform(20), df, ts).register();
       
       // context.getGrassSquare().register();
       // context.getBox().register();

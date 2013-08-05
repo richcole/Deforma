@@ -14,5 +14,10 @@ public class ScaleTransform implements Transform {
   public Vector transform(Vector vector) {
     return vector.times(scale);
   }
+
+  @Override
+  public Vector transformNormal(Vector q1, Vector n1) {
+    return n1;
+  }
   
 }
