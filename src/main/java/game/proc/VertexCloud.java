@@ -5,7 +5,6 @@ import game.math.Vector;
 
 import java.nio.DoubleBuffer;
 import java.util.List;
-import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -15,26 +14,38 @@ import org.lwjgl.opengl.GL30;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class VertexCloud implements Renderable {
   
-  int vId, pId, nId, tId, oId, uId, rId, pIndex = 0, nIndex = 1, tIndex = 2, oIndex = 3, dxIndex = 4, dyIndex = 5;
+  int vId, pIndex = 0, nIndex = 1, tIndex = 2, oIndex = 3, dxIndex = 4, dyIndex = 5;
   
-  List<Vector> positions;
-  List<Vector> normals;
-  List<Vector> textures;
-  List<Vector> origins;
-  List<Vector> dxs;
-  List<Vector> dys;
+  List<Vector>[]     vectors;
+  int[]              ids;
+  
+  int pos;
+  int tail;
   
   public VertexCloud() {
-    positions = Lists.newArrayList();
-    normals = Lists.newArrayList();
-    textures = Lists.newArrayList();
-    origins = Lists.newArrayList();
-    dxs = Lists.newArrayList();
-    dys = Lists.newArrayList();
+    vectors = (List<Vector>[])new List[6];
+    for(int i=0;i<vectors.length; ++i) {
+      vectors[i] = Lists.newArrayList();
+    }
+    ids = new int[6];
+    pos = 0;
+    tail = 0;
+  }
+  
+  public int pos() {
+    return pos;
+  }
+  
+  public void seek(int pos) {
+    this.pos = pos;
+  }
+  
+  public int seekEnd() {
+    this.pos = tail;
+    return tail;
   }
   
   public void addVertex(Vector p, Vector n, Vector t) {
@@ -47,25 +58,32 @@ public class VertexCloud implements Renderable {
     Preconditions.checkNotNull(n);
     Preconditions.checkNotNull(t);
     
-    positions.add(p);
-    normals.add(n);
-    textures.add(t);
-    origins.add(o);
-    dxs.add(dx);
-    dys.add(dy);
+    if ( pos >= vectors[pIndex].size() ) {
+      vectors[pIndex].add(p);
+      vectors[nIndex].add(n);
+      vectors[tIndex].add(t);
+      vectors[oIndex].add(o);
+      vectors[dxIndex].add(dx);
+      vectors[dyIndex].add(dy);
+    } else {
+      vectors[pIndex].set(pos, p);
+      vectors[nIndex].add(pos, n);
+      vectors[tIndex].add(pos, t);
+      vectors[oIndex].add(pos, o);
+      vectors[dxIndex].add(pos, dx);
+      vectors[dyIndex].add(pos, dy);
+    }
+    pos += 1;
+    tail += 1;
   }
   
   public void freeze() {
     vId = GL30.glGenVertexArrays();
     GL30.glBindVertexArray(vId);
     
-    int len = positions.size();
-    pId = setVertexData(pIndex, positions, len);
-    nId = setVertexData(nIndex, normals, len);
-    tId = setVertexData(tIndex, textures, len);
-    oId = setVertexData(oIndex, origins, len);
-    uId = setVertexData(dxIndex, dxs, len);
-    rId = setVertexData(dyIndex, dys, len);
+    for(int i=0;i<vectors.length; ++i) {
+      ids[i] = setVertexData(i, vectors[i], tail); 
+    }
     
     GL30.glBindVertexArray(0);
   }
@@ -76,13 +94,13 @@ public class VertexCloud implements Renderable {
     }
     int id = GL15.glGenBuffers();
     GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id);
-    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, createBuf(vs), GL15.GL_STATIC_DRAW);
+    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, createBuf(index, vs), GL15.GL_STATIC_DRAW);
     GL20.glVertexAttribPointer(index, 3, GL11.GL_DOUBLE, false, 0, 0);
     GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     return id;
   }
 
-  private DoubleBuffer createBuf(List<Vector> vs) {
+  private DoubleBuffer createBuf(int index, List<Vector> vs) {
     DoubleBuffer buf = BufferUtils.createDoubleBuffer(vs.size()*3);
     for(Vector v: vs) {
       buf.put(v.x());
@@ -95,34 +113,39 @@ public class VertexCloud implements Renderable {
   
   public void render() {
     GL30.glBindVertexArray(vId);
-    GL20.glEnableVertexAttribArray(pIndex);
-    GL20.glEnableVertexAttribArray(nIndex);
-    GL20.glEnableVertexAttribArray(tIndex);
-    GL20.glEnableVertexAttribArray(oIndex);
-    GL20.glEnableVertexAttribArray(dxIndex);
-    GL20.glEnableVertexAttribArray(dyIndex);
+    for(int i=0;i<vectors.length; ++i) {
+      GL20.glEnableVertexAttribArray(i);
+    }
     
-    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, positions.size());
+    GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, tail);
 
-    GL20.glDisableVertexAttribArray(pIndex);
-    GL20.glDisableVertexAttribArray(nIndex);
-    GL20.glDisableVertexAttribArray(tIndex);
-    GL20.glDisableVertexAttribArray(oIndex);
-    GL20.glDisableVertexAttribArray(dxIndex);
-    GL20.glDisableVertexAttribArray(dyIndex);
-    GL30.glBindVertexArray(0);
+    for(int i=0;i<vectors.length; ++i) {
+      GL20.glDisableVertexAttribArray(i);
+    }
   }
 
   public void computeNormals() {
-    for(int i=0;i<positions.size(); i+=3) {
-      Vector p1 = positions.get(i);
-      Vector p2 = positions.get(i+1);
-      Vector p3 = positions.get(i+2);
+    for(int i=0;i<tail; i+=3) {
+      Vector p1 = vectors[pIndex].get(i);
+      Vector p2 = vectors[pIndex].get(i+1);
+      Vector p3 = vectors[pIndex].get(i+2);
       Vector n = p2.minus(p1).cross(p3.minus(p1)).normalize();
-      normals.set(i, n);
-      normals.set(i+1, n);
-      normals.set(i+2, n);
+      vectors[nIndex].set(i, n);
+      vectors[nIndex].set(i+1, n);
+      vectors[nIndex].set(i+2, n);
     }
+    
+  }
+
+  public void free(int pos, int end) {
+    for(int i=pos; i<end; ++i) {
+      swap(i, tail);
+      tail -= 1;
+    }
+  }
+
+  private void swap(int i, int j) {
+    
     
   }
 }

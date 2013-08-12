@@ -4,7 +4,6 @@ import game.nwn.readers.BinaryFileReader;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

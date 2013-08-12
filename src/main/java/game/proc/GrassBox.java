@@ -4,7 +4,6 @@ import game.Context;
 import game.Renderable;
 import game.math.Vector;
 import game.shaders.ProgramRenderer;
-import game.shaders.ShaderArray;
 import game.shaders.ShaderVec3Array;
 import game.shaders.ShaderVec4Array;
 import game.utils.GLUtils;

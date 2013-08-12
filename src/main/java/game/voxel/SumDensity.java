@@ -1,10 +1,10 @@
 package game.voxel;
 
+import game.math.Vector;
+
 import java.util.List;
 
 import com.google.common.collect.Lists;
-
-import game.math.Vector;
 
 public class SumDensity implements DensityFunction {
   
@@ -16,39 +16,21 @@ public class SumDensity implements DensityFunction {
 
   @Override
   public double getDensity(Vector v) {
-    Double p = null;
-    Double n = null;
+    double r = 0;
     for(DensityFunction f: fs) {
-      double d = f.getDensity(v);
-      if ( d >= 0 && (p == null || Math.abs(d) < Math.abs(p)) ) {
-        p = d;
-      }
-      if ( d < 0 && (n == null || Math.abs(d) < Math.abs(n)) ) {
-        n = d;
-      }
+      r += f.getDensity(v);
     }
-    return p != null ? p : n;
+    return r;
   }
-
 
   @Override
   public Vector getDensityDerivative(Vector v) {
-    Double p = null;
-    Double n = null;
-    Vector dp = null;
-    Vector dn = null;
+    Vector r = Vector.ZERO;
     for(DensityFunction f: fs) {
-      double d = f.getDensity(v);
-      if ( d >= 0 && (p == null || Math.abs(d) < Math.abs(p)) ) {
-        p = d;
-        dp = f.getDensityDerivative(v);
-      }
-      if ( d < 0 && (n == null || Math.abs(d) < Math.abs(n)) ) {
-        n = d;
-        dn = f.getDensityDerivative(v);
-      }
+      r = r.plus(f.getDensityDerivative(v));
     }
-    return p != null ? dp : dn;
+    return r;
   }
-  
+
+ 
 }

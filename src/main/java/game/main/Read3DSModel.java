@@ -1,12 +1,12 @@
 package game.main;
 
+import game.ds.Parser;
+import game.ds.Parser.Chunk;
+
 import java.io.File;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-
-import game.ds.Parser;
-import game.ds.Parser.Chunk;
 
 public class Read3DSModel {
   

@@ -13,14 +13,12 @@ import game.models.Creature;
 import game.models.Grid;
 import game.models.Light;
 import game.models.Models;
-import game.models.Rect;
 import game.models.ResFiles;
 import game.models.SkyBox;
 import game.models.TerrainTile;
 import game.models.TileSetDescriptions;
 import game.nwn.readers.KeyReader;
 import game.proc.GrassBox;
-import game.proc.GrassImage;
 import game.proc.GrassSquare;
 import game.proc.HeightMap;
 import game.proc.Perlin2;
@@ -28,6 +26,9 @@ import game.proc.VertexCloud;
 import game.shaders.ProgramRenderer;
 import game.shaders.ShaderArray;
 import game.shaders.ShaderMatrix;
+import game.tools.DeformTerrainTool;
+import game.tools.MovePlayerTool;
+import game.voxel.DeformableTerrain;
 
 import java.io.File;
 import java.util.List;
@@ -78,6 +79,9 @@ public class Context {
 
   GrassSquare grassSquare;
   GrassBox grassBox;
+  private DeformableTerrain deformableTerrain;
+  private MovePlayerTool movePlayerTool;
+  private DeformTerrainTool deformTerrainTool;
 
   public Context() {
     configureLoghing();
@@ -322,6 +326,27 @@ public class Context {
       grassSquare = new GrassSquare(this);
     }
     return grassSquare;
+  }
+
+  public DeformableTerrain getDeformableTerrain() {
+    if ( deformableTerrain == null ) {
+      deformableTerrain = new DeformableTerrain(this);
+    }
+    return deformableTerrain;
+  }
+
+  public MovePlayerTool getMovePlayerTool() {
+    if ( movePlayerTool == null ) {
+      movePlayerTool = new MovePlayerTool(this);
+    }
+    return movePlayerTool;
+  }
+
+  public DeformTerrainTool getDeformTerrainTool() {
+    if ( deformTerrainTool == null ) {
+      deformTerrainTool = new DeformTerrainTool(this);
+    }
+    return deformTerrainTool;
   }
 
 }

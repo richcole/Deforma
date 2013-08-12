@@ -21,12 +21,8 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import javax.imageio.ImageIO;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Throwables;
 
 public class ImageTexture implements Texture {
   int width;

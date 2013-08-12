@@ -3,6 +3,10 @@ package game.voxel;
 import game.math.Vector;
 import game.proc.VertexCloud;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 public class MarchingCubes implements Tessellation {
   static final long EDGE_TABLE[]       = { 0x0, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f,
     0xb06, 0xc0a, 0xd03, 0xe09, 0xf00, 0x190, 0x99, 0x393, 0x29a, 0x596, 0x49f, 0x795, 0x69c, 0x99c, 0x895, 0xb9f,
@@ -120,52 +124,95 @@ public class MarchingCubes implements Tessellation {
 
   static byte       EDGE_INDEX[][]     = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 4, 5 }, { 5, 6 }, { 6, 7 },
     { 7, 4 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
+  
+  VertexCloud cloud;
+  Map<Vector, Face> faces;
+
+  private double[] grid;
+  private Vector[] ps;
+  private Vector[] vs;
+  
+  static private class Face {
+    int start;
+    int end;
+  }
+  
+  public MarchingCubes() {
+    this.grid = new double[CUBE_VERTS_TABLE.length];
+    this.ps = new Vector[CUBE_VERTS_TABLE.length];
+    this.vs = new Vector[32];
+    this.faces = Maps.newHashMap();
+  }
 
   @Override
-  public void genCloud(VertexCloud cloud, Vector bottomLeft, Vector topRight, DensityFunction densityFunction, Transform transformation) {
-    double grid[] = new double[CUBE_VERTS_TABLE.length];
-    Vector ps[] = new Vector[CUBE_VERTS_TABLE.length];
-    Vector vs[] = new Vector[32];
-
+  public void update(Vector bottomLeft, Vector topRight, DensityFunction densityFunction, Transform transformation) {
     for (double x = bottomLeft.x(); x < topRight.x(); ++x) {
       for (double y = bottomLeft.y(); y < topRight.y(); ++y) {
         for (double z = bottomLeft.z(); z < topRight.z(); ++z) {
-
-          Vector p = new Vector(x, y, z, 1);
-          int cubeIndex = 0;
-          for (int i = 0; i < CUBE_VERTS_TABLE.length; ++i) {
-            ps[i] = p.plus(CUBE_VERTS_TABLE[i]);
-            grid[i] = densityFunction.getDensity(ps[i]);
-            if (grid[i] > 0) {
-              cubeIndex |= (0x1 << i);
-            }
-          }
-
-          long edgeMask = EDGE_TABLE[cubeIndex];
-          if (edgeMask != 0) {
-            for (int i = 0; i < 12; ++i) {
-              if ((edgeMask & (0x1 << i)) > 0) {
-                byte e1 = EDGE_INDEX[i][0];
-                byte e2 = EDGE_INDEX[i][1];
-                vs[i] = midPoint(grid[e1], grid[e2], ps[e1], ps[e2]);
-              }
-            }
-
-            byte[] triIndexes = TRI_TABLE[cubeIndex];
-            for (int i = 0; i < triIndexes.length; i++) {
-              cloud.addVertex(transformation.transform(vs[triIndexes[i]]), Vector.ZERO, Vector.ZERO);
-            }
-          }
+          updatePoint(cloud, densityFunction, transformation, grid, ps, vs, x, y, z);
         }
       }
     }
-    cloud.computeNormals();
   }
   
-  private Vector midPoint(double d1, double d2, Vector p1, Vector p2) {
-    return p1.plus(p2.minus(p1).times(d1 / (d1 - d2)));
+  private void updatePoint(VertexCloud cloud, DensityFunction densityFunction, Transform transformation, double[] grid,
+    Vector[] ps, Vector[] vs, double x, double y, double z) {
+    Vector p = new Vector(x, y, z, 1);
+    int cubeIndex = 0;
+    for (int i = 0; i < CUBE_VERTS_TABLE.length; ++i) {
+      ps[i] = p.plus(CUBE_VERTS_TABLE[i]);
+      grid[i] = densityFunction.getDensity(ps[i]);
+      if (Funs.isPos(grid[i])) {
+        cubeIndex |= (0x1 << i);
+      }
+    }
+
+    long edgeMask = EDGE_TABLE[cubeIndex];
+    if (edgeMask != 0) {
+      for (int i = 0; i < 12; ++i) {
+        if ((edgeMask & (0x1 << i)) > 0) {
+          byte e1 = EDGE_INDEX[i][0];
+          byte e2 = EDGE_INDEX[i][1];
+          vs[i] = Funs.midPoint(grid[e1], grid[e2], ps[e1], ps[e2]);
+        }
+      }
+
+      byte[] triIndexes = TRI_TABLE[cubeIndex];
+      if ( triIndexes.length > 0 ) {
+        Face face = getFace(p);
+        if ( face.start == 0 ) {
+          face.start = cloud.seekEnd();
+          face.end = face.start + triIndexes.length;
+        } else if ( face.end - face.start < triIndexes.length ) {
+          cloud.free(face.start, face.end);
+          face.start = cloud.seekEnd();
+          face.end = face.start + triIndexes.length;
+        } else {
+          cloud.free(face.start + triIndexes.length, face.end);
+          cloud.seek(face.start);
+          face.end = face.start + triIndexes.length;
+        }
+        for (int i = 0; i < triIndexes.length; i++) {
+          Vector sv = vs[triIndexes[i]];
+          Vector sn = densityFunction.getDensityDerivative(sv).normalize();
+          cloud.addVertex(transformation.transform(sv), sn, Vector.ZERO);
+        }
+      }
+    }
   }
 
-  
+  private Face getFace(Vector p) {
+    Face face = faces.get(p);
+    if ( face == null ) {
+      face = new Face();
+      faces.put(p, face);
+    }
+    return face;
+  }
+
+  @Override
+  public void setCloud(VertexCloud cloud) {
+    this.cloud = cloud;
+  }
 
 }

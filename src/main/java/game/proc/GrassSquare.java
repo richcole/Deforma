@@ -1,18 +1,15 @@
 package game.proc;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Random;
-
-import org.lwjgl.opengl.GL11;
-
 import game.Context;
 import game.Renderable;
 import game.base.textures.TextureTile;
 import game.math.Matrix;
 import game.math.Vector;
 import game.models.Rect;
-import game.utils.GLUtils;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
 
 public class GrassSquare implements Renderable {
   

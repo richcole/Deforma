@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
-import game.nwn.readers.set.Tile;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

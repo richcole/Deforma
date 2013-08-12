@@ -1,11 +1,11 @@
 package game.proc;
 
-import java.util.Random;
-
 import game.Context;
 import game.base.textures.Image;
 import game.base.textures.TextureTile;
 import game.containers.Factory;
+
+import java.util.Random;
 
 public class GrassImage {
   

@@ -1,13 +1,15 @@
 package game;
 
-import game.math.Vector;
-import game.models.Grid.GridSquare;
-import game.models.Grid.TileSquare;
+import game.tools.Tool;
+
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+
+import com.google.common.collect.Sets;
 
 public class InputDevice {
   
@@ -20,84 +22,60 @@ public class InputDevice {
   boolean grabbed = false;
 
   private Context context;
+  private Set<? extends Tool> activeTools;
+  private Set<? extends Tool> inactiveTools;
 
   public InputDevice(Context context) {
     this.context = context;
+    this.activeTools = Sets.newHashSet(context.getMovePlayerTool(), context.getDeformTerrainTool());
+    this.inactiveTools = Sets.newHashSet();
     Mouse.setGrabbed(grabbed);
   }
 
-  public boolean process() {
-    boolean eventProcessed = false;
+  public void process() {
     if ( Display.isCloseRequested() ) {
       quit = true;
-      eventProcessed = true;
     }
-    eventProcessed = processMouse() || eventProcessed;
-    eventProcessed = processKeyboard() || eventProcessed;
-    return eventProcessed;
+    processMouse();
+    processKeyboard();
   }
 
-  private boolean processKeyboard() {
-    boolean eventProcessed = false;
+  private void processKeyboard() {
     while( Keyboard.next() ) {
       int key = Keyboard.getEventKey();
       boolean pressed = Keyboard.getEventKeyState();
       
       switch(key) {
-      case Keyboard.KEY_RETURN:
-        if ( pressed ) {
-        }
-        break;
       case Keyboard.KEY_ESCAPE:
         quit = true;
         break;
-      case Keyboard.KEY_Q:
-        context.getPlayer().setMovingUpward(pressed);
-        break;
-      case Keyboard.KEY_E:
-        context.getPlayer().setMovingDownward(pressed);
-        break;
-      case Keyboard.KEY_W:
-        context.getPlayer().setMovingForward(pressed);
-        break;
-      case Keyboard.KEY_S:
-        context.getPlayer().setMovingBackward(pressed);
-        break;
-      case Keyboard.KEY_A:
-        context.getPlayer().setMovingLeft(pressed);
-        break;
-      case Keyboard.KEY_D:
-        context.getPlayer().setMovingRight(pressed);
-        break;
-      case Keyboard.KEY_SPACE:
-        if ( pressed ) {
-          context.getPlayer().fire();
+      default:
+        for(Tool tool: activeTools) {
+          tool.handleKeyboardInput(key, pressed);
         }
-        break;
-      case Keyboard.KEY_L:
-        if ( pressed ) {
-          context.getPlayer().fireLight();
-        }
-        break;
       }
-      eventProcessed = true;
     }
-    return eventProcessed;
   }
 
-  private boolean processMouse() {
-    boolean eventProcessed = false;
+  private void processMouse() {
     while( Mouse.next() ) {
-      processRightClick();
-      processWheel();
+      for(Tool tool: activeTools) {
+        if ( Mouse.getEventDWheel() != 0 ) {
+          tool.handleWheel(Mouse.getEventDWheel() > 0);
+        }
+        if ( Mouse.getEventButton() == 1 ) {
+          grabbed = Mouse.getEventButtonState();
+          Mouse.setGrabbed(grabbed);
+          haveMouseCoords = false;
+        }
+      }
+
       if ( ! grabbed ) {
         boolean pressed = Mouse.getEventButtonState();
         if ( pressed ) {
-          int button = Mouse.getEventButton();
-          switch( button ) {
-          case 0:
-            selectTerrainCreature(Mouse.getX(), Mouse.getY());
-            break;
+          int button = Mouse.getEventButton();      
+          for(Tool tool: activeTools) {
+            tool.handleMouseButton(button, Mouse.getX(), Mouse.getY());
           }
         }
       }
@@ -107,7 +85,9 @@ public class InputDevice {
           float dy = Mouse.getY() - my;
           x += dx;
           y += dy;
-          context.getPlayer().rotate(dx, dy);
+          for(Tool tool: activeTools) {
+            tool.handleMouseMove(dx, dy);
+          }
         }
         haveMouseCoords = true;
         mx = Mouse.getX();
@@ -120,46 +100,7 @@ public class InputDevice {
           haveMouseCoords = false;
           Mouse.setCursorPosition((int)context.getView().getWidth()/2, (int)context.getView().getHeight()/2);
         }
-        eventProcessed = true;
       }
-    }
-    return eventProcessed;
-  }
-
-  private void processRightClick() {
-    if ( Mouse.getEventButton() == 1 ) {
-      grabbed = Mouse.getEventButtonState();
-      Mouse.setGrabbed(grabbed);
-      haveMouseCoords = false;
-    }
-  }
-
-  private void processWheel() {
-    if ( Mouse.getEventDWheel() > 0 ) {
-      context.getPlayer().nextTerrainTileIndex();
-    } else if ( Mouse.getEventDWheel() < 0 ) {
-      context.getPlayer().prevTerrainTileIndex();
-    }
-  }
-  
-  private void selectTerrainCreature(int x2, int y2) {
-    Vector f = context.getSelectionRay().getSelectionRay((float)x2, (float)y2);
-    Player player = context.getPlayer();
-    Vector p = player.getPos();
-    double s = -p.z() / f.z();
-    Vector x = p.plus(f.times(s));
-    GridSquare tile = context.getTerrain().getGridSquareAt(x);
-    if ( tile  != null ) {
-      player.setSelectedCreature(tile.getCreature());
-    } else {
-      player.setSelectedCreature(null);
-    }
-    
-    TileSquare tileSquare = context.getTerrain().getTileSquareAt(x);
-    if ( tileSquare != null ) {
-      player.setSelectedTileSquare(tileSquare);
-    } else {
-      player.setSelectedTileSquare(null);
     }
   }
 

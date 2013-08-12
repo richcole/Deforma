@@ -15,6 +15,9 @@ public class Vector {
   public static final Vector U1     = new Vector(1,  0,  0, 1);
   public static final Vector U2     = new Vector(0,  1,  0, 1);
   public static final Vector U3     = new Vector(0,  0,  1, 1);
+  public static final Vector MU1     = new Vector(-1,  0,  0, 1);
+  public static final Vector MU2     = new Vector(0,  -1,  0, 1);
+  public static final Vector MU3     = new Vector(0,  0,  -1, 1);
   public static final Vector ZERO   = new Vector(0,  0,  0, 1);
   public static final Vector ONES   = new Vector(1,  1,  1, 1);
   
@@ -213,6 +216,10 @@ public class Vector {
 
   public Vector elementTimes(Vector o) {
     return new Vector(v[0]*o.x(), v[1]*o.y(), v[2]*o.z(), v[3]);
+  }
+
+  public Vector divide(Vector o) {
+    return new Vector(v[0]/o.v[0], v[1]/o.v[1], v[2]/o.v[2], v[3]/o.v[3]);
   }
   
 }

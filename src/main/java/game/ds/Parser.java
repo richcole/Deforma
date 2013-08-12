@@ -1,14 +1,13 @@
 package game.ds;
 
+import game.nwn.readers.BinaryFileReader;
+
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import game.nwn.readers.BinaryFileReader;
 
 public class Parser {
   

@@ -2,9 +2,6 @@ package game.shaders;
 
 import game.Context;
 import game.Renderable;
-import game.math.Vector;
-import game.proc.Perlin2;
-
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.GL20;

@@ -3,7 +3,6 @@ package game.models;
 import game.Context;
 import game.Material;
 import game.Renderable;
-import game.base.textures.Texture;
 import game.base.textures.TextureTile;
 import game.math.Vector;
 

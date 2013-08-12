@@ -34,17 +34,12 @@ public class Player implements SimObject {
   boolean movingRight = false;
 
   private Context context;
-  private Creature selectedCreature;
-  private TileSquare selectedTileSquare;
-  private TileSetDescription tileSetDescription;
   
   public Player(Context context) {
     this.context = context;
     this.pos = new Vector(-100, -100, 150);
     this.theta1 = 45;
     this.theta2 = -45;
-    this.tileSetDescription = context.getTileSetDescriptions().getTileSetDescription(TileSet.Tin01);
-    this.selectedTileSquare = context.getTerrain().getTileSquare(0, 0);
   }
 
   public Vector getLeft() {
@@ -149,54 +144,6 @@ public class Player implements SimObject {
     context.getSimulator().register(this);
   }
 
-  public void setSelectedCreature(Creature selectedCreature) {
-    if ( this.selectedCreature != null ) {
-      this.selectedCreature.setSelected(false);
-    }
-    if ( selectedCreature != null ) {
-      selectedCreature.setSelected(true);
-    }
-    this.selectedCreature = selectedCreature;
-  }
-
-  public Creature getSelectedCreature() {
-    return selectedCreature;
-  }
-  
-  public void nextTerrainTileIndex() {
-    updateSelectedTile(1);
-  }
-  
-  public void prevTerrainTileIndex() {
-    updateSelectedTile(-1);
-  }
-
-  private void updateSelectedTile(int dirn) {
-    if ( selectedTileSquare != null ) {
-      TerrainTile tile = selectedTileSquare.getTerrainTile();
-      if ( tile == null ) {
-        tile = context.newTile();
-        selectedTileSquare.setTerrainTile(tile);
-        tile.setModel(tileSetDescription.getTiles().get(0).getModel());
-        tile.setModelIndex(0);
-      } else {
-        int numTiles = tileSetDescription.getTiles().size();
-        int modelIndex = tile.getModelIndex() + dirn;
-        if ( modelIndex < 0 ) {
-          modelIndex = numTiles + modelIndex;
-        } else if ( modelIndex >= numTiles ) {
-          modelIndex = modelIndex - numTiles;
-        }
-        tile.setModel(tileSetDescription.getTiles().get(modelIndex).getModel());
-        tile.setModelIndex(modelIndex);
-      }
-    }
-  }
-
-  public void setSelectedTileSquare(TileSquare selectedTileSquare) {
-    this.selectedTileSquare = selectedTileSquare;
-  }
-  
   public void rotate(double dtheta1, double dtheta2) {
     theta1 += dtheta1 * 6.283f / 5000.0f;
     theta2 += dtheta2 * 6.283f / 5000.0f;
