@@ -40,7 +40,7 @@ public class PhysicalObject implements SimObject {
       return v.scaleTo(r/vls);
     }
     else {
-      return Vector.ZERO;
+      return Vector.Z;
     }
   }
   

@@ -195,7 +195,7 @@ public class MarchingCubes implements Tessellation {
         for (int i = 0; i < triIndexes.length; i++) {
           Vector sv = vs[triIndexes[i]];
           Vector sn = densityFunction.getDensityDerivative(sv).normalize();
-          cloud.addVertex(transformation.transform(sv), sn, Vector.ZERO);
+          cloud.addVertex(transformation.transform(sv), sn, Vector.Z);
         }
       }
     }

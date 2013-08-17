@@ -25,7 +25,7 @@ public class SumDensity implements DensityFunction {
 
   @Override
   public Vector getDensityDerivative(Vector v) {
-    Vector r = Vector.ZERO;
+    Vector r = Vector.Z;
     for(DensityFunction f: fs) {
       r = r.plus(f.getDensityDerivative(v));
     }

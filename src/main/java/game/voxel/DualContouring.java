@@ -163,9 +163,9 @@ public class DualContouring implements Tessellation {
                   Vector n2 = vn.get(p1.plus(u1));
                   Vector n3 = vn.get(p1.plus(u2));
                   if ( q1 != null && q2 != null && q3 != null ) {
-                    cloud.addVertex(tr.transform(q1), tr.transformNormal(q1, n1), Vector.ZERO);
-                    cloud.addVertex(tr.transform(q2), tr.transformNormal(q2, n2), Vector.ZERO);
-                    cloud.addVertex(tr.transform(q3), tr.transformNormal(q3, n3), Vector.ZERO);
+                    cloud.addVertex(tr.transform(q1), tr.transformNormal(q1, n1), Vector.Z);
+                    cloud.addVertex(tr.transform(q2), tr.transformNormal(q2, n2), Vector.Z);
+                    cloud.addVertex(tr.transform(q3), tr.transformNormal(q3, n3), Vector.Z);
                   }
                 }
               }
@@ -206,7 +206,7 @@ public class DualContouring implements Tessellation {
   private void solveCubePoint2(DensityFunction densityFunction, Vector[] ev, Vector[] edv, Map<Vector, Vector> vm,
     Map<Vector, Vector> vn, Vector p, int evIndex) {
     if ( evIndex > 0 ) {
-      Vector sv1 = Vector.ZERO;
+      Vector sv1 = Vector.Z;
       for(int i=0;i<evIndex;++i) {
         sv1 = sv1.plus(ev[i]);
       }
@@ -228,7 +228,7 @@ public class DualContouring implements Tessellation {
   private void solveCubePoint(DensityFunction densityFunction, Vector[] ev, Vector[] edv, Map<Vector, Vector> vm,
     Map<Vector, Vector> vn, Vector p, int evIndex) {
     if ( evIndex > 0 ) {
-      Vector sv1 = Vector.ZERO;
+      Vector sv1 = Vector.Z;
       for(int i=0;i<evIndex;++i) {
         sv1 = sv1.plus(ev[i]);
       }

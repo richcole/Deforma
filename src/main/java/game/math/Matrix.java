@@ -8,7 +8,7 @@ public class Matrix {
   double v[] = new double[16];
   
   public static final Matrix IDENTITY = Matrix.id();
-  public static final Matrix BASIS    = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.ZERO);
+  public static final Matrix BASIS    = Matrix.rows(Vector.U1, Vector.U2, Vector.U3, Vector.Z);
   public static final Matrix ONES     = Matrix.ones();
   public static final Matrix ZERO     = IDENTITY.minus(IDENTITY);
   

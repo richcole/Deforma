@@ -13,7 +13,7 @@ public class SkyBox extends Cube {
   final static double SIZE = 10000;
   
   public SkyBox(Context context) {
-    super(context, Vector.ZERO, SIZE);
+    super(context, Vector.Z, SIZE);
   }
 
   @Override

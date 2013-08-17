@@ -4,6 +4,7 @@ import game.Context;
 import game.enums.TileSet;
 import game.nwn.readers.set.SetReader.TileSetDescription;
 import game.nwn.readers.set.Tile;
+import game.voxel.OctTreeTest;
 
 import org.apache.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -52,7 +53,8 @@ public class Main {
       // context.getTerrain().register();
       
       context.getPlayer().register();
-      context.getDeformableTerrain().register();
+      // context.getDeformableTerrain().register();
+      new OctTreeTest(context).register();
       // context.getHeightMap().register();
 
       context.getSimulator().start();

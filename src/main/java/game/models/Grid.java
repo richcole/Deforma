@@ -77,7 +77,7 @@ public class Grid implements Renderable {
     this.ty = dy/gridsPerTile;
     Vector n = Vector.NORMAL.times(gridScale/2);
     Vector l = Vector.LEFT.times(gridScale/2);
-    this.rect = new Rect(Vector.ZERO, n, l, context.getStoneTexture());
+    this.rect = new Rect(Vector.Z, n, l, context.getStoneTexture());
     this.gridSquares = new GridSquare[dx*dy];
     this.tileSquares = new TileSquare[tx*ty];
     for(int j=0;j<dx; ++j) {

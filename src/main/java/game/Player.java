@@ -72,7 +72,7 @@ public class Player implements SimObject {
   
   @Override
   public void tick() {
-    velocity = Vector.ZERO;
+    velocity = Vector.Z;
     if ( movingForward ) {
       velocity = velocity.plus(getNormal());
     }

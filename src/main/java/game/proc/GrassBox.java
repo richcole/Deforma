@@ -37,7 +37,7 @@ public class GrassBox implements Renderable {
     double scale = 100;
     Vector n = Vector.NORMAL.times(-1);
     Vector l = Vector.LEFT;
-    Vector z = Vector.ZERO;
+    Vector z = Vector.Z;
     Vector u = Vector.UP.times(scale/2);
     Vector r = Vector.LEFT.times(-scale/2);
     Vector f = Vector.NORMAL.times(scale/2);

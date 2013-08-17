@@ -21,7 +21,7 @@ public class MatrixTest {
     Matrix b = Matrix.BASIS;
     Matrix r = Matrix.rot(Math.PI/2, Vector.U1);
     Matrix c = b.times(r);
-    Matrix e = Matrix.rows(Vector.U1, Vector.U3.minus(), Vector.U2, Vector.ZERO);
+    Matrix e = Matrix.rows(Vector.U1, Vector.U3.minus(), Vector.U2, Vector.Z);
     System.out.println("r=" + c);
     System.out.println("c=" + c);
     Assert.assertTrue(e.withinDelta(c, 1e-6));

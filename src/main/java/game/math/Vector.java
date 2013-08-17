@@ -15,10 +15,10 @@ public class Vector {
   public static final Vector U1     = new Vector(1,  0,  0, 1);
   public static final Vector U2     = new Vector(0,  1,  0, 1);
   public static final Vector U3     = new Vector(0,  0,  1, 1);
-  public static final Vector MU1     = new Vector(-1,  0,  0, 1);
-  public static final Vector MU2     = new Vector(0,  -1,  0, 1);
-  public static final Vector MU3     = new Vector(0,  0,  -1, 1);
-  public static final Vector ZERO   = new Vector(0,  0,  0, 1);
+  public static final Vector M1     = new Vector(-1,  0,  0, 1);
+  public static final Vector M2     = new Vector(0,  -1,  0, 1);
+  public static final Vector M3     = new Vector(0,  0,  -1, 1);
+  public static final Vector Z      = new Vector(0,  0,  0, 1);
   public static final Vector ONES   = new Vector(1,  1,  1, 1);
   
   static {

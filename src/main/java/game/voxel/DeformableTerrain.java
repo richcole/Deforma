@@ -32,7 +32,7 @@ public class DeformableTerrain {
 
     ts = new MarchingCubes();
     transform = new ScaleTransform(400/size);
-    cubeMap = new CubeMap(context, Vector.ZERO, topRight, transform, s3, ts);
+    cubeMap = new CubeMap(context, Vector.Z, topRight, transform, s3, ts);
   }
   
   public void register() {

@@ -2,6 +2,7 @@ package game.proc;
 
 import game.Renderable;
 import game.math.Vector;
+import game.voxel.Transform;
 
 import java.nio.DoubleBuffer;
 import java.util.List;
@@ -49,7 +50,7 @@ public class VertexCloud implements Renderable {
   }
   
   public void addVertex(Vector p, Vector n, Vector t) {
-    Vector z = Vector.ZERO;
+    Vector z = Vector.Z;
     addVertex(p, n, t, z, z, z);
   }
   
@@ -145,7 +146,17 @@ public class VertexCloud implements Renderable {
   }
 
   private void swap(int i, int j) {
-    
-    
+    for(int k=0;i<vectors.length; ++i) {
+      Vector tmp = vectors[k].get(i);
+      vectors[k].set(i, vectors[k].get(j));
+      vectors[k].set(j, tmp);
+    }
+  }
+
+  public void addTriangle(Vector p1, Vector p2, Vector p3, Transform tr) {
+    Vector n = p2.minus(p1).cross(p3.minus(p1)).normalize();
+    addVertex(tr.transform(p1), tr.transformNormal(p1, n), Vector.Z);
+    addVertex(tr.transform(p2), tr.transformNormal(p2, n), Vector.Z);
+    addVertex(tr.transform(p3), tr.transformNormal(p3, n), Vector.Z);
   }
 }

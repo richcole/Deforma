@@ -87,7 +87,7 @@ public class AnimMeshRenderer {
 
   public Matrix updateTransform(Node node, String animName, double alpha, Matrix tr, boolean includeBaseTransforms) {
     AnimationNode animationNode = node.getAnimations().get(animName);
-    Vector position = Vector.ZERO;
+    Vector position = Vector.Z;
     Quaternion rotation = Quaternion.ZERO;
 
     if ( animationNode != null && animationNode.getPositions().size() > 0) {

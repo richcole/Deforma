@@ -105,7 +105,7 @@ public class CompressedAnimMesh {
             t.set(2, texture.getTextureZ());
             putVertex(texCoords, t);
           } else {
-            putVertex(texCoords, Vector.ZERO);
+            putVertex(texCoords, Vector.Z);
           }
         }
       }

@@ -9,13 +9,13 @@ public class SplineField implements DensityFunction {
   
   static Vector dvs[] = {
     Vector.U1.plus(Vector.U2).plus(Vector.U3), 
-    Vector.MU1.plus(Vector.U2).plus(Vector.U3), 
-    Vector.U1.plus(Vector.MU2).plus(Vector.U3), 
-    Vector.U1.plus(Vector.U2).plus(Vector.MU3), 
-    Vector.U1.plus(Vector.MU2).plus(Vector.MU3), 
-    Vector.MU1.plus(Vector.U2).plus(Vector.MU3), 
-    Vector.MU1.plus(Vector.MU2).plus(Vector.U3), 
-    Vector.MU1.plus(Vector.MU2).plus(Vector.MU3), 
+    Vector.M1.plus(Vector.U2).plus(Vector.U3), 
+    Vector.U1.plus(Vector.M2).plus(Vector.U3), 
+    Vector.U1.plus(Vector.U2).plus(Vector.M3), 
+    Vector.U1.plus(Vector.M2).plus(Vector.M3), 
+    Vector.M1.plus(Vector.U2).plus(Vector.M3), 
+    Vector.M1.plus(Vector.M2).plus(Vector.U3), 
+    Vector.M1.plus(Vector.M2).plus(Vector.M3), 
   };
   
   public SplineField(Vector size) {
@@ -73,7 +73,7 @@ public class SplineField implements DensityFunction {
   @Override
   public Vector getDensityDerivative(Vector v) {
     double d = getDensity(v);
-    Vector sv = Vector.ZERO;
+    Vector sv = Vector.Z;
     for(Vector dv: dvs) {
       double d2 = getDensity(v.plus(dv));
       double dd = d2 - d;

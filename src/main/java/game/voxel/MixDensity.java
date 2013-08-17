@@ -39,8 +39,8 @@ public class MixDensity implements DensityFunction {
 
   @Override
   public Vector getDensityDerivative(Vector v) {
-    Vector p = Vector.ZERO;
-    Vector n = Vector.ZERO;
+    Vector p = Vector.Z;
+    Vector n = Vector.Z;
     double np = 0, nn = 0, sp = 0, sn = 0;
     for(DensityFunction f: fs) {
       double d = f.getDensity(v);

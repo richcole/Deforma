@@ -23,7 +23,7 @@ public class Creature implements Renderable, SimObject {
   NwnMesh mesh;
   double scale;
   long tick = 0;
-  Vector pos = Vector.ZERO;
+  Vector pos = Vector.Z;
   Vector velocity = Vector.NORMAL;
   double mass = 0;
   double alpha = 0;
