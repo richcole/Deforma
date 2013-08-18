@@ -22,14 +22,14 @@ public class OctTreeTest implements Renderable, Registerable {
     this.context = context;
     this.radius = 50;
     this.center = Vector.ONES.times(radius);
-    this.octTree = new OctTree(center, radius, 6, 2);
+    this.octTree = new OctTree(center, radius, 3, 2);
     this.s1 = new PotentialField(center, radius/2);
     this.octTree.add(s1);
     this.cloud = new VertexCloud();
 
     ScaleTransform transform = new ScaleTransform(400/radius);
-
-    octTree.renderToVertexCloud(cloud, transform, s1);
+    octTree.renderToVertexCloud(cloud, transform);
+    cloud.computeNormals();
     cloud.freeze();
 
     this.program = new ProgramRenderer(context, cloud, "screen"); 

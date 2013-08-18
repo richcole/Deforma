@@ -11,6 +11,7 @@ void main() {
   vec4 r = normalize(p - e);
 
   double c = 0.3 * abs(dot(normal, vec4(0, 1, 0, 1)));
+	double v = gl_TexCoord[0].y;
 
   gl_FragColor = vec4(c, c, c, 1.0);
 }

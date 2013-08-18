@@ -7,6 +7,7 @@ import game.voxel.Transform;
 import java.nio.DoubleBuffer;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -17,6 +18,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 public class VertexCloud implements Renderable {
+  
+  static private Logger logger = Logger.getLogger(VertexCloud.class);
   
   int vId, pIndex = 0, nIndex = 1, tIndex = 2, oIndex = 3, dxIndex = 4, dyIndex = 5;
   
@@ -87,6 +90,8 @@ public class VertexCloud implements Renderable {
     }
     
     GL30.glBindVertexArray(0);
+    
+    logger.info("Number fo points: " + tail);
   }
 
   private int setVertexData(int index, List<Vector> vs, int expectedLen) {
