@@ -53,8 +53,13 @@ public class OctTree {
       numberOfNodes += 1;
       node = new Node();
       node.density = new double[8];
-      node.isBoundary = renderer.isBoundaryCube(center, radius, node.density, densityFunction);
     }
+    if ( ! renderer.isActive(center, radius, densityFunction) ) {
+      return node;
+    } else {
+      renderer.updateDensity(center, radius, node.density, densityFunction);
+    }
+    node.isBoundary = renderer.isBoundaryCube(center, radius, node.density);
     if ( depth < maxDepth ) {
       if ( node.children != null || depth < minDepth || node.isBoundary ) {
         if ( node.children == null ) {

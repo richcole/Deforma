@@ -30,5 +30,11 @@ public class PotentialField implements DensityFunction {
     double l = d.length();
     return d.times(radius / (l*l*l));
   }
+
+
+  @Override
+  public boolean getActive(Vector vector) {
+    return true;
+  }
   
 }

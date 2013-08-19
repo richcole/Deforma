@@ -61,5 +61,10 @@ public class MixDensity implements DensityFunction {
     return np != 0 ? p.times(1/sp) : n.times(1/sn);
   }
 
+  @Override
+  public boolean getActive(Vector vector) {
+    return true;
+  }
+
  
 }

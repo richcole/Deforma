@@ -129,4 +129,9 @@ public class SplineField implements DensityFunction {
     }
   }
 
+  @Override
+  public boolean getActive(Vector vector) {
+    return true;
+  }
+
 }

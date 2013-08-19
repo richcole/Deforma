@@ -173,12 +173,9 @@ public class ShapeRenderer {
     { 7, 4 }, { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
   
   
-  public boolean isBoundaryCube(Vector center, double radius, double[] ds, DensityFunction f) {
+  public boolean isBoundaryCube(Vector center, double radius, double[] ds) {
     int numPos = 0;
     for(int i=0;i<CUBE_VERTEXES.length;++i) {
-      Vector v =  CUBE_VERTEXES[i];
-      Vector p = center.plus(v.times(radius));
-      ds[i] = f.getDensity(p);
       if ( Funs.isPos(ds[i]) ) {
         numPos += 1;
       }
@@ -186,6 +183,26 @@ public class ShapeRenderer {
     return numPos != 0 && numPos != CUBE_VERTEXES.length;
   }
 
+  public boolean isActive(Vector center, double radius, DensityFunction f) {
+    for(int i=0;i<CUBE_VERTEXES.length;++i) {
+      Vector p = center.plus(CUBE_VERTEXES[i].times(radius));
+      if ( f.getActive(p) ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void updateDensity(Vector center, double radius, double[] ds, DensityFunction f) {
+    for(int i=0;i<CUBE_VERTEXES.length;++i) {
+      Vector v =  CUBE_VERTEXES[i];
+      Vector p = center.plus(v.times(radius));
+      double d = f.getDensity(p);
+      if ( f.getActive(p) && ds[i] < d) {
+        ds[i] = d; 
+      }
+    }
+  }
 
   public void addCube(VertexCloud cloud, Vector center, double radius, Transform tr) {
     for(int i=0; i<6; ++i) {

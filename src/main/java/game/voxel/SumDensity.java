@@ -32,5 +32,10 @@ public class SumDensity implements DensityFunction {
     return r;
   }
 
+  @Override
+  public boolean getActive(Vector vector) {
+    return true;
+  }
+
  
 }
