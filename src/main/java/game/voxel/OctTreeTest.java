@@ -13,8 +13,8 @@ public class OctTreeTest implements Renderable, Registerable {
   private double radius;
   private Vector center;
   private OctTree octTree;
-  private PotentialField s1;
-  private PotentialField s2;
+  private DensityFunction s1;
+  private DensityFunction s2;
   private VertexCloud cloud;
   private ProgramRenderer program;
 
@@ -24,10 +24,13 @@ public class OctTreeTest implements Renderable, Registerable {
     this.radius = 50;
     this.center = Vector.ONES.times(radius);
     this.octTree = new OctTree(center, radius, 3, 2);
-    this.s1 = new PotentialField(center, radius/2);
-    this.s2 = new PotentialField(center.times(0.5), radius/2);
+//    this.s1 = new PotentialField(center, radius/2);
+//    this.s2 = new PotentialField(center.times(0.5), radius/2);
+//    this.octTree.add(s1);
+//    this.octTree.add(s2);
+    
+    this.s1 = new PerlinNoiseField(radius*2);
     this.octTree.add(s1);
-    this.octTree.add(s2);
     this.cloud = new VertexCloud();
 
     ScaleTransform transform = new ScaleTransform(400/radius);

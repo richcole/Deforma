@@ -221,5 +221,9 @@ public class Vector {
   public Vector divide(Vector o) {
     return new Vector(v[0]/o.v[0], v[1]/o.v[1], v[2]/o.v[2], v[3]/o.v[3]);
   }
+
+  public Vector floor() {
+    return new Vector(Math.floor(x()), Math.floor(y()), Math.floor(z()), 1);
+  }
   
 }
