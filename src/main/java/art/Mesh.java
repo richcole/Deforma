@@ -38,6 +38,21 @@ public class Mesh {
 		return result;
 	}
 
+	public List<Integer> getBones() {
+		List<Integer> result = Lists.newArrayList();
+		int lower = 0;
+		int upper = 0;
+		for(Geom geom: geoms) {
+			List<Integer> boneIndexes = geom.getBones(); 
+			for(Integer index: boneIndexes) {
+				result.add(lower + index);
+				upper = Math.max(lower + index, upper);
+			}
+			lower = upper;
+		}
+		return result;
+	}
+
 	public Mesh addGeom(Geom geom) {
 		geoms.add(geom);
 		return this;

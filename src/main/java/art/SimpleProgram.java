@@ -1,6 +1,5 @@
 package art;
 
-import com.google.common.base.Preconditions;
 import org.lwjgl.opengl.GL20;
 
 import game.gl.GLProgram;
@@ -21,9 +20,6 @@ public class SimpleProgram implements GLResource {
         vert = program.getAttrib("vert");
         texCoords = program.getAttrib("texCoords");
         tr = program.getUniform("tr");
-        Preconditions.checkArgument(vert >= 0);
-        Preconditions.checkArgument(tr >= 0);
-        Preconditions.checkArgument(texCoords >= 0);
 	}
 
 	public void dispose() {

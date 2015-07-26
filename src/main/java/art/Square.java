@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import game.Util;
+import game.Utils;
 import game.math.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +52,10 @@ public class Square implements Geom {
 	}
 
 	public List<Integer> getElements() {
-		return Util.range(0, 6);
+		return Utils.range(0, 6);
+	}
+
+	public List<Integer> getBones() {
+		return Lists.newArrayList(1);
 	}
 }

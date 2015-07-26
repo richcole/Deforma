@@ -225,5 +225,14 @@ public class Vector {
   public Vector floor() {
     return new Vector(Math.floor(x()), Math.floor(y()), Math.floor(z()), 1);
   }
+
+  public boolean lessThan(Vector other) {
+	return x() < other.x() && y() < other.y() && z() < other.z();
+  }
+
+  public boolean greaterThan(Vector other) {
+	return x() < other.x() && y() < other.y() && z() < other.z();
+  }
+
   
 }

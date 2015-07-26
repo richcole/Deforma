@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -19,6 +20,14 @@ public class ImageResource implements Image {
 			img = ImageIO.read(Resources.getResource(path));
 		} catch(IOException e) {
 			throw new RuntimeException("Couldn't load " + path, e);
+		}
+	}
+
+	public ImageResource(File file) {
+		try {
+			img = ImageIO.read(file);
+		} catch(IOException e) {
+			throw new RuntimeException("Couldn't load " + file, e);
 		}
 	}
 

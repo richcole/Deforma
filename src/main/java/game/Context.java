@@ -1,11 +1,23 @@
 package game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import art.*;
 import game.gl.GLDisplay;
 import game.gl.GLResourceList;
+import game.math.BBox;
 import game.math.Vector;
+import game.voxel.GeomUtils;
+import game.voxel.MarchingCubes;
+import game.voxel.MeshGeom;
+import game.voxel.SphericalDensityFunction;
+import game.voxel.VertexCloud;
+import io.ModelLoader;
 
 public class Context implements Action {
+	
+	private static final Logger log = LoggerFactory.getLogger(Context.class);
 	
 	private ActionList actionList;
 	private Renderer renderer;
@@ -22,6 +34,9 @@ public class Context implements Action {
 	private Simulator simulator;
 	private InputProcessor inputProcessor;
 	private PositionController positionController;
+	private CompiledMesh cubesMesh;
+	private MeshGeom model;
+	
 
     Context() {
 	}
@@ -38,9 +53,22 @@ public class Context implements Action {
 		this.marble = new ImageTexture("skyline.jpg");
         this.gradientTexture = new ImageTexture(new GradientImage(256, 256));
 		this.triangle = new TriangleMesh(simpleProgram, this.gradientTexture);
-		this.square = new CompiledMesh(simpleProgram, this.marble, 
-				new Mesh().addGeom(new Square(Vector.U3.times(-3), Vector.U1, Vector.U2)));
+		
+		VertexCloud cubesCloud = new VertexCloud();
+		Vector p = new Vector(0, 0, 0);
+		Vector dp = new Vector(1, 1, 1).times(6); 
+		MarchingCubes cubes = new MarchingCubes(new SphericalDensityFunction(p, 5));
+		cubes.update(cubesCloud, p.minus(dp), p.plus(dp));
+		cubesMesh = new CompiledMesh(simpleProgram, this.marble, new Mesh().addGeom(cubesCloud));
 
+		this.square = new CompiledMesh(simpleProgram, this.marble, 
+				new Mesh().addGeom(new Square(p.minus(dp), Vector.U1.times(1), Vector.U2.times(1))));
+		
+		this.model = new ModelLoader().load("/home/richcole/models/Girl/girl.3ds");
+		BBox bbox = GeomUtils.getBBox(this.model);
+		log.info("bbox " + bbox);
+		this.square = new CompiledMesh(simpleProgram, this.marble, new Mesh().addGeom(model));
+		
 		this.view = new View(simpleProgram);
         this.simulator = new Simulator();
         this.inputProcessor = new InputProcessor();
@@ -61,10 +89,12 @@ public class Context implements Action {
 		resourceList.add("marble", marble);
 		resourceList.add("square", square);
         resourceList.add("gradientTexture", gradientTexture);
+        resourceList.add("cubeMesh", cubesMesh);
 		
 //		renderer.add("triangle", triangle);
         renderer.add("view", view);
 		renderer.add("square", square);
+		renderer.add("cubeMesh", cubesMesh);
 
 		resourceList.init();
 		actionList.init();	

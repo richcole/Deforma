@@ -1,10 +1,14 @@
 package game.gl;
 
+import java.nio.FloatBuffer;
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import game.Util;
-import game.gl.GLShader;
+import com.google.common.base.Preconditions;
+
+import game.Utils;
 
 public class GLProgram {
 
@@ -38,15 +42,42 @@ public class GLProgram {
 	}
 
 	public int getAttrib(String name) {
-		return GL20.glGetAttribLocation(id, name);
+		int attribId = GL20.glGetAttribLocation(id, name);
+        Preconditions.checkArgument(attribId  >= 0);
+        return attribId;
 	}
 
     public int getUniform(String name) {
-        return GL20.glGetUniformLocation(id, name);
+    	int attribId = GL20.glGetUniformLocation(id, name);
+        Preconditions.checkArgument(attribId >= 0);
+        return attribId;
     }
 
 	public void setUniform(String name, int value) {
 	    GL20.glUniform1i(GL20.glGetUniformLocation(id, name), value);
 	}
+	
+	public void setUniform(int var, int value) {
+	    GL20.glUniform1i(var, value);
+	}
 
+	public void setUniform(int var, float value) {
+	    GL20.glUniform1f(var, value);
+	}
+
+	public void setUniformInts(String name, List<Integer> values) {
+		GL20.glUniform1(GL20.glGetUniformLocation(id, name), Utils.toIntBuffer(values));
+	}
+
+	public void setUniformInts(int var, List<Integer> values) {
+		GL20.glUniform1(var, Utils.toIntBuffer(values));
+	}
+
+	public void setUniformFloats(int var, List<Float> values) {
+		GL20.glUniform1(var, Utils.toFloatBuffer(values));
+	}
+
+	public void setUniformFloats(int var, FloatBuffer values) {
+		GL20.glUniform1(var, values);
+	}
 }

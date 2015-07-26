@@ -9,5 +9,5 @@ public interface Geom {
 	List<Vector>  getVertices();
 	List<Integer> getElements();
 	List<Vector>  getTexCoords();
-
+	List<Integer> getBones();
 }

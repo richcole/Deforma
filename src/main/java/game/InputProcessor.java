@@ -22,8 +22,25 @@ public class InputProcessor implements Action {
 		mx = Mouse.getX();
 		my = Mouse.getY();
 		
+		while(Mouse.next()) {
+			int button = Mouse.getEventButton();
+			if ( button != -1 ) {
+				boolean state = Mouse.getEventButtonState();
+				for(InputController controller: controllers) {
+					if ( state ) {
+						controller.mouseDown(button);
+					} 
+					else {
+						controller.mouseUp(button);
+					}
+				}
+			}
+		}
+		
 		for(InputController controller: controllers) {
 			controller.mouseMove(mx - pmx, my - pmy);
+			pmx = mx;
+			pmy = my;
 		}
 		
 		while (Keyboard.next()) {

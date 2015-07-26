@@ -1,0 +1,57 @@
+
+A mesh will be a set of vertices
+
+  - position
+  - normal
+  - tex2d
+  - texIndex
+  - boneIndex
+  
+There will also be two parameters
+
+  - animIndex
+  - alpha
+  
+There is a parent bone array
+
+  parent(boneIndex) -> parentBoneIndex
+  
+This ends with a parentBoneIndex of -1
+
+There are a set of animations. Each animation for each bone defines 
+
+  - rotation(boneIndex, animIndex) -> quaternion
+  - translation(boneIndex, animIndex) -> vector
+  
+The the position of a vertex in the vertex shader is
+
+  while(boneIndex != -1) {
+    p = rotate(p, rotation(boneIndex, animIndex))
+    p = translate(p, translation(boneIndex, animIndex))
+    boneIndex = parent(boneIndex)
+  }
+  
+Thus rotation is 
+
+  vec4 rotation(int boneIndex, int animIndex) {
+    return rotationTable[animIndex * numBones + boneIndex];
+  }
+  
+and translation is
+
+  vec3 rotation(int boneIndex, int animIndex) {
+    return translationTable[animIndex * numBones + boneIndex];
+  }
+  
+Thus the total input for animation is
+
+  - vec4 rotationTable[]
+  - vec3 translationTable[]
+  - int numBones
+  - alpha
+  - animIndex
+  
+  
+
+  
+

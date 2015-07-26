@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL15;
 import com.google.common.base.Preconditions;
 
 import game.Renderable;
-import game.Util;
+import game.Utils;
 import game.gl.GLBuffer;
 import game.gl.GLResource;
 import game.gl.GLVertexArray;
@@ -45,10 +45,10 @@ public class TriangleMesh implements GLResource, Renderable {
 		vao = new GLVertexArray();
 
 		vbo = new GLBuffer();
-		vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3, Util.toFloatBuffer(verticesData));
+		vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3, Utils.toFloatBuffer(verticesData));
 
 		tbo = new GLBuffer();
-		vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, Util.toFloatBuffer(verticesData));
+		vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, Utils.toFloatBuffer(verticesData));
 	}
 
 	public void dispose() {

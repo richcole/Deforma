@@ -2,16 +2,41 @@ package game;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
 
 import com.google.common.collect.Lists;
 
-public class Util {
+public class Utils {
 
 	public static FloatBuffer toFloatBuffer(float[] floats) {
 		FloatBuffer buf = BufferUtils.createFloatBuffer(floats.length).put(floats);
+		buf.flip();
+		return buf;
+	}
+
+	public static IntBuffer toIntBuffer(int[] ints) {
+		IntBuffer buf = BufferUtils.createIntBuffer(ints.length).put(ints);
+		buf.flip();
+		return buf;
+	}
+
+	public static IntBuffer toIntBuffer(List<Integer> ints) {
+		IntBuffer buf = BufferUtils.createIntBuffer(ints.size());
+		for(Integer value: ints) {
+			buf.put(value);
+		}
+		buf.flip();
+		return buf;
+	}
+
+	public static FloatBuffer toFloatBuffer(List<Float> ints) {
+		FloatBuffer buf = BufferUtils.createFloatBuffer(ints.size());
+		for(Float value: ints) {
+			buf.put(value);
+		}
 		buf.flip();
 		return buf;
 	}

@@ -37,6 +37,13 @@ public class Quaternion extends Vector {
     public Quaternion times(double s) {
         return new Quaternion(v[0]*s, v[1]*s, v[2]*s, v[3]*s);
     }
+    
+    public Vector rotate(Vector v) {
+    	Quaternion p = new Quaternion(v.x(), v.y(), v.z(), 0);
+    	Quaternion q_conj = this.conjugate();
+    	Quaternion r = this.times(p).times(q_conj);
+    	return new Vector(r.v[0], r.v[1], r.v[2], 1.0);
+    }
 
     public Quaternion plus(Quaternion o) {
         return new Quaternion(v[0] + o.v[0], v[1] + o.v[1], v[2] + o.v[2], v[3] + o.v[3]);

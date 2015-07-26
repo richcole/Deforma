@@ -8,4 +8,8 @@ public interface InputController {
 
 	void keyUp(int eventKey);
 
+	void mouseDown(int button);
+
+	void mouseUp(int button);
+
 }
