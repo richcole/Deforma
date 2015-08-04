@@ -4,15 +4,22 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
+import art.ImageTexture;
+import art.Material;
+import art.Mesh;
 import game.ImageResource;
+import game.math.Matrix;
 import game.math.Vector;
 import game.voxel.MeshGeom;
 
@@ -45,7 +52,7 @@ public class DSReader {
 			return this;
 		}
 		
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			reader.skip((int)(length - 6));
 			return this;
 		}
@@ -84,10 +91,10 @@ public class DSReader {
 			super();
 		}
 		
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 			while(offset < length) {
-				Chunk child = readChunk();
+				Chunk child = readChunk(indent + "  ");
 				children.add(child);
 				offset += child.length;
 			}
@@ -133,14 +140,14 @@ public class DSReader {
 			super();
 		}
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			str = reader.readZString();
 			offset += str.length() + 1;
 
 			while(offset < length) {
-				Chunk child = readChunk();
+				Chunk child = readChunk(indent + "  ");
 				children.add(child);
 				offset += child.length;
 			}
@@ -166,7 +173,7 @@ public class DSReader {
 			super();
 		}
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			version = reader.readWord();
@@ -188,12 +195,124 @@ public class DSReader {
 
 	}
 				
+	public class TranslationMatrixChunk extends Chunk {
+		Matrix matrix = new Matrix(Matrix.IDENTITY);
+		
+		public TranslationMatrixChunk() {
+			super();
+		}
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+			for(int i=0;i<4;++i) {
+				for(int j=0;j<3;++j) {
+					matrix.set(i, j, reader.readFloat());
+				}
+			}
+			
+			offset += 4 * 12;
+
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d TranslationMatrixChunk %d\n", id, length, matrix);
+		}
+
+	}
+
+	public class FloatChunk extends Chunk {
+		float value = 0.0f;
+		
+		public FloatChunk() {
+			super();
+		}
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+			value = reader.readFloat();
+			
+			offset += 4;
+
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d FloatChunk %d\n", id, length, value);
+		}
+
+	}
+
+	public class WordChunk extends Chunk {
+		long value = 0L;
+		
+		public WordChunk() {
+			super();
+		}
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+			value = reader.readWord();
+			
+			offset += 4;
+			
+			reader.readBytes((int)(length - offset));
+
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d WordChunk %d\n", id, length, value);
+		}
+
+	}
+
+	public class ShortChunk extends Chunk {
+		int value = 0;
+		
+		public ShortChunk() {
+			super();
+		}
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+			value = reader.readShort();
+			
+			offset += 2;
+			
+			reader.readBytes((int)(length - offset));
+
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d ShortChunk %d\n", id, length, value);
+		}
+
+	}
+
 	public class FaceListChunk extends ContainersChunk {
 		int n;
 		int indexes[];
 		int info[];
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			n = reader.readShort();
@@ -210,7 +329,7 @@ public class DSReader {
 			offset += n * 4 * 2; 
 			
 			while(offset < length) {
-				Chunk child = readChunk();
+				Chunk child = readChunk(indent + "  ");
 				children.add(child);
 				offset += child.length;
 			}
@@ -234,7 +353,7 @@ public class DSReader {
 		int n;
 		float uv[];
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			n = reader.readShort();
@@ -268,7 +387,7 @@ public class DSReader {
 		int n;
 		int faces[];
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 			
 			materialName = reader.readZString();
@@ -297,7 +416,7 @@ public class DSReader {
 	public class MaterialNameChunk extends Chunk {
 		String materialName;
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 			
 			materialName = reader.readZString();
@@ -319,7 +438,7 @@ public class DSReader {
 	public class MappingFilenameChunk extends Chunk {
 		String textureFilename;
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 			
 			textureFilename = reader.readZString();
@@ -342,7 +461,7 @@ public class DSReader {
 		long start;
 		long end;
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			start = reader.readWord();
@@ -351,7 +470,7 @@ public class DSReader {
 			offset += 8;
 			
 			while(offset < length) {
-				Chunk child = readChunk();
+				Chunk child = readChunk(indent + "  ");
 				children.add(child);
 				offset += child.length;
 			}
@@ -375,7 +494,7 @@ public class DSReader {
 		public int n;
 		public double vs[];
 
-		Chunk parse(BReader reader) {
+		Chunk parse(BReader reader, String indent) {
 			int offset = 6;
 
 			n = reader.readShort();
@@ -390,7 +509,7 @@ public class DSReader {
 			offset += n * 3 * 4; 
 			
 			while(offset < length) {
-				Chunk child = readChunk();
+				Chunk child = readChunk(indent + "  ");
 				children.add(child);
 				offset += child.length;
 			}
@@ -458,14 +577,19 @@ public class DSReader {
 				chunk = new MappingFilenameChunk();
 				break;
 
-			case 0xa351:
 			case 0xa354:
 			case 0xa356:
 			case 0xa358:
 			case 0xa35a:
-
-			case 0x0030:
+				chunk = new FloatChunk();
+				break;
 				
+			case 0xa351:
+				chunk = new ShortChunk();
+				break;
+				
+			case 0x0030:
+			case 0x0144:
 				
 			case 0x0100:
 			case 0x2100:
@@ -481,6 +605,8 @@ public class DSReader {
 			case 0xa053:
 			case 0xa100:
 			case 0xa084:
+			case 0xa081:
+			case 0xa087:
 			case 0xa210:
 
 			case 0xb001:
@@ -506,6 +632,9 @@ public class DSReader {
 			case 0xb028:
 			case 0xb029:
 			case 0xb030:
+				
+			case 0x3d3e:
+			case 0xa353:
 				      
 			case 0x4160:
 			case 0x4150:
@@ -523,53 +652,117 @@ public class DSReader {
 		return null;
 	}
 
-	public Chunk readChunk() {
+	public Chunk readChunk(String indent) {
 		long pos = reader.pos();
 		int id = reader.readShort();
 		long length = reader.readWord();
 		
-		log.info(String.format("id %04x length %d pos %x", id, length, pos));
+		log.debug(String.format("%s id %04x length %d pos %x", indent, id, length, pos));
 		
 		Chunk chunk = newChunk(id, length);
-		chunk.parse(reader);
+		chunk.parse(reader, indent);
 				
 		return chunk;
 	}
 	
-	public MeshGeom getMeshGeom(Chunk root) {
-		MeshGeom geom = new MeshGeom();
+	public List<Mesh> getMeshGeom(File baseDir, Chunk root, Material mat) {
+		List<Mesh> meshList = Lists.newArrayList();
+		
+		for(Chunk parent: root.eachNode(0x4100)) {
 
-		Map<String, ImageResource> materials = Maps.newHashMap();
-		for(Chunk chunk: root.eachNode(0xafff)) {
-			DSReader.MappingFilenameChunk fChunk = (DSReader.MappingFilenameChunk) chunk.firstNode(0xa300);
-			DSReader.MaterialNameChunk nChunk = (DSReader.MaterialNameChunk) chunk.firstNode(0xa000);
-			if ( fChunk != null && nChunk != null ) {
-				log.info(fChunk.textureFilename + " " + nChunk.materialName);
-				ImageResource img = new ImageResource(new File("/home/richcole/models/Girl/Texture/", fChunk.textureFilename));
-				materials.put(nChunk.materialName, img);
+			Map<String, Material> materials = Maps.newHashMap();
+			for(Chunk chunk: root.eachNode(0xafff)) {
+				DSReader.MappingFilenameChunk fChunk = (DSReader.MappingFilenameChunk) chunk.firstNode(0xa300);
+				DSReader.MaterialNameChunk nChunk = (DSReader.MaterialNameChunk) chunk.firstNode(0xa000);
+				DSReader.FloatChunk vScale = (DSReader.FloatChunk) chunk.firstNode(0xa354);
+				DSReader.FloatChunk uScale = (DSReader.FloatChunk) chunk.firstNode(0xa356);
+				DSReader.FloatChunk uOffset = (DSReader.FloatChunk) chunk.firstNode(0xa358);
+				DSReader.FloatChunk vOffset = (DSReader.FloatChunk) chunk.firstNode(0xa35a);
+				DSReader.ShortChunk tilingParams = (DSReader.ShortChunk) chunk.firstNode(0xa351);
+				if ( fChunk != null && nChunk != null ) {
+					log.debug(fChunk.textureFilename + " " + nChunk.materialName);
+					if ( uScale != null ) {
+						log.debug("uScale " + uScale.value);
+					}
+					if ( vScale != null ) {
+						log.debug("vScale " + vScale.value);
+					}
+					if ( uOffset != null ) {
+						log.debug("uOffset " + uOffset.value);
+					}
+					if ( vOffset != null ) {
+						log.debug("vOffset " + vOffset.value);
+					}
+					if ( tilingParams != null ) {
+						log.debug("tiling " + tilingParams.value);
+					}
+					File imageFile = findImageFile(baseDir, fChunk.textureFilename);
+					Preconditions.checkNotNull(imageFile);
+					ImageResource img = new ImageResource(imageFile);
+					materials.put(nChunk.materialName, new ImageTexture(img));
+				}
+			}
+	
+			Set<Integer> existingFaces = Sets.newHashSet();
+			VertexListChunk vs = (VertexListChunk) parent.firstNode(0x4110);
+			TexCoordsChunk texCoords = (TexCoordsChunk) parent.firstNode(0x4140);
+			for(Chunk chunk: parent.eachNode(0x4120)) {
+				FaceListChunk faces = (FaceListChunk) chunk;
+				
+				for(Chunk fChunk: parent.eachNode(0x4130)) {
+					
+					FaceMaterialChunk faceMaterials = (FaceMaterialChunk) fChunk;
+		
+					Material material = materials.get(faceMaterials.materialName);
+					
+					if ( material == null ) {
+						log.debug("Using default material");
+						material = mat;
+					}
+					Mesh mesh = new Mesh(material);
+					
+					MeshGeom geom = new MeshGeom();
+					for(int i=0;i<vs.vs.length/3;++i) {
+						Vector p = new Vector(vs.vs[i*3], vs.vs[i*3+1], vs.vs[i*3+2], 1.0);
+						float u = texCoords.uv[i*2];
+						float v = texCoords.uv[i*2+1];
+						Vector t = new Vector(u, 1.0 - v, 0, 1.0);
+						geom.addVertex(p, Vector.Z, t);
+					}
+					for(int faceIndex=0;faceIndex<faceMaterials.n;++faceIndex) {
+						int index = faceMaterials.faces[faceIndex];
+						existingFaces.add(index);
+						geom.addElement(faces.indexes[index*3], faces.indexes[index*3+1], faces.indexes[index*3+2]);
+					}
+					
+					log.debug("Adding mesh " + faceMaterials.n + " " + faceMaterials.materialName);
+					
+					mesh.addGeom(geom);
+					meshList.add(mesh);
+				}
+			
 			}
 		}
-		for(Chunk chunk: root.eachNode(0x4130)) {
-			DSReader.FaceMaterialChunk f = (DSReader.FaceMaterialChunk) chunk;
-			log.info(f.materialName + " " + f.n);
+		
+		return meshList;
+	}
+
+	private File findImageFile(File baseDir, String fileName) {
+		for(File child: baseDir.listFiles()) {
+			if (isNameCloseEnough(fileName, child)) {
+				return child;
+			}
+			if (child.isDirectory()) {
+				File cand = findImageFile(child, fileName);
+				if ( cand != null ) {
+					return cand;
+				}
+			}
 		}
-		
-		Chunk parent = root.firstNode(0x4100);
-		VertexListChunk vs = (VertexListChunk) parent.firstNode(0x4110);
-		FaceListChunk faces = (FaceListChunk) parent.firstNode(0x4120);
-		TexCoordsChunk texCoords = (TexCoordsChunk) parent.firstNode(0x4140);
-		
-		for(int i=0;i<vs.vs.length/3;++i) {
-			Vector p = new Vector(vs.vs[i*3], vs.vs[i*3+1], vs.vs[i*3+2], 1.0);
-			Vector t = new Vector(texCoords.uv[i*2], texCoords.uv[i*2+1], 0, 1.0);
-			geom.addVertex(p, Vector.Z, t);
-		}
-		for(int i=0;i<faces.indexes.length/3;++i) {
-			geom.addElement(faces.indexes[i*3], faces.indexes[i*3+1], faces.indexes[i*3+2]);
-		}
-		
-		
-		
-		return geom;
+		return null;
+	}
+
+	private boolean isNameCloseEnough(String fileName, File child) {
+		return child.getName().equals(fileName) || child.getName().startsWith(fileName);
 	}
 }

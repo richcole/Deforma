@@ -4,13 +4,15 @@ import org.lwjgl.opengl.GL15;
 
 import com.google.common.base.Preconditions;
 
-import game.Renderable;
+import game.Model;
 import game.Utils;
 import game.gl.GLBuffer;
 import game.gl.GLResource;
+import game.gl.GLTexture;
 import game.gl.GLVertexArray;
+import game.math.Matrix;
 
-public class TriangleMesh implements GLResource, Renderable {
+public class TriangleMesh extends GLResource implements Model {
 
 	GLVertexArray vao;
 	GLBuffer vbo, tbo;
@@ -28,16 +30,22 @@ public class TriangleMesh implements GLResource, Renderable {
     };
     
 	private SimpleProgram simpleProgram;
-	private TextureSupplier tex;
+	private TextureSupplier texSupplier;
+
 	private int vert;
 	private int texCoords;
+	private GLTexture tex;
+	private Matrix modelTr;
     
     public TriangleMesh(SimpleProgram simpleProgram, TextureSupplier tex) {
     	this.simpleProgram = simpleProgram;
-    	this.tex = tex;
+    	this.texSupplier = tex;
+    	this.modelTr = Matrix.IDENTITY;
     }
 	
-	public void init() {
+	public void init() { 
+		simpleProgram.ensureInitialized();
+	
 		vert = simpleProgram.getVert();
 		texCoords = simpleProgram.getTexCoords();
 		Preconditions.checkArgument(vert >= 0);
@@ -49,6 +57,8 @@ public class TriangleMesh implements GLResource, Renderable {
 
 		tbo = new GLBuffer();
 		vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, Utils.toFloatBuffer(verticesData));
+		
+		this.tex = texSupplier.getTexture();
 	}
 
 	public void dispose() {
@@ -56,8 +66,14 @@ public class TriangleMesh implements GLResource, Renderable {
 
 	public void render() {
 		simpleProgram.use();
-		tex.getTexture().bind(simpleProgram.getTex());
+		tex.bind(simpleProgram.getTex());
+		simpleProgram.setModelTr(modelTr);
 		vao.drawArrays();
+	}
+
+	@Override
+	public void setModelTr(Matrix modelTr) {
+		this.modelTr = modelTr;
 	}
 	
 	

@@ -1,16 +1,22 @@
 package game;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import art.*;
+import art.CompiledMesh;
+import art.CompiledMeshList;
+import art.ImageTexture;
+import art.Material;
+import art.Mesh;
+import art.SimpleProgram;
+import art.TriangleMesh;
 import game.gl.GLDisplay;
 import game.gl.GLResourceList;
-import game.math.BBox;
+import game.math.Matrix;
 import game.math.Vector;
-import game.voxel.GeomUtils;
 import game.voxel.MarchingCubes;
-import game.voxel.MeshGeom;
 import game.voxel.SphericalDensityFunction;
 import game.voxel.VertexCloud;
 import io.ModelLoader;
@@ -20,23 +26,19 @@ public class Context implements Action {
 	private static final Logger log = LoggerFactory.getLogger(Context.class);
 	
 	private ActionList actionList;
-	private Renderer renderer;
 	private CloseWatcher closeWatcher;
 	private SimpleProgram simpleProgram;
 	private GLDisplay display;
 	private GLResourceList resourceList;
 	private DisplayResizer dispayResizer;
 	private TriangleMesh triangle;
-    private CompiledMesh square;
     private View view;
-    private ImageTexture gradientTexture;
-    private ImageTexture marble;
+    private Material gradientTexture;
+    private Material marble;
 	private Simulator simulator;
 	private InputProcessor inputProcessor;
 	private PositionController positionController;
 	private CompiledMesh cubesMesh;
-	private MeshGeom model;
-	
 
     Context() {
 	}
@@ -45,7 +47,6 @@ public class Context implements Action {
 		this.actionList = new ActionList(this);
 		this.resourceList = new GLResourceList();
 
-		this.renderer = new Renderer();
 		this.closeWatcher = new CloseWatcher();
 		this.simpleProgram = new SimpleProgram();
 		this.display = new GLDisplay();
@@ -57,17 +58,20 @@ public class Context implements Action {
 		VertexCloud cubesCloud = new VertexCloud();
 		Vector p = new Vector(0, 0, 0);
 		Vector dp = new Vector(1, 1, 1).times(6); 
-		MarchingCubes cubes = new MarchingCubes(new SphericalDensityFunction(p, 5));
+		MarchingCubes cubes = new MarchingCubes(new SphericalDensityFunction(p, 5), this.marble);
 		cubes.update(cubesCloud, p.minus(dp), p.plus(dp));
-		cubesMesh = new CompiledMesh(simpleProgram, this.marble, new Mesh().addGeom(cubesCloud));
 
-		this.square = new CompiledMesh(simpleProgram, this.marble, 
-				new Mesh().addGeom(new Square(p.minus(dp), Vector.U1.times(1), Vector.U2.times(1))));
+		Mesh mesh = new Mesh(this.marble);
+		mesh.addGeom(cubesCloud);
+		cubesMesh = new CompiledMesh(simpleProgram, mesh);
+
+		CompiledMeshList girl = new CompiledMeshList(simpleProgram, 
+				new ModelLoader().load("/home/richcole/models/Girl/girl.3ds", marble));
+		girl.setModelTr(Matrix.rot(Math.PI / 2, Vector.U1));
 		
-		this.model = new ModelLoader().load("/home/richcole/models/Girl/girl.3ds");
-		BBox bbox = GeomUtils.getBBox(this.model);
-		log.info("bbox " + bbox);
-		this.square = new CompiledMesh(simpleProgram, this.marble, new Mesh().addGeom(model));
+		CompiledMeshList trees = new CompiledMeshList(simpleProgram, 
+				new ModelLoader().load("/home/richcole/models/trees9/trees9.3ds", marble));
+		trees.setModelTr(Matrix.translate(new Vector(20, 0, 0)).times(Matrix.rot(Math.PI / 2, Vector.U1)));
 		
 		this.view = new View(simpleProgram);
         this.simulator = new Simulator();
@@ -81,20 +85,19 @@ public class Context implements Action {
 		actionList.add("displayResizer", dispayResizer);
 		actionList.add("inputProcessor", inputProcessor);
 		actionList.add("simulator", simulator);
-		actionList.add("renderer", renderer);
+		actionList.add("renderer", view);
 		
-		resourceList.add("display", display);
-		resourceList.add("simpleProgram", simpleProgram);
-		resourceList.add("triangle", triangle);
-		resourceList.add("marble", marble);
-		resourceList.add("square", square);
-        resourceList.add("gradientTexture", gradientTexture);
-        resourceList.add("cubeMesh", cubesMesh);
+		resourceList.addResource(display);
+		resourceList.addResource(simpleProgram);
+		resourceList.addResource(triangle);
+		resourceList.addResource(girl);
+		resourceList.addResource(trees);
+		resourceList.addResource(cubesMesh);
 		
-//		renderer.add("triangle", triangle);
-        renderer.add("view", view);
-		renderer.add("square", square);
-		renderer.add("cubeMesh", cubesMesh);
+		view.add(triangle);
+		view.add(girl);
+		view.add(cubesMesh);
+		view.add(trees);
 
 		resourceList.init();
 		actionList.init();	

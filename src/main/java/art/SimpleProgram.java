@@ -5,11 +5,12 @@ import org.lwjgl.opengl.GL20;
 import game.gl.GLProgram;
 import game.gl.GLResource;
 import game.gl.GLShader;
+import game.math.Matrix;
 
-public class SimpleProgram implements GLResource {
+public class SimpleProgram extends GLResource {
 
 	private GLProgram program;
-    private int vert, tr, texCoords;
+    private int vert, viewTr, modelTr, texCoords;
 
 	public void init() {
 		program = new GLProgram();
@@ -19,7 +20,8 @@ public class SimpleProgram implements GLResource {
 		program.setUniform("tex", 0);
         vert = program.getAttrib("vert");
         texCoords = program.getAttrib("texCoords");
-        tr = program.getUniform("tr");
+        viewTr = program.getUniform("viewTr");
+        modelTr = program.getUniform("modelTr");
 	}
 
 	public void dispose() {
@@ -28,10 +30,6 @@ public class SimpleProgram implements GLResource {
 	public int getVert() {
 		return vert;
 	}
-
-    public int getTr() {
-        return tr;
-    }
 
 	public void use() {
 		program.use();
@@ -43,5 +41,21 @@ public class SimpleProgram implements GLResource {
 
 	public int getTex() {
 		return 0;
+	}
+
+	public void setViewTr(Matrix viewMatrix) {
+		if ( viewMatrix != null ) {
+			GL20.glUniformMatrix4(viewTr, true, viewMatrix.toBuf());
+		} else {
+			GL20.glUniformMatrix4(viewTr, true, Matrix.IDENTITY.toBuf());
+		}
+	}
+
+	public void setModelTr(Matrix modelMatrix) {
+		if ( modelMatrix != null ) {
+			GL20.glUniformMatrix4(modelTr, true, modelMatrix.toBuf());	
+		} else {
+			GL20.glUniformMatrix4(modelTr, true, Matrix.IDENTITY.toBuf());
+		}
 	}
 }

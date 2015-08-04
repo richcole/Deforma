@@ -1,34 +1,37 @@
 package art;
 
-import game.GradientImage;
+import com.google.common.base.Preconditions;
+
 import game.Image;
 import game.ImageResource;
-import game.gl.GLResource;
 import game.gl.GLTexture;
 
-public class ImageTexture implements GLResource, TextureSupplier {
+public class ImageTexture extends Material {
 
-    private final Image image;
-
-    private GLTexture tex;
-
-    public ImageTexture(String path) {
-        this.image = new ImageResource(path);
-    }
-
-    public ImageTexture(GradientImage image) {
-        this.image = image;
-    }
-
-    public void init() {
-		tex = new GLTexture().withImage(image);
+	private GLTexture tex;
+	private Image image;
+	
+	public ImageTexture(Image image) {
+		Preconditions.checkNotNull(image);
+		this.image = image;
 	}
 	
+	public ImageTexture(String path) {
+		Preconditions.checkNotNull(path);
+		this.image = new ImageResource(path);
+	}
+
+	@Override
+	public void init() {
+		this.tex = new GLTexture().withImage(image);
+	}
+
+	@Override
 	public void dispose() {
 	}
-
+	
 	public GLTexture getTexture() {
+		ensureInitialized();
 		return tex;
 	}
-
 }

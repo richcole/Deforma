@@ -5,11 +5,11 @@ import java.util.List;
 import org.lwjgl.opengl.GL20;
 
 import game.gl.GLProgram;
-import game.gl.GLResource;
+import game.gl.GLResourceList;
 import game.gl.GLShader;
 import game.math.Matrix;
 
-public class AnimProgram implements GLResource {
+public class AnimProgram extends GLResourceList {
 
 	private GLProgram program;
     

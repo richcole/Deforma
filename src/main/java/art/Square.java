@@ -2,18 +2,19 @@ package art;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import game.Utils;
 import game.math.Vector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Square implements Geom {
 
     final static Logger log = LoggerFactory.getLogger(Square.class);
 
-    Vector center, up, right;
+    private Vector center, up, right;
 	
 	public Square(Vector center, Vector right, Vector up) {
 		this.center = center;

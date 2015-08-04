@@ -4,9 +4,11 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-public class GLDisplay implements GLResource {
+public class GLDisplay extends GLResource {
 
-	public void init() {
+	boolean initialized = false;
+	
+	public void init() {		
 		try {
 			Display.create();
 		    Display.setTitle("Game2"); 

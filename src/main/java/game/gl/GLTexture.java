@@ -3,7 +3,8 @@ package game.gl;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
-import game.ImageResource;
+import com.google.common.base.Preconditions;
+
 import game.Image;
 
 public class GLTexture {
@@ -19,6 +20,7 @@ public class GLTexture {
 	}
 	
 	public GLTexture withImage(Image img) {
+		Preconditions.checkNotNull(img);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);

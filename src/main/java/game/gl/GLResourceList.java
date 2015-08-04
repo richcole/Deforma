@@ -1,32 +1,32 @@
 package game.gl;
 
-import java.util.LinkedHashMap;
+import java.util.List;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
-public class GLResourceList implements GLResource {
+public class GLResourceList extends GLResource {
 	
-	LinkedHashMap<String, GLResource> runables = Maps.newLinkedHashMap();
+	protected List<GLResource> resources = Lists.newArrayList();
 	
 	public GLResourceList() {
 		super();
 	}
+	
+	public void addResource(GLResource resource) {
+		resources.add(resource);
+	}
 
 	public void init() {
-		for(GLResource runable: runables.values()) {
+		for(GLResource runable: resources) {
 			runable.init();
 		}
 	}
 	
 	public void dispose() {
-		for(GLResource runable: runables.values()) {
+		for(GLResource runable: resources) {
 			runable.dispose();
 		}
 	}
 	
-	public void add(String name, GLResource renderer) {
-		runables.put(name, renderer);
-	}
-
 
 }

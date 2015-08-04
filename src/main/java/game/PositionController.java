@@ -4,6 +4,7 @@ import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import game.math.Matrix;
 import game.math.Quaternion;
 import game.math.Vector;
 
@@ -19,7 +20,8 @@ public class PositionController implements Simulant, InputController {
 	
 	private boolean mouseDown = false;
 
-	Quaternion rotation = Quaternion.ZERO;
+	Matrix rot1 = Matrix.IDENTITY;
+	Matrix rot2 = Matrix.IDENTITY;
 
 	PositionController(View view) {
 		this.view = view;
@@ -30,7 +32,7 @@ public class PositionController implements Simulant, InputController {
 	public void tick(long dt) {
 		if ( vx != 0 || vy != 0 ) {
 			Vector dp = Vector.U1.times(vx / dt).plus(Vector.U3.times(vy / dt));
-			Vector rdp = rotation.conjugate().rotate(dp);
+			Vector rdp = rot2.times(dp);
 			view.move(rdp);
 		}
 	}
@@ -44,11 +46,23 @@ public class PositionController implements Simulant, InputController {
 	private void rotate(int drx, int dry) {
 		rx += drx;
 		ry += dry;
-		double sx = Math.sin(rx / 360.0);
-		double sy = Math.sin(ry / 360.0);
-		rotation = new Quaternion(0, sx, 0, Math.sqrt(1 - sx*sx))
-		    .times(new Quaternion(sy, 0, 0, Math.sqrt(1 - sy*sy)));
-		view.setRotation(rotation);
+		double sx = rx / 360.0;
+		double sy = ry / 360.0;
+		
+		Matrix rotX1 = Matrix.rot2(sx, Vector.U2);
+		Matrix rotX2 = Matrix.rot2(-sx, Vector.U2);
+		
+		Vector tu = rotX1.times(Vector.U1);
+
+		Matrix rotY1 = Matrix.rot2(sy, Vector.U1);
+		Matrix rotY2 = Matrix.rot2(-sy, Vector.U1);
+		
+		rot1 = rotY1.times(rotX1);
+		rot2 = rotX2.times(rotY2);
+		
+		log.info("tu " + tu);
+		
+		view.setRotation(rot1);
 	}
 
 	public void mouseDown(int button) {

@@ -1,8 +1,8 @@
 package game;
 
-import org.lwjgl.BufferUtils;
-
 import java.nio.ByteBuffer;
+
+import org.lwjgl.BufferUtils;
 
 public class GradientImage implements Image {
 

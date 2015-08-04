@@ -1,8 +1,17 @@
 package game.gl;
 
-public interface GLResource {
+public abstract class GLResource {
 	
-	public void init();
-	public void dispose();
+	boolean initialized = false;
+	
+	public void ensureInitialized() {
+		if ( ! initialized ) {
+			initialized = true;
+			init();
+		}
+	}
+	
+	public abstract void init();
+	public abstract void dispose();
 
 }

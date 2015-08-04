@@ -11,32 +11,41 @@ import org.lwjgl.opengl.GL30;
 
 import com.google.common.base.Preconditions;
 
-import game.Renderable;
+import game.Model;
 import game.gl.GLBuffer;
 import game.gl.GLResource;
+import game.gl.GLTexture;
 import game.gl.GLVertexArray;
+import game.math.Matrix;
 import game.math.Vector;
 
-public class CompiledMesh implements GLResource, Renderable {
-
-	GLVertexArray vao;
-	GLBuffer vbo, tbo, ibo;
+public class CompiledMesh extends GLResource implements Model  {
 
 	private SimpleProgram simpleProgram;
-	private TextureSupplier tex;
+	private GLTexture tex;
+
+	private GLVertexArray vao;
+	private GLBuffer vbo, tbo, ibo;
+
 	private int vert;
 	private int texCoords;
+	
 	private Mesh mesh;
-    
-    public CompiledMesh(SimpleProgram simpleProgram, TextureSupplier tex, Mesh mesh) {
+	private Matrix modelTr;
+
+	
+    public CompiledMesh(SimpleProgram simpleProgram, Mesh mesh) {
     	this.simpleProgram = simpleProgram;
-    	this.tex = tex;
     	this.mesh = mesh;
+    	this.modelTr = Matrix.IDENTITY;
     }
 	
-	public void init() {
+	public void init() {	
+		simpleProgram.ensureInitialized();
+		
 		vert = simpleProgram.getVert();
 		texCoords = simpleProgram.getTexCoords();
+		
 		Preconditions.checkArgument(vert >= 0);
 		Preconditions.checkArgument(texCoords >= 0);
 
@@ -50,6 +59,9 @@ public class CompiledMesh implements GLResource, Renderable {
 		
 		ibo = new GLBuffer();
 		ibo.bindData(GL15.GL_ELEMENT_ARRAY_BUFFER, getElementData());
+		
+		tex = mesh.getMaterial().getTexture();
+		Preconditions.checkNotNull(tex);
 	}
 
 	private FloatBuffer getVertexData() {
@@ -96,13 +108,19 @@ public class CompiledMesh implements GLResource, Renderable {
 
 	public void render() {
 		simpleProgram.use();
-		tex.getTexture().bind(simpleProgram.getTex());
+		tex.bind(simpleProgram.getTex());
+		simpleProgram.setModelTr(modelTr);
 		
 		GL30.glBindVertexArray(vao.getId());
 		GL20.glEnableVertexAttribArray(vert);
 		GL20.glEnableVertexAttribArray(texCoords);
 		
 		ibo.drawElements();
+	}
+
+	@Override
+	public void setModelTr(Matrix modelTr) {
+		this.modelTr = modelTr;
 	}
 	
 }

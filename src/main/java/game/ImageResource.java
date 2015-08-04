@@ -3,12 +3,14 @@ package game;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;
 
 public class ImageResource implements Image {
@@ -17,7 +19,9 @@ public class ImageResource implements Image {
 
 	public ImageResource(String path) {
 		try {
-			img = ImageIO.read(Resources.getResource(path));
+			URL url = Resources.getResource(path);
+			Preconditions.checkNotNull(url);
+			img = ImageIO.read(url);
 		} catch(IOException e) {
 			throw new RuntimeException("Couldn't load " + path, e);
 		}
@@ -25,7 +29,11 @@ public class ImageResource implements Image {
 
 	public ImageResource(File file) {
 		try {
+			Preconditions.checkNotNull(file);
 			img = ImageIO.read(file);
+			if ( img == null ) {
+				throw new RuntimeException("Couldn't load " + file);
+			}
 		} catch(IOException e) {
 			throw new RuntimeException("Couldn't load " + file, e);
 		}

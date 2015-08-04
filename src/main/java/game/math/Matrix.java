@@ -1,8 +1,8 @@
 package game.math;
 
-import org.lwjgl.BufferUtils;
-
 import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 public class Matrix {
 
@@ -157,12 +157,49 @@ public class Matrix {
     public static Matrix rot(double theta, Vector x) {
         x = x.normalize();
         Matrix square = Matrix.square(x);
-        Matrix r = square.plus(Matrix.IDENTITY.minus(square).times(Math.cos(theta)).plus(Matrix.skew(x).times(Math.sin(theta))));
+        Matrix r = square.plus(
+        		Matrix.IDENTITY
+        			.minus(square)
+        			.times(Math.cos(theta))
+        			.plus(Matrix.skew(x)
+					.times(Math.sin(theta))));
         for (int i = 0; i < 4; ++i) {
             r.v[i * 4 + 3] = i == 3 ? 1 : 0;
             r.v[3 * 4 + i] = i == 3 ? 1 : 0;
         }
         return r;
+    }
+
+    public static Matrix rot2(double theta, Vector v) {
+    	double c = Math.cos(theta);
+    	double s = Math.sin(theta);
+    	double t = 1 - c;
+    	double x = v.x();
+    	double y = v.y();
+    	double z = v.z();
+
+    	Matrix result = new Matrix();
+    	result.set(0, 0, t*x*x + c);
+    	result.set(0, 1, t*x*y-s*z);
+    	result.set(0, 2, t*x*z+s*y);
+    	result.set(0, 3, 0);
+    	
+    	result.set(1, 0, t*x*y + s*z);
+    	result.set(1, 1, t*y*y + c);
+    	result.set(1, 2, t*y*z - s*x);
+    	result.set(1, 3, 0);
+
+    	result.set(2, 0, t*x*z - s*y);
+    	result.set(2, 1, t*y*z + s*x);
+    	result.set(2, 2, t*z*z + c);
+    	result.set(2, 3, 0);
+
+    	result.set(3, 0, 0);
+    	result.set(3, 1, 0);
+    	result.set(3, 2, 0);
+    	result.set(3, 3, 1);
+
+    	return result;
     }
 
     public static Matrix translate(Vector x) {

@@ -3,6 +3,7 @@ package game.voxel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import art.Material;
 import game.math.Vector;
 
 public class MarchingCubes {
@@ -140,7 +141,7 @@ public class MarchingCubes {
 
 	private DensityFunction densityFunction;
 
-	public MarchingCubes(DensityFunction densityFunction) {
+	public MarchingCubes(DensityFunction densityFunction, Material material) {
 		this.grid = new double[CUBE_VERTS_TABLE.length];
 		this.ps = new Vector[CUBE_VERTS_TABLE.length];
 		this.vs = new Vector[32];

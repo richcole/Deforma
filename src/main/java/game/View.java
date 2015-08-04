@@ -1,27 +1,30 @@
 package game;
 
-import art.SimpleProgram;
-import game.math.Matrix;
-import game.math.Quaternion;
-import game.math.Vector;
+import java.util.List;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class View implements Renderable {
+import com.google.common.collect.Lists;
+
+import art.SimpleProgram;
+import game.math.Matrix;
+import game.math.Vector;
+
+public class View implements Action {
 
 	final static Logger log = LoggerFactory.getLogger(View.class);
 
 	private final SimpleProgram program;
 
 	Vector position = Vector.U1.times(1.0);
-	Quaternion rotation = Quaternion.ZERO;
 	Matrix viewMatrix = Matrix.IDENTITY;
+	Matrix rot = Matrix.IDENTITY;
 	
-	double rx, ry;
-
+	List<Model> renderables = Lists.newArrayList();
+	
 	View(SimpleProgram program) {
 		this.program = program;
 		update();
@@ -30,8 +33,8 @@ public class View implements Renderable {
 	private void update() {
 		viewMatrix = Matrix
 			.flip(1)
-			.times(Matrix.frustum(-1, 1, 1, -1, 1, 1000))
-			.times(rotation.toMatrix())
+			.times(Matrix.frustum(-1, 1, 1, -1, 1, 10000))
+			.times(rot)
 			.times(Matrix.translate(position.minus()));
 	}
 
@@ -40,21 +43,39 @@ public class View implements Renderable {
 		update();
 	}
 
-	public void render() {
-		program.use();
+	public void run() {
+		GL11.glClearColor(0, 0, 0, 1); // black
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		// GL11.glDisable(GL11.GL_CULL_FACE);
-		GL20.glUniformMatrix4(program.getTr(), true, viewMatrix.toBuf());
+
+		program.use();
+		program.setViewTr(viewMatrix);
+
+		for(Model r: renderables) {
+			r.render();
+		}
+		Display.update();
+        Display.sync(60);
 	}
 
-	public void rotate(int dx, int dy) {
-		rx += dx;
-		ry += dy;
+	public void setRotation(Matrix rot) {
+		this.rot = rot;
 		update();
 	}
+	
+	public void add(Model r) {
+		renderables.add(r);
+	}
 
-	public void setRotation(Quaternion rotation) {
-		this.rotation = rotation;
-		update();
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		
 	}
 }
