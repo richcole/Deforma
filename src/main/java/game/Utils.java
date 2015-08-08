@@ -67,4 +67,14 @@ public class Utils {
 		return range(0, upper);
 	}
 
+	public static double clamp(double v, double l, double u) {
+		if (v < l) {
+			return l;
+		}
+		if (v > u) {
+			return u;
+		}
+		return v;
+	}
+		
 }

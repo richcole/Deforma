@@ -52,15 +52,11 @@ public class PositionController implements Simulant, InputController {
 		Matrix rotX1 = Matrix.rot2(sx, Vector.U2);
 		Matrix rotX2 = Matrix.rot2(-sx, Vector.U2);
 		
-		Vector tu = rotX1.times(Vector.U1);
-
 		Matrix rotY1 = Matrix.rot2(sy, Vector.U1);
 		Matrix rotY2 = Matrix.rot2(-sy, Vector.U1);
 		
 		rot1 = rotY1.times(rotX1);
 		rot2 = rotX2.times(rotY2);
-		
-		log.info("tu " + tu);
 		
 		view.setRotation(rot1);
 	}

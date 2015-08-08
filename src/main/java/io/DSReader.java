@@ -490,6 +490,79 @@ public class DSReader {
 
 	}
 
+	public class ObjectInfoChunk extends ContainersChunk {
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+
+			while(offset < length) {
+				Chunk child = readChunk(indent + "  ");
+				children.add(child);
+				offset += child.length;
+			}
+				
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d ObjectInfoChunk %d %d\n", id, length);
+			for(Chunk child: children) {
+				child.print(out, indent + 2);
+			}
+		}
+
+	}
+
+	public class ObjectHierarchyDescriptor extends Chunk {
+		
+		String name;
+		int a, b, c;
+
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+
+			name = reader.readZString();
+			a = reader.readShort();
+			b = reader.readShort();
+			c = reader.readShort();
+				
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d ObjectInfoChunk %d %d\n", id, length);
+		}
+
+	}
+
+	public class ObjectDummyNameChunk extends Chunk {
+
+		String name;
+		
+		Chunk parse(BReader reader, String indent) {
+			int offset = 6;
+			
+			name = reader.readZString();
+
+			return this;
+		}
+
+		public void print(PrintStream out, int indent) {
+			for(int i=0;i<indent;++i) {
+				out.print(" ");
+			}
+			out.format("%04x %d ObjectDummyNameChunk %d %d %s\n", id, length, name);
+		}
+
+	}
+
 	public class VertexListChunk extends ContainersChunk {
 		public int n;
 		public double vs[];
@@ -588,6 +661,12 @@ public class DSReader {
 				chunk = new ShortChunk();
 				break;
 				
+			case 0xb002:
+				chunk = new ObjectInfoChunk();
+				
+			case 0xb011:
+				chunk = new ObjectDummyNameChunk();
+
 			case 0x0030:
 			case 0x0144:
 				
@@ -610,7 +689,6 @@ public class DSReader {
 			case 0xa210:
 
 			case 0xb001:
-			case 0xb002:
 			case 0xb003:
 			case 0xb004:
 			case 0xb005:
@@ -657,7 +735,7 @@ public class DSReader {
 		int id = reader.readShort();
 		long length = reader.readWord();
 		
-		log.debug(String.format("%s id %04x length %d pos %x", indent, id, length, pos));
+		log.info(String.format("%s id %04x length %d pos %x", indent, id, length, pos));
 		
 		Chunk chunk = newChunk(id, length);
 		chunk.parse(reader, indent);

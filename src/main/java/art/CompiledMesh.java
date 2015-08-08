@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -32,6 +33,8 @@ public class CompiledMesh extends GLResource implements Model  {
 	
 	private Mesh mesh;
 	private Matrix modelTr;
+	
+	private boolean wireFrame = false;
 
 	
     public CompiledMesh(SimpleProgram simpleProgram, Mesh mesh) {
@@ -114,13 +117,22 @@ public class CompiledMesh extends GLResource implements Model  {
 		GL30.glBindVertexArray(vao.getId());
 		GL20.glEnableVertexAttribArray(vert);
 		GL20.glEnableVertexAttribArray(texCoords);
-		
+
+		if ( wireFrame ) {
+			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+		} else {
+			GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		}
 		ibo.drawElements();
 	}
 
 	@Override
 	public void setModelTr(Matrix modelTr) {
 		this.modelTr = modelTr;
+	}
+
+	public void setWireFrame(boolean wireFrame) {
+		this.wireFrame = wireFrame;
 	}
 	
 }

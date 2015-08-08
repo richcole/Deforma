@@ -1,7 +1,5 @@
 package game;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,7 @@ import game.gl.GLResourceList;
 import game.math.Matrix;
 import game.math.Vector;
 import game.voxel.MarchingCubes;
-import game.voxel.SphericalDensityFunction;
+import game.voxel.SphericalDensityField;
 import game.voxel.VertexCloud;
 import io.ModelLoader;
 
@@ -57,13 +55,19 @@ public class Context implements Action {
 		
 		VertexCloud cubesCloud = new VertexCloud();
 		Vector p = new Vector(0, 0, 0);
-		Vector dp = new Vector(1, 1, 1).times(6); 
-		MarchingCubes cubes = new MarchingCubes(new SphericalDensityFunction(p, 5), this.marble);
-		cubes.update(cubesCloud, p.minus(dp), p.plus(dp));
+		Vector dp = new Vector(1, 1, 1).times(6);
+
+		SphericalDensityField field = new SphericalDensityField();
+		field.add(Vector.U1.times(-2), 0.6);
+		field.add(Vector.U1.times(2), 0.6);
+		
+		MarchingCubes cubes = new MarchingCubes(field, this.marble);
+		cubes.update(cubesCloud, p.minus(dp), p.plus(dp), Vector.ONES.times(0.5));
 
 		Mesh mesh = new Mesh(this.marble);
 		mesh.addGeom(cubesCloud);
 		cubesMesh = new CompiledMesh(simpleProgram, mesh);
+		cubesMesh.setWireFrame(true);
 
 		CompiledMeshList girl = new CompiledMeshList(simpleProgram, 
 				new ModelLoader().load("/home/richcole/models/Girl/girl.3ds", marble));

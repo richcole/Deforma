@@ -148,11 +148,11 @@ public class MarchingCubes {
 		this.densityFunction = densityFunction;
 	}
 
-	public void update(VertexCloud cloud, Vector bottomLeft, Vector topRight) {
-		for (double x = bottomLeft.x(); x < topRight.x(); ++x) {
-			for (double y = bottomLeft.y(); y < topRight.y(); ++y) {
-				for (double z = bottomLeft.z(); z < topRight.z(); ++z) {
-					updateCube(cloud, densityFunction, x, y, z);
+	public void update(VertexCloud cloud, Vector bottomLeft, Vector topRight, Vector d) {
+		for (double x = bottomLeft.x(); x < topRight.x(); x += d.x()) {
+			for (double y = bottomLeft.y(); y < topRight.y(); y += d.y()) {
+				for (double z = bottomLeft.z(); z < topRight.z(); z += d.z()) {
+					updateCube(cloud, densityFunction, x, y, z, bottomLeft, topRight, d);
 				}
 			}
 		}
@@ -162,11 +162,11 @@ public class MarchingCubes {
 		return p1.plus(p2.minus(p1).times((d1 - 0.5) / (d1 - d2)));
 	}
 
-	private void updateCube(VertexCloud cloud, DensityFunction densityFunction, double x, double y, double z) {
+	private void updateCube(VertexCloud cloud, DensityFunction densityFunction, double x, double y, double z, Vector bottomLeft, Vector topRight, Vector d) {
 		Vector p = new Vector(x, y, z, 1);
 		int cubeIndex = 0;
 		for (int i = 0; i < CUBE_VERTS_TABLE.length; ++i) {
-			ps[i] = p.plus(CUBE_VERTS_TABLE[i]);
+			ps[i] = p.plus(CUBE_VERTS_TABLE[i].scaleBy(d));
 			grid[i] = densityFunction.getDensity(ps[i]);
 			if (densityFunction.isPositive(grid[i])) {
 				cubeIndex |= (0x1 << i);
@@ -187,7 +187,11 @@ public class MarchingCubes {
 			for (int i = 0; i < triIndexes.length; i++) {
 				Vector sv = vs[triIndexes[i]];
 				Vector sn = densityFunction.getDensityDerivative(sv).normalize();
-				cloud.addVertex(sv, sn, new Vector(x / 20.0, y / 20.0, z / 20.0, 1.0));
+				Vector tv = new Vector(
+						(sv.x() - bottomLeft.x()) / (topRight.x() - bottomLeft.x()), 
+						(sv.y() - bottomLeft.y()) / (topRight.y() - bottomLeft.y()),
+						0.0, 1.0);
+				cloud.addVertex(sv, sn, tv);
 			}
 		}
 	}
