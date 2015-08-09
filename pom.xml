@@ -14,22 +14,27 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-    <repositories>
-        <repository>
-            <id>mavenNatives</id>
-            <name>Maven Natives Repository</name>
-            <url>http://mavennatives.googlecode.com/svn/repo</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+	<repositories>
+		<repository>
+			<id>maven.nikr.net</id>
+			<name>maven.nikr.net</name>
+			<url>http://maven.nikr.net/</url>
+		</repository>
+		<repository>
+			<id>mavenNatives</id>
+			<name>Maven Natives Repository</name>
+			<url>http://mavennatives.googlecode.com/svn/repo</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 
-        <repository>
-            <id>slick</id>
-            <name>slick</name>
-            <url>http://slick.cokeandcode.com/mavenrepo</url>
-        </repository>
-    </repositories>
+		<repository>
+			<id>slick</id>
+			<name>slick</name>
+			<url>http://slick.cokeandcode.com/mavenrepo</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
@@ -48,7 +53,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 
 	<dependencies>
 		<dependency>
@@ -80,6 +85,12 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.nikr</groupId>
+			<artifactId>dds</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 	</dependencies>

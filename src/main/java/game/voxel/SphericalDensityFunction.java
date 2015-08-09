@@ -1,7 +1,5 @@
 package game.voxel;
 
-import game.math.Vector;
-
 public class SphericalDensityFunction implements DensityFunction {
 	
 	Vector c;

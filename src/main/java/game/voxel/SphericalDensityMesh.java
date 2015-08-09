@@ -4,9 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import game.Utils;
-import game.math.Vector;
-
 public class SphericalDensityMesh implements DensityFunction {
 	
 	int res;
@@ -50,7 +47,7 @@ public class SphericalDensityMesh implements DensityFunction {
 			1.0);
 	}
 		
-	List<PointPair> neighbourhood(Vector v, double radius) {
+	List<Sphere> neighbourhood(Vector v, double radius) {
 		Vector c = tr(v);
 		// dx, dy, dz are in [0, res] space
 		double dx = res * radius / (topRight.x() - bottomLeft.x());
@@ -63,7 +60,7 @@ public class SphericalDensityMesh implements DensityFunction {
 		double uy = Utils.clamp(c.y() + dy, 0, res-1);
 		double uz = Utils.clamp(c.z() + dz, 0, res-1);
 		
-		List<PointPair> result = Lists.newArrayList();
+		List<Sphere> result = Lists.newArrayList();
 		for(double x=lx;x<=ux;x+=1.0) {
 			for(double y=ly;y<=uy;y+=1.0) {
 				for(double z=lx;z<=uz;z+=1.0) {
@@ -71,7 +68,7 @@ public class SphericalDensityMesh implements DensityFunction {
 					double fy = Math.floor(y);
 					double fz = Math.floor(z);
 					Vector p = new Vector(fx, fy, fz, 1.0);
-					result.add(new PointPair(p, res - p.minus(c).length()));
+					result.add(new Sphere(p, res - p.minus(c).length()));
 				}
 			}
 		}
@@ -79,7 +76,7 @@ public class SphericalDensityMesh implements DensityFunction {
 		return result;
 	}
 	
-	List<PointPair> neighbourhood(Vector v) {
+	List<Sphere> neighbourhood(Vector v) {
 		Vector c = tr(v);
 		// dx, dy, dz are in [0, res] space
 		double dx = res / (topRight.x() - bottomLeft.x());
@@ -92,7 +89,7 @@ public class SphericalDensityMesh implements DensityFunction {
 		double uy = Utils.clamp(c.y() + dy, 0, res-1);
 		double uz = Utils.clamp(c.z() + dz, 0, res-1);
 		
-		List<PointPair> result = Lists.newArrayList();
+		List<Sphere> result = Lists.newArrayList();
 		for(double x=lx;x<=ux;x+=1.0) {
 			for(double y=ly;y<=uy;y+=1.0) {
 				for(double z=lz;z<=uz;z+=1.0) {
@@ -100,7 +97,7 @@ public class SphericalDensityMesh implements DensityFunction {
 					double fy = Math.floor(y);
 					double fz = Math.floor(z);
 					Vector p = new Vector(fx, fy, fz, 1.0);
-					result.add(new PointPair(p, res - p.minus(c).length()));
+					result.add(new Sphere(p, res - p.minus(c).length()));
 				}
 			}
 		}
@@ -109,25 +106,25 @@ public class SphericalDensityMesh implements DensityFunction {
 	}
 
 	public void add(Vector c, double r) {
-		List<PointPair> n = neighbourhood(c, r);
-		for(PointPair p: n) {
-			s[index(p.v)] += p.weight / 5;
+		List<Sphere> n = neighbourhood(c, r);
+		for(Sphere p: n) {
+			s[index(p.c)] += p.r / 5;
 		}
 	}
 
 	public double getDensity(Vector c) {
-		List<PointPair> n = neighbourhood(c);
+		List<Sphere> n = neighbourhood(c);
 		double result = 0.0;
-		for(PointPair p: n) {
-			result += s[index(p.v)] * p.weight;
+		for(Sphere p: n) {
+			result += s[index(p.c)] * p.r;
 		}
 		return result;
 	}
 
 	public Vector getDensityDerivative(Vector v) {
 		Vector r = Vector.Z;
-		for(PointPair p: neighbourhood(v)) {
-			r = p.v.minus(v).times(s[index(p.v)]);
+		for(Sphere p: neighbourhood(v)) {
+			r = p.c.minus(v).times(s[index(p.c)]);
 		}
 		return r.normalize();
 	}

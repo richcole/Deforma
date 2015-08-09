@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import art.Geom;
-import game.math.Vector;
-
 public class MeshGeom implements Geom {
 	
 	private static final Logger log = LoggerFactory.getLogger(MeshGeom.class);
