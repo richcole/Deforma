@@ -1,0 +1,15 @@
+package game;
+
+public class XPSBone {
+
+	public String name;
+	public int parentIndex;
+	public Vector vector;
+
+	public XPSBone(String name, int parentIndex, Vector vector) {
+		this.name = name;
+		this.parentIndex = parentIndex;
+		this.vector = vector;
+	}
+
+}
