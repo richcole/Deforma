@@ -18,64 +18,76 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class UI extends Application {
-	
-	private CheckBoxTreeItem<String> rootItem;
-	private Context context;
-	
-	public UI() {
-		super();
-	}
-	
-	@Override
-	public void start(Stage primaryStage) {
-		context = new Context(this);
-		
-		Button btn = new Button();
-		btn.setText("Say 'Hello World'");
-		btn.setOnAction((ActionEvent event) -> {
-			System.out.println("Hello World!");
-		});
-		
-		rootItem = new CheckBoxTreeItem<String>("Root");
 
-		TreeView<String> treeView = new TreeView<String>(rootItem);
-		treeView.setCellFactory(CheckBoxTreeCell.<String>forTreeView());
-		
-		StackPane root = new StackPane();
-		root.getChildren().add(btn);
-		
-		root.getChildren().add(treeView);
+  private CheckBoxTreeItem<String> rootItem;
+  private Context context;
 
-		Scene scene = new Scene(root, 300, 250);
+  public UI() {
+    super();
+  }
 
-		primaryStage.setTitle("Hello World!");
-		primaryStage.setScene(scene);
-		primaryStage.show();
+  @Override
+  public void start(Stage primaryStage) {
+    context = new Context(this);
 
-		context.getEventBus().onEventType(context, (ApplicationCloseEvent e) -> { Platform.exit(); }, ApplicationCloseEvent.class);
-	}
+    Button btn = new Button();
+    btn.setText("Say 'Hello World'");
+    btn.setOnAction((ActionEvent event) -> {
+      System.out.println("Hello World!");
+    });
 
-	public TreeNode newNode(String nodeText) {
-		return newNode(rootItem, nodeText, false);
-	}
+    rootItem = new CheckBoxTreeItem<String>("Root");
 
-	public TreeNode newNode(TreeNode parentNode, String nodeText, boolean isChecked) {
-		return newNode(parentNode.treeItem, nodeText, isChecked);
-	}
-	
-	private TreeNode newNode(CheckBoxTreeItem<String> parentNode, String nodeText, boolean isChecked) {
-		TreeNode node = new TreeNode(new CheckBoxTreeItem<String>(nodeText));
-		node.treeItem.setSelected(isChecked);
-		node.treeItem.addEventHandler(CheckBoxTreeItem.<String>checkBoxSelectionChangedEvent(), 
-			(TreeModificationEvent<String> event) -> {
-				boolean isItemChecked = node.treeItem.isSelected();
-				context.getEventBus().post(new TreeNodeClickedEvent(node, isItemChecked)); 
-		});
-		parentNode.getChildren().add(node.treeItem);
-		return node;
-	}
+    TreeView<String> treeView = new TreeView<String>(rootItem);
+    treeView.setCellFactory(CheckBoxTreeCell.<String> forTreeView());
 
-	public Registration<TreeNodeClickedEvent> onTreeNodeClicked(TreeNode node, Consumer<TreeNodeClickedEvent> action) {
-		return context.getEventBus().onEventType(node, action, TreeNodeClickedEvent.class);
-	}
+    StackPane root = new StackPane();
+    root.getChildren().add(btn);
+
+    root.getChildren().add(treeView);
+
+    Scene scene = new Scene(root, 300, 250);
+
+    primaryStage.setTitle("Hello World!");
+    primaryStage.setScene(scene);
+    primaryStage.show();
+
+    context.getEventBus().onEventType(context, (ApplicationCloseEvent e) -> {
+      Platform.exit();
+    }, ApplicationCloseEvent.class);
+  }
+
+  public TreeNode newNode(String nodeText) {
+    return newNode(rootItem, nodeText, false);
+  }
+
+  public TreeNode newNode(TreeNode parentNode, String nodeText,
+      boolean isChecked) {
+    return newNode(parentNode.treeItem, nodeText, isChecked);
+  }
+
+  private TreeNode newNode(CheckBoxTreeItem<String> parentNode,
+      String nodeText, boolean isChecked) {
+    TreeNode node = new TreeNode(new CheckBoxTreeItem<String>(nodeText));
+    node.treeItem.setSelected(isChecked);
+    node.treeItem.addEventHandler(
+        CheckBoxTreeItem.<String> checkBoxSelectionChangedEvent(),
+        (TreeModificationEvent<String> event) -> {
+          boolean isItemChecked = node.treeItem.isSelected();
+          context.getEventBus().post(
+              new TreeNodeClickedEvent(node, isItemChecked));
+        });
+    parentNode.getChildren().add(node.treeItem);
+    return node;
+  }
+
+  public Registration<TreeNodeClickedEvent> onTreeNodeClicked(TreeNode node,
+      Consumer<TreeNodeClickedEvent> action) {
+    return context.getEventBus().onEventType(node, action,
+        TreeNodeClickedEvent.class);
+  }
+
+  public static void main(String[] args) {
+    launch(args);
+  }
 }

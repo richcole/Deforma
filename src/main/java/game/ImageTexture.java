@@ -26,7 +26,7 @@ public class ImageTexture extends Material {
 
 	@Override
 	public void init() {
-		this.tex = new GLTexture().withImage(image);
+    this.tex = new GLTexture().withImage(image);
 	}
 
 	@Override
