@@ -24,19 +24,4 @@ public class RenderableModel implements RenderableResource {
 		this.modelTr = modelTr;
 	}
 
-	@Override
-	public void init() {
-		model.init();
-	}
-
-	@Override
-	public void dispose() {
-		model.dispose();
-	}
-
-	@Override
-	public void ensureInitialized() {
-		model.ensureInitialized();
-	}
-
 }

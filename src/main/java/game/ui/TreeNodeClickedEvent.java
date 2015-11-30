@@ -1,6 +1,6 @@
 package game.ui;
 
-import game.AbstractEvent;
+import game.events.AbstractEvent;
 
 public class TreeNodeClickedEvent extends AbstractEvent {
 	

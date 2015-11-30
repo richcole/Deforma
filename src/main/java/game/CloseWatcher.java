@@ -1,35 +1,38 @@
 package game;
 
+import java.util.function.Consumer;
+
 import org.lwjgl.opengl.Display;
 
 import game.events.ApplicationCloseEvent;
+import game.events.Clock;
+import game.events.EventBus;
+import game.events.TickEvent;
 
-public class CloseWatcher implements Action {
+public class CloseWatcher implements Consumer<TickEvent> {
 
 	private boolean isClosed = false;
 	private EventBus eventBus;
-	private Object object;
+  private Clock clock;
+  private Object object;
 	
-	public CloseWatcher(Object object, EventBus eventBus) {
+	public CloseWatcher(Clock clock, Object object, EventBus eventBus) {
 		this.eventBus = eventBus;
-		this.object = object;
+    this.isClosed = false;
+    this.clock = clock;
+    this.object = object;
+    eventBus.onEventType(clock, this, TickEvent.class);
 	}
 	
-	public void init() {
-		isClosed = false;
-	}
-
-	public void run() {
-		if ( ! isClosed && Display.isCloseRequested() ) {
-			eventBus.post(new ApplicationCloseEvent(object));
-		}
-		isClosed = Display.isCloseRequested();
-	}
-	
-	public void dispose() {
-	}
-
 	public boolean isClosed() {
 		return isClosed;
 	}
+
+  @Override
+  public void accept(TickEvent t) {
+    if ( ! isClosed && Display.isCloseRequested() ) {
+      eventBus.post(new ApplicationCloseEvent(object));
+    }
+    isClosed = Display.isCloseRequested();
+  }
 }

@@ -1,42 +1,33 @@
 package game;
 
+import game.events.Clock;
+import game.events.EventBus;
+import game.events.TickEvent;
+
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
 
-public class Simulator implements Action {
+public class Simulator implements Consumer<TickEvent> {
 	
 	long lastTick;
 	long tickTime = 10;
 	
-	List<Simulant> simulants = Lists.newArrayList();
+	EventBus eventBus;
 	
-	Simulator() {
-		lastTick = System.currentTimeMillis();
+	Simulator(Clock clock, EventBus eventBus) {
+    lastTick = System.currentTimeMillis();
+    this.eventBus = eventBus; 
+	  eventBus.onEventType(clock, this, TickEvent.class);
 	}
 	
-	public void run() {
+	public void accept(TickEvent tickEvent) {
 		long tick = System.currentTimeMillis();
-		if (tick - lastTick > tickTime) {
+		long dt = tick - lastTick;
+		if (dt > tickTime) {
 			lastTick = tick;
-			for(Simulant sim: simulants) {
-				sim.tick(tickTime);
-			}
+			eventBus.post(new TickEvent(this, dt));
 		}
 	}
-
-	public void init() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void add(Simulant simulant) {
-		simulants.add(simulant);
-	}
-	
 }

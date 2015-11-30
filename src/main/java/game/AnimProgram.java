@@ -4,133 +4,130 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL20;
 
-public class AnimProgram extends GLResourceList {
+public class AnimProgram {
 
-	private GLProgram program;
-    
-	// variable uniforms
-	private int tr, animIndex, alpha;
+  private GLProgram program;
 
-	// vertex attribs
-    private int vert, texCoords, bones;
-    
-    // preloaded uniforms
-    private int numAnim, numBones, rotationTable, translationTable, boneParents;
-    
-	public void init() {
-		program = new GLProgram();
-		program.attach(new GLShader(GL20.GL_VERTEX_SHADER).compile("anim.vert"));
-		program.attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("anim.frag"));
-		program.link();
-		program.setUniform("tex", 0);
+  // variable uniforms
+  private int tr, animIndex, alpha;
 
-		tr = program.getUniform("tr");
-        animIndex = program.getUniform("animIndex");
-        alpha = program.getUniform("alpha");
+  // vertex attribs
+  private int vert, texCoords, bones;
 
-		vert = program.getAttrib("vert");
-        texCoords = program.getAttrib("texCoords");
-        texCoords = program.getAttrib("bones");
-        
-        numAnim = program.getUniform("numAnim");
-        numBones = program.getUniform("numBones");
-        rotationTable = program.getUniform("rotationTable");
-        translationTable = program.getUniform("translationTable");
-        boneParents = program.getUniform("boneParents");
-	}
+  // preloaded uniforms
+  private int numAnim, numBones, rotationTable, translationTable, boneParents;
 
-	public void dispose() {
-	}
-	
-	public int getVert() {
-		return vert;
-	}
+  public void AnimProgram() {
+    program = new GLProgram();
+    program.attach(new GLShader(GL20.GL_VERTEX_SHADER).compile("anim.vert"));
+    program.attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("anim.frag"));
+    program.link();
+    program.setUniform("tex", 0);
 
-    public int getTr() {
-        return tr;
-    }
+    tr = program.getUniform("tr");
+    animIndex = program.getUniform("animIndex");
+    alpha = program.getUniform("alpha");
 
-	public void use() {
-		program.use();
-	}
+    vert = program.getAttrib("vert");
+    texCoords = program.getAttrib("texCoords");
+    texCoords = program.getAttrib("bones");
 
-	public int getTexCoords() {
-		return texCoords;
-	}
+    numAnim = program.getUniform("numAnim");
+    numBones = program.getUniform("numBones");
+    rotationTable = program.getUniform("rotationTable");
+    translationTable = program.getUniform("translationTable");
+    boneParents = program.getUniform("boneParents");
+  }
 
-	public int getTex() {
-		return 0;
-	}
+  public int getVert() {
+    return vert;
+  }
 
-	public GLProgram getProgram() {
-		return program;
-	}
+  public int getTr() {
+    return tr;
+  }
 
-	public int getAnimIndex() {
-		return animIndex;
-	}
+  public void use() {
+    program.use();
+  }
 
-	public int getAlpha() {
-		return alpha;
-	}
+  public int getTexCoords() {
+    return texCoords;
+  }
 
-	public int getBones() {
-		return bones;
-	}
+  public int getTex() {
+    return 0;
+  }
 
-	public void setBones(int bones) {
-		this.bones = bones;
-	}
+  public GLProgram getProgram() {
+    return program;
+  }
 
-	public int getNumAnim() {
-		return numAnim;
-	}
+  public int getAnimIndex() {
+    return animIndex;
+  }
 
-	public int getNumBones() {
-		return numBones;
-	}
+  public int getAlpha() {
+    return alpha;
+  }
 
-	public int getRotationTable() {
-		return rotationTable;
-	}
+  public int getBones() {
+    return bones;
+  }
 
-	public int getTranslationTable() {
-		return translationTable;
-	}
+  public void setBones(int bones) {
+    this.bones = bones;
+  }
 
-	public int getBoneParents() {
-		return boneParents;
-	}
-	
-	public void setBoneParents(List<Integer> data) {
-		program.setUniformInts(boneParents, data);
-	}
-	
-	public void setRotationTable(List<Float> data) {
-		program.setUniformFloats(rotationTable, data);
-	}
+  public int getNumAnim() {
+    return numAnim;
+  }
 
-	public void setTranslationTable(List<Float> data) {
-		program.setUniformFloats(translationTable, data);
-	}
-	
-	public void setNumAnim(int value) {
-		program.setUniform(numAnim, value);
-	}
+  public int getNumBones() {
+    return numBones;
+  }
 
-	public void setNumBones(int value) {
-		program.setUniform(numBones, value);
-	}
+  public int getRotationTable() {
+    return rotationTable;
+  }
 
-	public void setAnimIndex(int value) {
-		program.setUniform(animIndex, value);
-	}
+  public int getTranslationTable() {
+    return translationTable;
+  }
 
-	public void setAlpha(float value) {
-		program.setUniform(alpha, value);
-	}
-	
-	public void setTr(Matrix value) {
-		program.setUniformFloats(tr, value.toBuf());
-	}
+  public int getBoneParents() {
+    return boneParents;
+  }
+
+  public void setBoneParents(List<Integer> data) {
+    program.setUniformInts(boneParents, data);
+  }
+
+  public void setRotationTable(List<Float> data) {
+    program.setUniformFloats(rotationTable, data);
+  }
+
+  public void setTranslationTable(List<Float> data) {
+    program.setUniformFloats(translationTable, data);
+  }
+
+  public void setNumAnim(int value) {
+    program.setUniform(numAnim, value);
+  }
+
+  public void setNumBones(int value) {
+    program.setUniform(numBones, value);
+  }
+
+  public void setAnimIndex(int value) {
+    program.setUniform(animIndex, value);
+  }
+
+  public void setAlpha(float value) {
+    program.setUniform(alpha, value);
+  }
+
+  public void setTr(Matrix value) {
+    program.setUniformFloats(tr, value.toBuf());
+  }
 }

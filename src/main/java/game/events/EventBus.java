@@ -1,4 +1,6 @@
-package game;
+package game.events;
+
+import game.Registration;
 
 import java.util.List;
 import java.util.Map;

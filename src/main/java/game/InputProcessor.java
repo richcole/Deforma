@@ -1,68 +1,62 @@
 package game;
 
+import game.events.Clock;
+import game.events.EventBus;
+import game.events.KeyDownEvent;
+import game.events.KeyUpEvent;
+import game.events.MouseButtonEvent;
+import game.events.MouseMoveEvent;
+import game.events.TickEvent;
+
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-public class InputProcessor implements Action {
+public class InputProcessor implements Consumer<TickEvent> {
 	
-	List<InputController> controllers = Lists.newArrayList();
-	
-	int mx, my, pmx, pmy;
+  private static final Logger log = LoggerFactory.getLogger(Context.class);
 
-	public void init() {
-		pmx = Mouse.getX();
-		pmy = Mouse.getY();
+  int mx, my, pmx, pmy;
+
+  private EventBus eventBus;
+
+	public InputProcessor(Clock clock, EventBus eventBus) {
+    this.pmx = Mouse.getX();
+    this.pmy = Mouse.getY();
+    this.eventBus = eventBus;
+	  eventBus.onEventType(clock, this, TickEvent.class);
 	}
 
-	public void run() {
+	public void accept(TickEvent event) {
 		mx = Mouse.getX();
 		my = Mouse.getY();
 		
 		while(Mouse.next()) {
 			int button = Mouse.getEventButton();
 			if ( button != -1 ) {
-				boolean state = Mouse.getEventButtonState();
-				for(InputController controller: controllers) {
-					if ( state ) {
-						controller.mouseDown(button);
-					} 
-					else {
-						controller.mouseUp(button);
-					}
-				}
+				eventBus.post(new MouseButtonEvent(this, button, Mouse.getEventButtonState()));
 			}
 		}
-		
-		for(InputController controller: controllers) {
-			controller.mouseMove(mx - pmx, my - pmy);
-			pmx = mx;
-			pmy = my;
-		}
-		
+
+    eventBus.post(new MouseMoveEvent(this, mx - pmx, my - pmy));
+    pmx = mx;
+    pmy = my;
+
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
-				for(InputController controller: controllers) {
-						controller.keyDown(Keyboard.getEventKey());
-				}
+			  log.info("Button down " + Keyboard.getEventKey());
+			  eventBus.post(new KeyDownEvent(this, Keyboard.getEventKey()));
 			}
 			else {
-				for(InputController controller: controllers) {
-					controller.keyUp(Keyboard.getEventKey());
-				}
+        log.info("Button up " + Keyboard.getEventKey());
+        eventBus.post(new KeyUpEvent(this, Keyboard.getEventKey()));
 			}
 		}
-		
 	}
-
-	public void dispose() {
-	}
-
-	public void add(InputController inputController) {
-		controllers.add(inputController);
-	}
-
 }

@@ -1,5 +1,5 @@
 package game;
 
-public interface RenderableResource extends Renderable, GLResource {
+public interface RenderableResource extends Renderable {
 
 }

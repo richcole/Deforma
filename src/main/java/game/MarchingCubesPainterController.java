@@ -1,10 +1,14 @@
 package game;
 
+import game.events.EventBus;
+import game.events.KeyDownEvent;
+import net.java.games.input.AbstractController;
+
 import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MarchingCubesPainterController implements Simulant, InputController {
+public class MarchingCubesPainterController extends InputController {
 	
 	private static final Logger log = LoggerFactory.getLogger(MarchingCubesPainterController.class);
 	
@@ -21,7 +25,8 @@ public class MarchingCubesPainterController implements Simulant, InputController
 	Vector topRight;
 	Vector res;
 
-	MarchingCubesPainterController(PositionController posController, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
+	MarchingCubesPainterController(EventBus eventBus, PositionController posController, InputProcessor inputProcessor, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
+	  super(inputProcessor, eventBus);
 		this.posController = posController;
 		this.material = material;
 		this.field = new SphericalDensityField();
@@ -49,24 +54,15 @@ public class MarchingCubesPainterController implements Simulant, InputController
 
 		CompiledMesh cubesMesh = new CompiledMesh(simpleProgram, cubesCloud);
 		cubesMesh.setWireFrame(wireFrame);
-		cubesMesh.ensureInitialized();
 
 		meshContainer.setModel(cubesMesh);
 
 		log.info("Time " + (System.currentTimeMillis() - begin));
 	}
 
-	public void mouseMove(int dx, int dy) {
-	}
-	
-	public void mouseDown(int button) {
-	}
-
-	public void mouseUp(int button) {
-	}
-
-	public void keyDown(int eventKey) {
-		if ( eventKey == Keyboard.KEY_G) {
+	@Override
+	public void onKeyDownEvent(KeyDownEvent event) {
+		if ( event.key == Keyboard.KEY_G) {
 			Sphere sp = new Sphere(c, r);
 			Line line = new Line(posController.getPosition(), posController.getForward());
 			setLineMesh(new Box(posController.getPosition(), posController.getPosition().plus(posController.getForward())));
@@ -83,7 +79,7 @@ public class MarchingCubesPainterController implements Simulant, InputController
 				}
 			}
 		}
-		if ( eventKey == Keyboard.KEY_H) {
+		if ( event.key == Keyboard.KEY_H) {
 			wireFrame = ! wireFrame;
 			updateModel();
 		}
@@ -92,14 +88,7 @@ public class MarchingCubesPainterController implements Simulant, InputController
 	private void setLineMesh(Box box) {
 		LineGeom line = new LineGeom(box, 0.1, material);
 		CompiledMesh lineModel = new CompiledMesh(simpleProgram, line);
-		lineModel.ensureInitialized();
 		meshContainer.setLineModel(lineModel);
-	}
-
-	@Override
-	public void keyUp(int eventKey) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

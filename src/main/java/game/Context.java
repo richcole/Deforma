@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import game.events.Clock;
+import game.events.EventBus;
 import game.ui.UI;
 import game.ui.UI;
 
@@ -28,26 +30,30 @@ public class Context implements Runnable {
   }
 
   public void run() {
-    ActionList actionList = new ActionList(eventBus);
-    GLResourceList resourceList = new GLResourceList();
-
     GLDisplay display = new GLDisplay();
+    
+    Clock clock = new Clock(eventBus);
+    CloseWatcher closeWatcher = new CloseWatcher(clock, this, eventBus);
+    Simulator simulator = new Simulator(clock, eventBus);
+
     SimpleProgram simpleProgram = new SimpleProgram();
-    DisplayResizer dispayResizer = new DisplayResizer();
+    DisplayResizer dispayResizer = new DisplayResizer(clock, eventBus);
     ImageTexture marble = new ImageTexture("skyline.jpg");
     ImageTexture gradientTexture = new ImageTexture(new GradientImage(256, 256));
     TriangleMesh triangle = new TriangleMesh(simpleProgram, gradientTexture);
 
-    View view = new View(simpleProgram);
+    View view = new View(simpleProgram, clock, eventBus);
 
     MeshContainer meshContainer = new MeshContainer();
-    PositionController positionController = new PositionController(view);
-    MarchingCubesPainterController mcPainterController = new MarchingCubesPainterController(
-        positionController, simpleProgram, marble, meshContainer);
+
+    InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
+    PositionController positionController = new PositionController(eventBus, simulator, inputProcessor, view);
+    MarchingCubesPainterController mcPainterController = new MarchingCubesPainterController
+        (eventBus, positionController, inputProcessor, simpleProgram, gradientTexture, meshContainer);
 
     if ( false ) {
       List<Geom> girlModelList = new ModelLoader().load(
-          "/home/richcole/models/Girl/girl.3ds", marble);
+          "/home/richcole/models/Girl/", marble);
       CompiledMeshList girlModel = new CompiledMeshList(simpleProgram,
           girlModelList);
       ModelController girlModelController = new ModelController(girlModel, ui);
@@ -64,7 +70,7 @@ public class Context implements Runnable {
       XPSReader xpsReader = new XPSReader();
       MaterialSource materialSource = new MaterialSource();
       XPSModelBuilder xpsBuilder = new XPSModelBuilder(materialSource, marble);
-      String fname = "/home/richcole/models/hitomi naked - Red bikini";
+      String fname = "/home/richcole/models/";
       File root = new File(fname);
       XPSModel xpsBasicModel = xpsReader.read(root, "xps.xps");
       CompiledMeshList xpsModel = xpsBuilder.toCompiledMesh(simpleProgram,
@@ -81,11 +87,6 @@ public class Context implements Runnable {
         xpsModels.add(xpsMesh);
       }
       
-      resourceList.addResource(girl);
-      resourceList.addResource(trees);
-      resourceList.addResource(xpsModel);
-      resourceList.addResource(xpsBoneModel);
-
       view.add(girl);
       view.add(trees);
       view.addAll(xpsModels);
@@ -96,37 +97,13 @@ public class Context implements Runnable {
 
     CompiledMesh lineMesh = new CompiledMesh(simpleProgram, line);
 
-
-    Simulator simulator = new Simulator();
-    InputProcessor inputProcessor = new InputProcessor();
-
-    inputProcessor.add(positionController);
-    inputProcessor.add(mcPainterController);
-    simulator.add(positionController);
-
-    actionList.add(new CloseWatcher(this, eventBus));
-    actionList.add(dispayResizer);
-    actionList.add(inputProcessor);
-    actionList.add(simulator);
-    actionList.add(view);
-
-    resourceList.addResource(display);
-    resourceList.addResource(simpleProgram);
-    resourceList.addResource(triangle);
-    resourceList.addResource(lineMesh);
-
     view.add(triangle);
     view.add(meshContainer);
     view.add(lineMesh);
 
-    resourceList.init();
-    actionList.init();
-
-    try {
-      actionList.run();
-    } finally {
-      actionList.dispose();
-      resourceList.dispose();
+    while(! closeWatcher.isClosed()) {
+      clock.run();
+      eventBus.processEvents();
     }
   }
 

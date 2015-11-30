@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class CompiledMeshList extends AbstractGLResource implements ModelResource {
+public class CompiledMeshList implements ModelResource {
 	
 	private List<CompiledMesh> compiledMeshList = Lists.newArrayList();
 	
@@ -15,25 +15,12 @@ public class CompiledMeshList extends AbstractGLResource implements ModelResourc
 	}
 
 	@Override
-	public void init() {
-		for(CompiledMesh compiledMesh: compiledMeshList) {
-			compiledMesh.ensureInitialized();
-		}
-	}
-
-	@Override
 	public void render(Matrix modelTr) {
 		for(CompiledMesh compiledMesh: compiledMeshList) {
 			compiledMesh.render(modelTr);
 		}
 	}
 
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public List<CompiledMesh> getMeshList() {
 		return compiledMeshList;
 	}

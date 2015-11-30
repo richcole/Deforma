@@ -1,4 +1,5 @@
-package game;
+package game.events;
+
 
 public class AbstractEvent implements Event {
 	

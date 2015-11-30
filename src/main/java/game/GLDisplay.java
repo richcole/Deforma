@@ -4,11 +4,11 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-public class GLDisplay extends AbstractGLResource {
+public class GLDisplay {
 
 	boolean initialized = false;
 	
-	public void init() {		
+	public GLDisplay() {		
 		try {
 			Display.create();
 		    Display.setTitle("Game2"); 
@@ -21,9 +21,8 @@ public class GLDisplay extends AbstractGLResource {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
-	public void dispose() {
+	public void finalize() {
 		Display.destroy();
 	}
 

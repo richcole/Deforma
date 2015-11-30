@@ -1,6 +1,5 @@
 package game.events;
 
-import game.AbstractEvent;
 
 public class ApplicationCloseEvent extends AbstractEvent {
 

@@ -1,5 +1,7 @@
 package game;
 
+import game.events.Event;
+
 import java.util.function.Consumer;
 
 public class Registration<T extends Event> {

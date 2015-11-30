@@ -1,5 +1,5 @@
 package game;
 
-public interface ModelResource extends Model, GLResource {
+public interface ModelResource extends Model {
 
 }
