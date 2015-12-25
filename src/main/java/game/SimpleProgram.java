@@ -5,16 +5,16 @@ import org.lwjgl.opengl.GL20;
 public class SimpleProgram {
 
   private GLProgram program;
-  private int vert, viewTr, modelTr, texCoords;
+  private int vert, normal, viewTr, modelTr, texCoords;
 
   public SimpleProgram() {
     program = new GLProgram();
     program.attach(new GLShader(GL20.GL_VERTEX_SHADER).compile("simple.vert"));
-    program
-        .attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("simple.frag"));
+    program.attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("simple.frag"));
     program.link();
     program.setUniform("tex", 0);
     vert = program.getAttrib("vert");
+    normal = program.getAttrib("normal");
     texCoords = program.getAttrib("texCoords");
     viewTr = program.getUniform("viewTr");
     modelTr = program.getUniform("modelTr");
@@ -22,6 +22,10 @@ public class SimpleProgram {
 
   public int getVert() {
     return vert;
+  }
+  
+  public int getNormal() {
+  	return normal;
   }
 
   public void use() {

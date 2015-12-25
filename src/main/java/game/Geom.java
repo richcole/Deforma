@@ -8,4 +8,5 @@ public interface Geom {
 	List<Integer>   getElements();
 	List<TexCoords> getTexCoords();
 	List<Integer>   getBones();
+	List<Vector>    getNormals();
 }

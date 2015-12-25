@@ -48,5 +48,10 @@ public class SingleLayerMeshGeom implements Geom {
 	public List<Integer> getBones() {
 		return bones;
 	}
+
+	@Override
+	public List<Vector> getNormals() {
+		return normals;
+	}
 	
 }

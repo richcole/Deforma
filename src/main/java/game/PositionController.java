@@ -38,7 +38,7 @@ public class PositionController extends InputController {
   public void onTickEvent(TickEvent event) {
     double dt = event.dt;
 		if ( dt != 0 && (vx != 0 || vy != 0) ) {
-			Vector dp = Vector.U1.times(vx / dt).plus(Vector.U3.times(vy / dt));
+			Vector dp = Vector.U1.times(vx / dt).plus(Vector.U3.times(vy / dt)).times(10);
 			Vector rdp = rot2.times(dp);
 			view.move(rdp);
 		}

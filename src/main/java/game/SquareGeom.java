@@ -9,19 +9,19 @@ import com.google.common.collect.Lists;
 
 public class SquareGeom implements Geom {
 
-    final static Logger log = LoggerFactory.getLogger(SquareGeom.class);
+	final static Logger log = LoggerFactory.getLogger(SquareGeom.class);
 
-    private Vector center, up, right;
+	private Vector center, up, right;
 
 	private TexCoords texCoords;
-	
+
 	public SquareGeom(Vector center, Vector right, Vector up, Material material) {
 		this.center = center;
 		this.up = up;
 		this.right = right;
-		
+
 		texCoords = new TexCoords(material);
-		
+
 		texCoords.add(Vector.U1.plus(Vector.U2));
 		texCoords.add(Vector.U1);
 		texCoords.add(Vector.U2);
@@ -30,19 +30,28 @@ public class SquareGeom implements Geom {
 		texCoords.add(Vector.Z);
 		texCoords.add(Vector.U2);
 	}
-	
+
 	public List<Vector> getVertices() {
 		List<Vector> result = Lists.newArrayList();
-		
-		result.add(center.plus(up).plus(right));    // right up
-		result.add(center.minus(up).plus(right));   // right
-		result.add(center.plus(up).minus(right));   // up
-		result.add(center.minus(up).plus(right));   // right
-		result.add(center.minus(up).minus(right));  // 
-		result.add(center.plus(up).minus(right));   // up
 
-        log.info("square verts " + result);
+		result.add(center.plus(up).plus(right)); // right up
+		result.add(center.minus(up).plus(right)); // right
+		result.add(center.plus(up).minus(right)); // up
+		result.add(center.minus(up).plus(right)); // right
+		result.add(center.minus(up).minus(right)); //
+		result.add(center.plus(up).minus(right)); // up
 
+		log.info("square verts " + result);
+
+		return result;
+	}
+
+	public List<Vector> getNormals() {
+		Vector n = up.cross(right).normalize();
+		List<Vector> result = Lists.newArrayList();
+		for(int i=0;i<6;++i) {
+			result.add(n);
+		}
 		return result;
 	}
 	

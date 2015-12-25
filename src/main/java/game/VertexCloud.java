@@ -24,7 +24,7 @@ public class VertexCloud implements Geom {
 	
 	public void addVertex(Vector p, Vector n, Vector texCoord) {
 		vertices.add(p);
-		normals.add(p);
+		normals.add(n);
 		texCoords.get(0).add(texCoord);
 		bones.add(0);
 		elements.add(elements.size());
@@ -44,6 +44,11 @@ public class VertexCloud implements Geom {
 
 	public List<Integer> getBones() {
 		return bones;
+	}
+
+	@Override
+	public List<Vector> getNormals() {
+		return normals;
 	}
 
 }

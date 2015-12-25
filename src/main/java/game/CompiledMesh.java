@@ -19,10 +19,9 @@ public class CompiledMesh implements ModelResource {
   private List<GLTexture> textures;
 
   private GLVertexArray vao;
-  private GLBuffer vbo, tbo, ibo;
+  private GLBuffer nbo, vbo, tbo, ibo;
 
-  private int vert;
-  private int texCoords;
+  private int normal, vert, texCoords;
 
   private Geom geom;
 
@@ -34,6 +33,7 @@ public class CompiledMesh implements ModelResource {
     this.geom = geom;
 
     vert = simpleProgram.getVert();
+    normal = simpleProgram.getNormal();
     texCoords = simpleProgram.getTexCoords();
 
     Preconditions.checkArgument(vert >= 0);
@@ -43,6 +43,9 @@ public class CompiledMesh implements ModelResource {
 
     vbo = new GLBuffer();
     vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3, getVertexData());
+
+    nbo = new GLBuffer();
+    vao.bindData(normal, GL15.GL_ARRAY_BUFFER, nbo, 3, getNormalData());
 
     tbo = new GLBuffer();
     vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, getTexCoordData());
@@ -60,6 +63,20 @@ public class CompiledMesh implements ModelResource {
 
   private FloatBuffer getVertexData() {
     List<Vector> vertices = geom.getVertices();
+    FloatBuffer buf = BufferUtils.createFloatBuffer(vertices.size() * 3);
+
+    for (Vector vector : vertices) {
+      buf.put((float) vector.x());
+      buf.put((float) vector.y());
+      buf.put((float) vector.z());
+    }
+    buf.flip();
+
+    return buf;
+  }
+
+  private FloatBuffer getNormalData() {
+    List<Vector> vertices = geom.getNormals();
     FloatBuffer buf = BufferUtils.createFloatBuffer(vertices.size() * 3);
 
     for (Vector vector : vertices) {
