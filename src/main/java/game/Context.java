@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import game.events.Clock;
 import game.events.EventBus;
 import game.ui.UI;
-import game.ui.UI;
 
 public class Context implements Runnable {
 
@@ -31,7 +30,7 @@ public class Context implements Runnable {
 
   public void run() {
     GLDisplay display = new GLDisplay();
-    
+
     Clock clock = new Clock(eventBus);
     CloseWatcher closeWatcher = new CloseWatcher(clock, this, eventBus);
     Simulator simulator = new Simulator(clock, eventBus);
@@ -86,7 +85,7 @@ public class Context implements Runnable {
             .times(Matrix.rot(Math.PI, Vector.U1)).times(Matrix.scale(5)));
         xpsModels.add(xpsMesh);
       }
-      
+
       view.add(girl);
       view.add(trees);
       view.addAll(xpsModels);

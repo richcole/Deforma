@@ -36,7 +36,7 @@ public class PositionController extends InputController {
 	}
 	
   public void onTickEvent(TickEvent event) {
-    long dt = event.getTicks();
+    double dt = event.dt;
 		if ( dt != 0 && (vx != 0 || vy != 0) ) {
 			Vector dp = Vector.U1.times(vx / dt).plus(Vector.U3.times(vy / dt));
 			Vector rdp = rot2.times(dp);
@@ -60,32 +60,32 @@ public class PositionController extends InputController {
 
   @Override
 	public void onKeyDownEvent(KeyDownEvent event) {
-		if ( event.key== Keyboard.KEY_A) {
+		if ( event.key == Keyboard.KEY_A) {
 			vx = -1;
 		}
-		if ( event.key== Keyboard.KEY_D) {
+		if ( event.key == Keyboard.KEY_D) {
 			vx = 1;
 		}
-		if ( event.key== Keyboard.KEY_W) {
+		if ( event.key == Keyboard.KEY_W) {
 			vy = -1;
 		}
-		if ( event.key== Keyboard.KEY_S) {
+		if ( event.key == Keyboard.KEY_S) {
 			vy = 1;
 		}
 	}
 
 	@Override
 	public void onKeyUpEvent(KeyUpEvent event) {
-		if ( event.key== Keyboard.KEY_A) {
+		if ( event.key == Keyboard.KEY_A) {
 			vx = 0;
 		}
-		if ( event.key== Keyboard.KEY_D) {
+		if ( event.key == Keyboard.KEY_D) {
 			vx = 0;
 		}
-		if ( event.key== Keyboard.KEY_W) {
+		if ( event.key == Keyboard.KEY_W) {
 			vy = 0;
 		}
-		if ( event.key== Keyboard.KEY_S) {
+		if ( event.key == Keyboard.KEY_S) {
 			vy = 0;
 		}
 	}

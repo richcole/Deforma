@@ -1,4 +1,4 @@
-#version 150
+#version 130
 
 uniform mat4 viewTr;
 uniform mat4 modelTr;
@@ -10,7 +10,7 @@ out vec2 fragTexCoords;
 out mat4 fragTr;
 
 void main() {
-	fragTr = viewTr * modelTr;
+    fragTr = viewTr * modelTr;
     gl_Position = fragTr * vec4(vert, 1);
     fragTexCoords = texCoords;
 }

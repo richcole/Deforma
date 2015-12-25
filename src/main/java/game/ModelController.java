@@ -9,7 +9,7 @@ public class ModelController {
 	public ModelController(CompiledMeshList meshList, UI ui) {
 		TreeNode root = ui.newNode(meshList.toString());
 		
-		for(CompiledMesh compiledMesh: meshList.getMeshList()) {
+		for(final CompiledMesh compiledMesh: meshList.getMeshList()) {
 			TreeNode meshNode = ui.newNode(root, compiledMesh.getGeom().toString(), true);
 			ui.onTreeNodeClicked(meshNode, (TreeNodeClickedEvent e) -> { treeNodeClicked(e, compiledMesh); });
 		}
