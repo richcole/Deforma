@@ -29,7 +29,7 @@ public class TestEventBus {
 		Assert.assertEquals(results.size(), 0);
 		bus.post(new ExampleEvent(object));
 		Assert.assertEquals(results.size(), 1);
-		bus.unregister(object, reg);
+		bus.unregister(reg);
 		bus.post(new ExampleEvent(object));
 		Assert.assertEquals(results.size(), 1);
 	}

@@ -1,12 +1,25 @@
-package game;
-
-import game.events.EventBus;
-import game.events.KeyDownEvent;
-import net.java.games.input.AbstractController;
+package game.controllers;
 
 import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import game.Box;
+import game.CompiledMesh;
+import game.InputProcessor;
+import game.Line;
+import game.LineGeom;
+import game.MarchingCubes;
+import game.Material;
+import game.MeshContainer;
+import game.SimpleProgram;
+import game.Sphere;
+import game.SphericalDensityField;
+import game.Utils;
+import game.Vector;
+import game.VertexCloud;
+import game.events.EventBus;
+import game.events.KeyDownEvent;
 
 public class MarchingCubesPainterController extends InputController {
 	
@@ -25,7 +38,7 @@ public class MarchingCubesPainterController extends InputController {
 	Vector topRight;
 	Vector res;
 
-	MarchingCubesPainterController(EventBus eventBus, PositionController posController, InputProcessor inputProcessor, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
+	public MarchingCubesPainterController(EventBus eventBus, PositionController posController, InputProcessor inputProcessor, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
 	  super(inputProcessor, eventBus);
 		this.posController = posController;
 		this.material = material;

@@ -77,6 +77,10 @@ public class Utils {
 		return v;
 	}
 	
+	public static double mix(double x1, double x2, double alpha) {
+		return (1 - alpha) * x1 + alpha * x2;
+	}
+	
 	public static Box intersection(Sphere s, Line l) {
 		Vector oc = l.o.minus(s.c);	
 		double loc = l.l.dot(oc);

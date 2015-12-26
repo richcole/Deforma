@@ -37,7 +37,7 @@ public class View implements Consumer<TickEvent> {
         .times(rot).times(Matrix.translate(position.minus()));
   }
 
-  void move(Vector dx) {
+  public void move(Vector dx) {
     position = position.plus(dx);
     update();
   }

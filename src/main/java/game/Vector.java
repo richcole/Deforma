@@ -230,7 +230,15 @@ public class Vector {
 	}
 
 	public boolean greaterThan(Vector other) {
-		return x() < other.x() && y() < other.y() && z() < other.z();
+		return x() > other.x() && y() > other.y() && z() > other.z();
+	}
+
+	public boolean lessThanOrEqual(Vector other) {
+		return x() <= other.x() && y() <= other.y() && z() <= other.z();
+	}
+
+	public boolean greaterThanOrEqual(Vector other) {
+		return x() >= other.x() && y() >= other.y() && z() >= other.z();
 	}
 
 	public Vector scaleBy(Vector d) {

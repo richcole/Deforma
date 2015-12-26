@@ -43,7 +43,7 @@ public class HeightMapGeom implements Geom {
 		vertexIndexMap.put(heightMap.index(x, z), vertices.size());
 		vertices.add(heightMap.transform(new Vector(x, heightMap.getHeight(x, z), z, 1.0)));
 		normals.add(getNormal(heightMap, x, z));
-		texCoords.get(0).add(new Vector(x / (double) heightMap.dx(), z / (double) heightMap.dz(), 0.0, 0.1));
+		texCoords.get(0).add(new Vector(x / (double) heightMap.dx(), z / (double) heightMap.dz(), 0.0, 0.01));
 	}
 
 	private Vector getNormal(HeightMap heightMap, int x, int z) {

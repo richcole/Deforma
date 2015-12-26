@@ -1,5 +1,10 @@
-package game;
+package game.controllers;
 
+import game.InputProcessor;
+import game.Matrix;
+import game.Vector;
+import game.View;
+import game.events.Clock;
 import game.events.EventBus;
 import game.events.KeyDownEvent;
 import game.events.KeyUpEvent;
@@ -19,26 +24,28 @@ public class PositionController extends InputController {
 	
 	private double rx, ry;
 	private double vx, vy;
+	private double speed;
 	
 	private boolean mouseDown;
 
 	Matrix rot1 = Matrix.IDENTITY;
 	Matrix rot2 = Matrix.IDENTITY;
 
-	PositionController(EventBus eventBus, Simulator simulator, InputProcessor inputProcessor, View view) {
+	public PositionController(EventBus eventBus, Clock clock, InputProcessor inputProcessor, View view) {
 	  super(inputProcessor, eventBus);
-		eventBus.onEventType(simulator, (e) -> onTickEvent(e), TickEvent.class);
+		eventBus.onEventType(clock, (e) -> onTickEvent(e), TickEvent.class);
 
 		this.view = view;
     this.rx = 0;
     this.ry = 0;
+    this.speed = 10;
     this.mouseDown = false;
 	}
 	
   public void onTickEvent(TickEvent event) {
     double dt = event.dt;
 		if ( dt != 0 && (vx != 0 || vy != 0) ) {
-			Vector dp = Vector.U1.times(vx / dt).plus(Vector.U3.times(vy / dt)).times(10);
+			Vector dp = Vector.U1.times(vx * dt).plus(Vector.U3.times(vy * dt)).times(speed);
 			Vector rdp = rot2.times(dp);
 			view.move(rdp);
 		}

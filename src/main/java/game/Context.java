@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import game.controllers.GravityController;
+import game.controllers.MarchingCubesPainterController;
+import game.controllers.PositionController;
 import game.events.Clock;
 import game.events.EventBus;
 import game.ui.UI;
@@ -33,7 +36,6 @@ public class Context implements Runnable {
 
 		Clock clock = new Clock(eventBus);
 		CloseWatcher closeWatcher = new CloseWatcher(clock, this, eventBus);
-		Simulator simulator = new Simulator(clock, eventBus);
 
 		SimpleProgram simpleProgram = new SimpleProgram();
 		DisplayResizer dispayResizer = new DisplayResizer(clock, eventBus);
@@ -48,8 +50,7 @@ public class Context implements Runnable {
 		MeshContainer meshContainer = new MeshContainer();
 
 		InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
-		PositionController positionController = new PositionController(eventBus,
-				simulator, inputProcessor, view);
+		PositionController positionController = new PositionController(eventBus, clock, inputProcessor, view);
 		MarchingCubesPainterController mcPainterController = new MarchingCubesPainterController(
 				eventBus, positionController, inputProcessor, simpleProgram,
 				gradientTexture, meshContainer);
@@ -101,14 +102,14 @@ public class Context implements Runnable {
 		}
 
 		{
-			Matrix tr =  Matrix.IDENTITY;
-			tr = tr.times(Matrix.scale(new Vector(20, 20, 20)));
-			HeightMap hm = new HeightMap(50, 20, 50, tr);
+			Matrix tr = Matrix.scale(new Vector(20, 20, 20));
+			Matrix ntr = Matrix.scale(new Vector(1/20.0, 1/20.0, 1/20.0, 1.0));
+			HeightMap hm = new HeightMap(50, 20, 50, tr, ntr);
 			HeightMapGeom hmg = new HeightMapGeom(grass, hm);
 			CompiledMesh hmm = new CompiledMesh(simpleProgram, hmg);
 			// hmm.setWireFrame(true);
 			view.add(hmm);
-			
+			new GravityController(eventBus, clock, view, hm);
 		}
 
 		{

@@ -51,13 +51,13 @@ public class EventBus {
 	}
 
 	public <T extends Event> Registration<T> onEventType(Object object, Consumer<T> action, Class<T> eventType) {
-		Registration<T> reg = new Registration<T>(eventType, action);
+		Registration<T> reg = new Registration<T>(this, object, eventType, action);
 		getOrCreateRegistrations(object, eventType).add(reg);
 		return reg;
 	}
 	
-	public <T extends Event> void unregister(Object object, Registration<T> reg) {
-		getRegistrations(object, reg.getEventType()).remove(reg);
+	public <T extends Event> void unregister(Registration<T> reg) {
+		getRegistrations(reg.getObject(), reg.getEventType()).remove(reg);
 	}
 
 	public boolean isClosed() {

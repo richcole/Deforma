@@ -1,4 +1,4 @@
-package game;
+package game.controllers;
 
 import game.events.EventBus;
 import game.events.KeyDownEvent;

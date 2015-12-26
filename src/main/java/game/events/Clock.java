@@ -16,7 +16,9 @@ public class Clock {
     double dt = ( currTick - prevTick ) / 1e9;
     if ( dt > tickTime ) {
       eventBus.post(new TickEvent(this, dt));
+      prevTick = currTick;
     }
+    
   }
 
 }

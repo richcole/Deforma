@@ -2,8 +2,8 @@ package game;
 
 public class Box {
 	
-	Vector bottomLeft;
-	Vector topRight;
+	public Vector bottomLeft;
+	public Vector topRight;
 	
 	public Box(Vector bottomLeft, Vector topRight) {
 		this.bottomLeft = bottomLeft;
@@ -29,6 +29,10 @@ public class Box {
 
 	public Vector center() {
 		return bottomLeft.plus(topRight).times(0.5);
+	}
+	
+	public boolean contains(Vector p) {
+		return bottomLeft.lessThanOrEqual(p) && topRight.greaterThanOrEqual(p);
 	}
 
 }

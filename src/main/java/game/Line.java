@@ -2,10 +2,10 @@ package game;
 
 public class Line {
 	
-	Vector o;
-	Vector l;
+	public Vector o;
+	public Vector l;
 
-	Line(Vector o, Vector l) {
+	public Line(Vector o, Vector l) {
 		this.o = o;
 		this.l = l;
 	}
