@@ -9,4 +9,8 @@ public class KeyDownEvent extends AbstractEvent {
     this.key = key;
   }
 
+  public int getKey() {
+    return key;
+  }
+
 }
