@@ -11,6 +11,15 @@ public class KdTreeDensityFunction<T extends DensityProvider> implements Density
   @Override
   public double getDensity(Vector p) {
     KdTree.NN<T> nn = tree.nn(p);
+    
+    if ( nn == null || nn.getV1() == null ) {
+      return 1.0;
+    }
+
+    if ( nn.getV2() == null ) {
+      return nn.getT1().getDensity();
+    }
+    
     double den1 = nn.getT1().getDensity();
     double den2 = nn.getT2().getDensity();
     double d1 = p.dist(nn.getV1());
@@ -28,7 +37,7 @@ public class KdTreeDensityFunction<T extends DensityProvider> implements Density
 
   @Override
   public boolean isPositive(double d) {
-    return d > 0.5;
+    return d > 0;
   }
 
 }

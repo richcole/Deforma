@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import game.Box;
 import game.CompiledMesh;
 import game.InputProcessor;
+import game.KdTree;
+import game.KdTreeDensityFunction;
 import game.Line;
 import game.LineGeom;
 import game.MarchingCubes;
@@ -27,39 +29,41 @@ public class MarchingCubesPainterController extends InputController {
 	
 	private Material material;
 	private MeshContainer meshContainer;
-	private SphericalDensityField field;
+	private KdTreeDensityFunction<TerrainPoint> field;
+  private KdTree<TerrainPoint> tree;
 	private SimpleProgram simpleProgram;
 	private boolean wireFrame = false;
 	private PositionController posController;
 	
-	Vector c;
-	double r;
-	Vector bottomLeft;
-	Vector topRight;
-	Vector res;
+	private Vector c;
+	private double r;
+	private Vector bottomLeft;
+	private Vector topRight;
+	private Vector res;
 
 	public MarchingCubesPainterController(EventBus eventBus, PositionController posController, InputProcessor inputProcessor, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
 	  super(inputProcessor, eventBus);
 		this.posController = posController;
 		this.material = material;
-		this.field = new SphericalDensityField();
+		this.tree = new KdTree<TerrainPoint>();
+		this.field = new KdTreeDensityFunction<TerrainPoint>(tree);
 		this.meshContainer = meshContainer;
 		this.simpleProgram = simpleProgram;
 		this.c = Vector.Z;
-		this.r = 12;
+		this.r = 10;
 		this.bottomLeft = c.minus(Vector.ONES.times(r));
 		this.topRight = c.plus(Vector.ONES.times(r));
 		this.res = Vector.ONES.times(0.5);
 
-		field.add(Vector.U1.times(-2), 0.6);
-		field.add(Vector.U1.times(2), 0.6);
-	}
-	
-	public void tick(long dt) {
+		tree.insert(Vector.U1.times(-1.0), new TerrainPoint(-1.0));
+    tree.insert(Vector.U1.times(1.0), new TerrainPoint(1.0));
+    updateModel();
 	}
 	
 	public void updateModel() {
-		VertexCloud cubesCloud = new VertexCloud(material);
+    log.info("Starting Update");
+
+    VertexCloud cubesCloud = new VertexCloud(material);
 		
 		long begin = System.currentTimeMillis();
 		MarchingCubes cubes = new MarchingCubes(field, material);
@@ -67,14 +71,32 @@ public class MarchingCubesPainterController extends InputController {
 
 		CompiledMesh cubesMesh = new CompiledMesh(simpleProgram, cubesCloud);
 		cubesMesh.setWireFrame(wireFrame);
-
 		meshContainer.setModel(cubesMesh);
 
 		log.info("Time " + (System.currentTimeMillis() - begin));
 	}
 
-	@Override
-	public void onKeyDownEvent(KeyDownEvent event) {
+  @Override
+  public void onKeyDownEvent(KeyDownEvent event) {
+    if ( event.key == Keyboard.KEY_G) {
+      Vector p = posController.getPosition().plus(posController.getForward());
+      tree.insert(p, new TerrainPoint(1.0));
+      updateModel();
+    }
+    if ( event.key == Keyboard.KEY_B) {
+      Vector p = posController.getPosition().plus(posController.getForward());
+      tree.insert(p, new TerrainPoint(-1.0));
+      updateModel();
+    }
+    if ( event.key == Keyboard.KEY_H) {
+      wireFrame = ! wireFrame;
+      updateModel();
+    }
+  }
+
+/*
+ 	public void OldOnKeyDownEvent(KeyDownEvent event) {
+ 
 		if ( event.key == Keyboard.KEY_G) {
 			Sphere sp = new Sphere(c, r);
 			Line line = new Line(posController.getPosition(), posController.getForward());
@@ -97,7 +119,8 @@ public class MarchingCubesPainterController extends InputController {
 			updateModel();
 		}
 	}
-
+*/
+  
 	private void setLineMesh(Box box) {
 		LineGeom line = new LineGeom(box, 0.1, material);
 		CompiledMesh lineModel = new CompiledMesh(simpleProgram, line);

@@ -156,7 +156,7 @@ public class MarchingCubes {
 	}
 
 	public Vector midPoint(double d1, double d2, Vector p1, Vector p2) {
-		return p1.plus(p2.minus(p1).times((d1 - 0.5) / (d1 - d2)));
+		return p1.plus(p2.minus(p1).times((d1 - 0) / (d1 - d2)));
 	}
 
 	private void updateCube(VertexCloud cloud, DensityFunction densityFunction, double x, double y, double z, Vector bottomLeft, Vector topRight, Vector d) {

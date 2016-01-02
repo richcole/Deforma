@@ -68,7 +68,6 @@ public class Context implements Runnable {
 		}
 
 		if (false) {
-
 			RenderableModel trees = new RenderableModel(
 					new CompiledMeshList(simpleProgram, new ModelLoader()
 							.load("/home/richcole/models/trees9/trees9.3ds", marble)));
@@ -101,6 +100,7 @@ public class Context implements Runnable {
 
 		}
 
+		if ( false )
 		{
 			Matrix tr = Matrix.scale(new Vector(20, 20, 20));
 			Matrix ntr = Matrix.scale(new Vector(1/20.0, 1/20.0, 1/20.0, 1.0));
