@@ -95,5 +95,9 @@ public class Utils {
 			return null;
 		}
 	}
+
+  public static double squared(double d) {
+    return d*d;
+  }
 		
 }

@@ -155,6 +155,10 @@ public class Vector {
 	public double z() {
 		return v[2] / v[3];
 	}
+	
+	public double getValue(int d) {
+	  return v[d] / v[3];	  
+	}
 
 	public Vector minus(Vector o) {
 		Vector r = new Vector();
@@ -245,4 +249,17 @@ public class Vector {
 		return new Vector(x() * d.x(), y() * d.y(), z() * d.z(), 1.0);
 	}
 
+  public double distSquared(Vector v2) {
+    double dx = x() - v2.x();
+    double dy = y() - v2.y();
+    double dz = z() - v2.z();
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  public double dist(Vector v2) {
+    double dx = x() - v2.x();
+    double dy = y() - v2.y();
+    double dz = z() - v2.z();
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
 }

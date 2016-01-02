@@ -2,8 +2,8 @@ package game;
 
 public class BBox {
 
-	private Vector lower;
-	private Vector upper;
+	public Vector lower;
+	public Vector upper;
 
 	public BBox() {
 	}
@@ -30,5 +30,9 @@ public class BBox {
 	public String toString() {
 		return "BBox [lower=" + lower + ", upper=" + upper + "]";
 	}
+
+  public boolean contains(Vector v) {
+    return lower.lessThanOrEqual(v) && v.lessThanOrEqual(upper);
+  }
 	
 }
