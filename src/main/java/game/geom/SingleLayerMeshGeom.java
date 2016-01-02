@@ -1,6 +1,12 @@
-package game;
+package game.geom;
+
+import game.Geom;
+import game.Material;
+import game.TexCoords;
+import game.Vector;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

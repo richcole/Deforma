@@ -1,5 +1,8 @@
 package game;
 
+import game.geom.LinesGeom;
+import game.geom.MultiLayerMeshGeom;
+
 import java.util.List;
 
 import com.google.common.collect.Lists;

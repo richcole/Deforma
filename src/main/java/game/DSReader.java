@@ -1,5 +1,7 @@
 package game;
 
+import game.geom.SingleLayerMeshGeom;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;

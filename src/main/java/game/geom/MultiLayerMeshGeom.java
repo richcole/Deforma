@@ -1,4 +1,9 @@
-package game;
+package game.geom;
+
+import game.Geom;
+import game.Material;
+import game.TexCoords;
+import game.Vector;
 
 import java.util.List;
 
@@ -7,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-public class VertexCloud implements Geom {
+public class MultiLayerMeshGeom implements Geom {
 	
-	private static final Logger log = LoggerFactory.getLogger(VertexCloud.class);
+	private static final Logger log = LoggerFactory.getLogger(MultiLayerMeshGeom.class);
 
 	List<Vector> vertices = Lists.newArrayList();
 	List<Vector> normals = Lists.newArrayList();
@@ -17,16 +22,27 @@ public class VertexCloud implements Geom {
 	List<Integer> elements = Lists.newArrayList();
 	List<Integer> bones = Lists.newArrayList();
 	
-	public VertexCloud(Material material) {
-		texCoords = Lists.newArrayList(new TexCoords(material));
+	public MultiLayerMeshGeom() {
 	}
 	
-	public void addVertex(Vector p, Vector n, Vector texCoord) {
+	public void addVertex(Vector p, Vector n) {
 		vertices.add(p);
 		normals.add(n);
-		texCoords.get(0).add(texCoord);
 		bones.add(0);
-		elements.add(elements.size());
+	}
+	
+	public void addTexCoord(int index, double u, double v) {
+		texCoords.get(index).add(new Vector(u, v, 0, 1.0)); 
+	}
+	
+	public void addMaterial(Material m) {
+		texCoords.add(new TexCoords(m));
+	}
+	
+	public void addElement(int a, int b, int c) {
+		elements.add(a);
+		elements.add(b);
+		elements.add(c);
 	}
 
 	public List<Vector> getVertices() {
@@ -49,5 +65,5 @@ public class VertexCloud implements Geom {
 	public List<Vector> getNormals() {
 		return normals;
 	}
-
+	
 }

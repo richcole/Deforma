@@ -13,6 +13,8 @@ import game.controllers.MarchingCubesPainterController;
 import game.controllers.PositionController;
 import game.events.Clock;
 import game.events.EventBus;
+import game.geom.HeightMapGeom;
+import game.geom.LineGeom;
 import game.ui.UI;
 
 public class Context implements Runnable {

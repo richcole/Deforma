@@ -10,7 +10,6 @@ import game.InputProcessor;
 import game.KdTree;
 import game.KdTreeDensityFunction;
 import game.Line;
-import game.LineGeom;
 import game.MarchingCubes;
 import game.Material;
 import game.MeshContainer;
@@ -19,9 +18,10 @@ import game.Sphere;
 import game.SphericalDensityField;
 import game.Utils;
 import game.Vector;
-import game.VertexCloud;
 import game.events.EventBus;
 import game.events.KeyDownEvent;
+import game.geom.LineGeom;
+import game.geom.VertexCloud;
 
 public class MarchingCubesPainterController extends InputController {
 	
