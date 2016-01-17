@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -22,8 +24,10 @@ public class CompiledAnimMesh implements Model {
   private Geom geom;
   private GLTexture tex;
   private Matrix modelTr;
+  private EventBus eventBus;
 
-  public CompiledAnimMesh(AnimProgram program, TextureSupplier tex, Geom geom) {
+  public CompiledAnimMesh(EventBus eventBus, AnimProgram program, TextureSupplier tex, Geom geom) {
+    this.eventBus = eventBus;
     this.program = program;
     this.texSupplier = tex;
     this.geom = geom;
@@ -35,18 +39,18 @@ public class CompiledAnimMesh implements Model {
     Preconditions.checkArgument(vert >= 0);
     Preconditions.checkArgument(texCoords >= 0);
 
-    vao = new GLVertexArray();
+    vao = new GLVertexArray(eventBus);
 
-    vbo = new GLBuffer();
+    vbo = new GLBuffer(eventBus);
     vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3, getVertexData());
 
-    tbo = new GLBuffer();
+    tbo = new GLBuffer(eventBus);
     vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, getTexCoordData());
 
-    bbo = new GLBuffer();
+    bbo = new GLBuffer(eventBus);
     vao.bindData(boneIndex, GL15.GL_ARRAY_BUFFER, bbo, 2, getBoneIndexData());
 
-    ibo = new GLBuffer();
+    ibo = new GLBuffer(eventBus);
     ibo.bindData(GL15.GL_ELEMENT_ARRAY_BUFFER, getElementData());
 
     this.tex = texSupplier.getTexture();

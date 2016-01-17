@@ -1,5 +1,6 @@
 package game;
 
+import game.events.EventBus;
 import game.geom.SingleLayerMeshGeom;
 
 import java.io.File;
@@ -21,10 +22,12 @@ public class DSReader {
 	
 	private static final Logger log = LoggerFactory.getLogger(DSReader.class);
 	
-	BReader reader;
+	private BReader reader;
+  private EventBus eventBus;
 	
-	DSReader(File file) {
-		reader = new BReader(file);
+	DSReader(EventBus eventBus, File file) {
+		this.reader = new BReader(file);
+		this.eventBus = eventBus;
 	}
 	
 	public class Chunk {
@@ -771,7 +774,7 @@ public class DSReader {
 					File imageFile = findImageFile(baseDir, fChunk.textureFilename);
 					Preconditions.checkNotNull(imageFile);
 					ImageResource img = new ImageResource(imageFile);
-					materials.put(nChunk.materialName, new ImageTexture(img));
+					materials.put(nChunk.materialName, new ImageTexture(eventBus, img));
 				}
 			}
 	

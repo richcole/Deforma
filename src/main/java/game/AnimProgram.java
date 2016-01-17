@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.util.List;
 
 import org.lwjgl.opengl.GL20;
@@ -17,10 +19,10 @@ public class AnimProgram {
   // preloaded uniforms
   private int numAnim, numBones, rotationTable, translationTable, boneParents;
 
-  public void AnimProgram() {
-    program = new GLProgram();
-    program.attach(new GLShader(GL20.GL_VERTEX_SHADER).compile("anim.vert"));
-    program.attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("anim.frag"));
+  public void AnimProgram(EventBus eventBus) {
+    program = new GLProgram(eventBus);
+    program.attach(new GLShader(eventBus, GL20.GL_VERTEX_SHADER).compile("anim.vert"));
+    program.attach(new GLShader(eventBus, GL20.GL_FRAGMENT_SHADER).compile("anim.frag"));
     program.link();
     program.setUniform("tex", 0);
 

@@ -3,6 +3,7 @@ package game;
 public class MeshContainer implements ModelResource {
 	
 	private ModelResource model;
+	private ModelResource cubesModel;
 	private ModelResource lineModel;
 	
 	@Override
@@ -13,13 +14,20 @@ public class MeshContainer implements ModelResource {
 		if ( lineModel != null ) {
 			lineModel.render(tr);
 		}
+		if ( cubesModel != null ) {
+		  cubesModel.render(tr);
+		}
 	}
 
 	public void setModel(ModelResource model) {
 		this.model = model;
 	}
 
-	public void setLineModel(ModelResource lineModel) {
+  public void setCubesModel(ModelResource model) {
+    this.cubesModel = model;
+  }
+
+  public void setLineModel(ModelResource lineModel) {
 		this.lineModel = lineModel;
 	}
 

@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
@@ -9,11 +11,15 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 public class CompiledMesh implements ModelResource {
+  
+  final static Logger log = LoggerFactory.getLogger(CompiledMesh.class);
 
   private SimpleProgram simpleProgram;
   private List<GLTexture> textures;
@@ -28,7 +34,10 @@ public class CompiledMesh implements ModelResource {
   private boolean wireFrame = false;
   private boolean visible = true;
 
-  public CompiledMesh(SimpleProgram simpleProgram, Geom geom) {
+  private EventBus eventBus;
+
+  public CompiledMesh(EventBus eventBus, SimpleProgram simpleProgram, Geom geom) {
+    this.eventBus = eventBus;
     this.simpleProgram = simpleProgram;
     this.geom = geom;
 
@@ -39,18 +48,18 @@ public class CompiledMesh implements ModelResource {
     Preconditions.checkArgument(vert >= 0);
     Preconditions.checkArgument(texCoords >= 0);
 
-    vao = new GLVertexArray();
+    vao = new GLVertexArray(eventBus);
 
-    vbo = new GLBuffer();
+    vbo = new GLBuffer(eventBus);
     vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3, getVertexData());
 
-    nbo = new GLBuffer();
+    nbo = new GLBuffer(eventBus);
     vao.bindData(normal, GL15.GL_ARRAY_BUFFER, nbo, 3, getNormalData());
 
-    tbo = new GLBuffer();
+    tbo = new GLBuffer(eventBus);
     vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2, getTexCoordData());
 
-    ibo = new GLBuffer();
+    ibo = new GLBuffer(eventBus);
     ibo.bindData(GL15.GL_ELEMENT_ARRAY_BUFFER, getElementData());
 
     textures = Lists.newArrayList();
@@ -59,6 +68,10 @@ public class CompiledMesh implements ModelResource {
       Preconditions.checkNotNull(tex);
       textures.add(tex);
     }
+  }
+  
+  public void finalize() {
+    log.info("Dispose compiled mesh");
   }
 
   private FloatBuffer getVertexData() {

@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import org.lwjgl.opengl.GL20;
 
 public class SimpleProgram {
@@ -7,10 +9,10 @@ public class SimpleProgram {
   private GLProgram program;
   private int vert, normal, viewTr, modelTr, texCoords;
 
-  public SimpleProgram() {
-    program = new GLProgram();
-    program.attach(new GLShader(GL20.GL_VERTEX_SHADER).compile("simple.vert"));
-    program.attach(new GLShader(GL20.GL_FRAGMENT_SHADER).compile("simple.frag"));
+  public SimpleProgram(EventBus eventBus) {
+    program = new GLProgram(eventBus);
+    program.attach(new GLShader(eventBus, GL20.GL_VERTEX_SHADER).compile("simple.vert"));
+    program.attach(new GLShader(eventBus, GL20.GL_FRAGMENT_SHADER).compile("simple.frag"));
     program.link();
     program.setUniform("tex", 0);
     vert = program.getAttrib("vert");

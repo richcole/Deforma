@@ -20,6 +20,7 @@ import game.Utils;
 import game.Vector;
 import game.events.EventBus;
 import game.events.KeyDownEvent;
+import game.geom.CubesGeom;
 import game.geom.LineGeom;
 import game.geom.VertexCloud;
 
@@ -41,12 +42,18 @@ public class MarchingCubesPainterController extends InputController {
 	private Vector topRight;
 	private Vector res;
 
+  private CubesGeom cubesGeom;
+
+  private EventBus eventBus;
+
 	public MarchingCubesPainterController(EventBus eventBus, PositionController posController, InputProcessor inputProcessor, SimpleProgram simpleProgram, Material material, MeshContainer meshContainer) {
 	  super(inputProcessor, eventBus);
+	  this.eventBus = eventBus;
 		this.posController = posController;
 		this.material = material;
 		this.tree = new KdTree<TerrainPoint>();
 		this.field = new KdTreeDensityFunction<TerrainPoint>(tree);
+		this.cubesGeom = new CubesGeom(new VertexCloud(material));
 		this.meshContainer = meshContainer;
 		this.simpleProgram = simpleProgram;
 		this.c = Vector.Z;
@@ -55,23 +62,28 @@ public class MarchingCubesPainterController extends InputController {
 		this.topRight = c.plus(Vector.ONES.times(r));
 		this.res = Vector.ONES.times(0.5);
 
-		tree.insert(Vector.U1.times(-1.0), new TerrainPoint(-1.0));
-    tree.insert(Vector.U1.times(1.0), new TerrainPoint(1.0));
+		insertPoint(Vector.U1.times(-1.0), -1, 0.2);
+    insertPoint(Vector.U1.times(1.0), 1, 0.2);
     updateModel();
 	}
 	
 	public void updateModel() {
     log.info("Starting Update");
 
-    VertexCloud cubesCloud = new VertexCloud(material);
-		
-		long begin = System.currentTimeMillis();
-		MarchingCubes cubes = new MarchingCubes(field, material);
-		cubes.update(cubesCloud, bottomLeft, topRight, res);
-
-		CompiledMesh cubesMesh = new CompiledMesh(simpleProgram, cubesCloud);
-		cubesMesh.setWireFrame(wireFrame);
-		meshContainer.setModel(cubesMesh);
+    long begin = System.currentTimeMillis();
+    try {
+  
+      VertexCloud cubesCloud = new VertexCloud(material);
+  		MarchingCubes cubes = new MarchingCubes(field, material);
+  		cubes.update(cubesCloud, bottomLeft, topRight, res);
+  		CompiledMesh cubesMesh = new CompiledMesh(eventBus, simpleProgram, cubesCloud);
+      cubesMesh.setWireFrame(wireFrame);
+  
+      meshContainer.setModel(cubesMesh);
+  		meshContainer.setCubesModel(new CompiledMesh(eventBus, simpleProgram, cubesGeom.getVertexCloud()));
+    } catch(Exception e) {
+      log.error("Exception while updating", e);
+    }
 
 		log.info("Time " + (System.currentTimeMillis() - begin));
 	}
@@ -79,13 +91,13 @@ public class MarchingCubesPainterController extends InputController {
   @Override
   public void onKeyDownEvent(KeyDownEvent event) {
     if ( event.key == Keyboard.KEY_G) {
-      Vector p = posController.getPosition().plus(posController.getForward());
-      tree.insert(p, new TerrainPoint(1.0));
+      Vector p = posController.getPosition().plus(posController.getForward().normalize().times(2));
+      insertPoint(p, 1.0, 0.05);
       updateModel();
     }
     if ( event.key == Keyboard.KEY_B) {
-      Vector p = posController.getPosition().plus(posController.getForward());
-      tree.insert(p, new TerrainPoint(-1.0));
+      Vector p = posController.getPosition().plus(posController.getForward().normalize().times(2));
+      insertPoint(p, -1.0, 0.05);
       updateModel();
     }
     if ( event.key == Keyboard.KEY_H) {
@@ -94,37 +106,9 @@ public class MarchingCubesPainterController extends InputController {
     }
   }
 
-/*
- 	public void OldOnKeyDownEvent(KeyDownEvent event) {
- 
-		if ( event.key == Keyboard.KEY_G) {
-			Sphere sp = new Sphere(c, r);
-			Line line = new Line(posController.getPosition(), posController.getForward());
-			setLineMesh(new Box(posController.getPosition(), posController.getPosition().plus(posController.getForward())));
-			log.info("Sphere " + sp + " Line " + line);
-			Box box = Utils.intersection(sp, line);
-			if ( box != null ) {
-				box = box.orientTo(posController.getForward());
-				log.info("Pos " + posController.getPosition() + " Box " + box);
-				Vector p = field.intersection(box.bottomLeft, box.topRight, box.dp().normalize().times(0.5));
-				if ( p != null ) {
-					log.info("p " + p);
-					field.add(p, 0.1);
-					updateModel();
-				}
-			}
-		}
-		if ( event.key == Keyboard.KEY_H) {
-			wireFrame = ! wireFrame;
-			updateModel();
-		}
-	}
-*/
+  private void insertPoint(Vector p, double d, double r) {
+    tree.insert(p, new TerrainPoint(d));
+    cubesGeom.addCube(p, r);
+  }
   
-	private void setLineMesh(Box box) {
-		LineGeom line = new LineGeom(box, 0.1, material);
-		CompiledMesh lineModel = new CompiledMesh(simpleProgram, line);
-		meshContainer.setLineModel(lineModel);
-	}
-
 }

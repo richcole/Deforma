@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -8,9 +10,9 @@ public class CompiledMeshList implements ModelResource {
 	
 	private List<CompiledMesh> compiledMeshList = Lists.newArrayList();
 	
-	public CompiledMeshList(SimpleProgram simpleProgram, List<Geom> geomList) {
+	public CompiledMeshList(EventBus eventBus, SimpleProgram simpleProgram, List<Geom> geomList) {
 		for(Geom mesh: geomList) {
-			compiledMeshList.add(new CompiledMesh(simpleProgram, mesh));
+			compiledMeshList.add(new CompiledMesh(eventBus, simpleProgram, mesh));
 		}
 	}
 

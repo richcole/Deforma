@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.nio.FloatBuffer;
 import java.util.List;
 
@@ -8,16 +10,17 @@ import org.lwjgl.opengl.GL20;
 
 import com.google.common.base.Preconditions;
 
-public class GLProgram {
+public class GLProgram extends GLResource {
 
 	int id;
 
-	public GLProgram() {
+	public GLProgram(EventBus eventBus) {
+	  super(eventBus);
 		this.id = GL20.glCreateProgram();
 	}
 
-	void finalizer() {
-		GL20.glDeleteProgram(id);
+	protected Runnable dispose() {
+	  return () -> GL20.glDeleteProgram(id);
 	}
 
 	public void attach(GLShader shader) {

@@ -19,6 +19,10 @@ public class Vector {
 	public static final Vector M3 = new Vector(0, 0, -1, 1);
 	public static final Vector Z = new Vector(0, 0, 0, 1);
 	public static final Vector ONES = new Vector(1, 1, 1, 1);
+  public static final Vector BL = new Vector( 0,  0,  0, 1);
+  public static final Vector BR = new Vector( 1,  0,  0, 1);
+  public static final Vector TL = new Vector( 0,  1,  0, 1);
+  public static final Vector TR = new Vector( 1,  1,  0, 1);
 
 	static {
 		if (!LEFT.cross(UP).equals(NORMAL)) {
@@ -261,5 +265,11 @@ public class Vector {
     double dy = y() - v2.y();
     double dz = z() - v2.z();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  public static Vector UNIT(int dim) {
+    Vector r = new Vector(0.0, 0.0, 0.0, 1.0);
+    r.v[dim] = 1.0;
+    return r;
   }
 }

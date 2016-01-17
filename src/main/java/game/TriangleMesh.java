@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import org.lwjgl.opengl.GL15;
 
 import com.google.common.base.Preconditions;
@@ -21,7 +23,7 @@ public class TriangleMesh implements ModelResource {
   private int texCoords;
   private GLTexture tex;
 
-  public TriangleMesh(SimpleProgram simpleProgram, TextureSupplier tex) {
+  public TriangleMesh(EventBus eventBus, SimpleProgram simpleProgram, TextureSupplier tex) {
     this.simpleProgram = simpleProgram;
     this.texSupplier = tex;
 
@@ -29,13 +31,13 @@ public class TriangleMesh implements ModelResource {
     texCoords = simpleProgram.getTexCoords();
     Preconditions.checkArgument(vert >= 0);
     Preconditions.checkArgument(texCoords >= 0);
-    vao = new GLVertexArray();
+    vao = new GLVertexArray(eventBus);
 
-    vbo = new GLBuffer();
+    vbo = new GLBuffer(eventBus);
     vao.bindData(vert, GL15.GL_ARRAY_BUFFER, vbo, 3,
         Utils.toFloatBuffer(verticesData));
 
-    tbo = new GLBuffer();
+    tbo = new GLBuffer(eventBus);
     vao.bindData(texCoords, GL15.GL_ARRAY_BUFFER, tbo, 2,
         Utils.toFloatBuffer(verticesData));
 

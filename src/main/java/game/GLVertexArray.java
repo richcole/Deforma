@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -8,18 +10,19 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-public class GLVertexArray {
+public class GLVertexArray extends GLResource {
 
 	int id;
 	int vertexCount;
 	int elementCount; 
 	
-	public GLVertexArray() {
+	public GLVertexArray(EventBus eventBus) {
+	  super(eventBus);
 		id = GL30.glGenVertexArrays();
 	}
 
-	public void finalize() {
-		GL30.glDeleteVertexArrays(id);
+	protected Runnable dispose() {
+	  return () -> GL30.glDeleteVertexArrays(id);
 	}
 
 	public void bindData(int position, int bufferType, GLBuffer buffer, int valuesPerVertex, FloatBuffer data) {

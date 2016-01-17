@@ -1,22 +1,29 @@
 package game;
 
+import game.events.EventBus;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GLBuffer {
+public class GLBuffer extends GLResource {
+
+  final static Logger log = LoggerFactory.getLogger(GLBuffer.class);
 	
-	int id;
+	int id = -1;
 	int numIndexes;
 	
-	public GLBuffer() {
+	public GLBuffer(EventBus eventBus) {
+	  super(eventBus);
 		id = GL15.glGenBuffers();
 	}
 	
-	public void finalize() {
-		GL15.glDeleteBuffers(id);
+	protected Runnable dispose() {
+		return () -> GL15.glDeleteBuffers(id);
 	}
 
 	public int getId() {

@@ -1,5 +1,6 @@
 package game;
 
+import game.events.EventBus;
 import game.geom.LinesGeom;
 import game.geom.MultiLayerMeshGeom;
 
@@ -11,10 +12,12 @@ public class XPSModelBuilder {
 	
 	private MaterialSource materialSource;
 	private Material boneMaterial;
+  private EventBus eventBus;
 
-	public XPSModelBuilder(MaterialSource materialSource, Material boneMaterial) {
+	public XPSModelBuilder(EventBus eventBus, MaterialSource materialSource, Material boneMaterial) {
 		this.materialSource = materialSource;
 		this.boneMaterial = boneMaterial;
+		this.eventBus = eventBus;
 	}
 
 	public List<Geom> toMeshGeom(XPSModel model) {
@@ -74,10 +77,10 @@ public class XPSModelBuilder {
 	}
 
 	public CompiledMeshList toCompiledMesh(SimpleProgram simpleProgram, Material material, XPSModel model) {
-		return new CompiledMeshList(simpleProgram, toMeshGeom(model));
+		return new CompiledMeshList(eventBus, simpleProgram, toMeshGeom(model));
 	}
 	
 	public CompiledMesh getBoneCompiledMesh(SimpleProgram simpleProgram, Material material, XPSModel model) {
-		return new CompiledMesh(simpleProgram, getBoneGeom(model));
+		return new CompiledMesh(eventBus, simpleProgram, getBoneGeom(model));
 	}
 }

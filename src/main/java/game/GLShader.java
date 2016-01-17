@@ -1,5 +1,7 @@
 package game;
 
+import game.events.EventBus;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -12,13 +14,14 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Resources;
 
-public class GLShader {
+public class GLShader extends GLResource {
 	
 	private static final Logger log = LoggerFactory.getLogger(GLShader.class);
 
 	int id;
 
-	public GLShader(int type) {
+	public GLShader(EventBus eventBus, int type) {
+	  super(eventBus);
 		id = GL20.glCreateShader(type);
 	}
 
@@ -40,8 +43,8 @@ public class GLShader {
 		return this;
 	}
 
-	void finalizer() {
-		GL20.glDeleteShader(id);
+	protected Runnable dispose() {
+		return () -> GL20.glDeleteShader(id);
 	}
 
 	public int getId() {

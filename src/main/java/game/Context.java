@@ -35,17 +35,18 @@ public class Context implements Runnable {
 
 	public void run() {
 		GLDisplay display = new GLDisplay();
-
+		
 		Clock clock = new Clock(eventBus);
 		CloseWatcher closeWatcher = new CloseWatcher(clock, this, eventBus);
+		
+		EventRunner eventRunner = new EventRunner(eventBus);
 
-		SimpleProgram simpleProgram = new SimpleProgram();
+		SimpleProgram simpleProgram = new SimpleProgram(eventBus);
 		DisplayResizer dispayResizer = new DisplayResizer(clock, eventBus);
-		ImageTexture marble = new ImageTexture("skyline.jpg");
-		ImageTexture grass = new ImageTexture("grass.jpg");
-		ImageTexture gradientTexture = new ImageTexture(
-				new GradientImage(256, 256));
-		TriangleMesh triangle = new TriangleMesh(simpleProgram, gradientTexture);
+		ImageTexture marble = new ImageTexture(eventBus, "skyline.jpg");
+		ImageTexture grass = new ImageTexture(eventBus, "grass.jpg");
+		ImageTexture gradientTexture = new ImageTexture(eventBus, new GradientImage(256, 256));
+		TriangleMesh triangle = new TriangleMesh(eventBus, simpleProgram, gradientTexture);
 
 		View view = new View(simpleProgram, clock, eventBus);
 
@@ -59,8 +60,8 @@ public class Context implements Runnable {
 
 		if (false) {
 			List<Geom> girlModelList = new ModelLoader()
-					.load("/home/richcole/models/Girl/", marble);
-			CompiledMeshList girlModel = new CompiledMeshList(simpleProgram,
+					.load(eventBus, "/home/richcole/models/Girl/", marble);
+			CompiledMeshList girlModel = new CompiledMeshList(eventBus, simpleProgram,
 					girlModelList);
 			ModelController girlModelController = new ModelController(girlModel, ui);
 
@@ -71,8 +72,8 @@ public class Context implements Runnable {
 
 		if (false) {
 			RenderableModel trees = new RenderableModel(
-					new CompiledMeshList(simpleProgram, new ModelLoader()
-							.load("/home/richcole/models/trees9/trees9.3ds", marble)));
+					new CompiledMeshList(eventBus, simpleProgram, new ModelLoader()
+							.load(eventBus, "/home/richcole/models/trees9/trees9.3ds", marble)));
 			trees.setModelTr(Matrix.translate(new Vector(20, 0, 0))
 					.times(Matrix.rot(Math.PI / 2, Vector.U1)));
 			view.add(trees);
@@ -80,8 +81,8 @@ public class Context implements Runnable {
 
 		if (false) {
 			XPSReader xpsReader = new XPSReader();
-			MaterialSource materialSource = new MaterialSource();
-			XPSModelBuilder xpsBuilder = new XPSModelBuilder(materialSource, marble);
+			MaterialSource materialSource = new MaterialSource(eventBus);
+			XPSModelBuilder xpsBuilder = new XPSModelBuilder(eventBus, materialSource, marble);
 			String fname = "src/main/resources/huan_shuyi";
 			File root = new File(fname);
 			XPSModel xpsBasicModel = xpsReader.read(root, "xps.xps");
@@ -108,17 +109,17 @@ public class Context implements Runnable {
 			Matrix ntr = Matrix.scale(new Vector(1/20.0, 1/20.0, 1/20.0, 1.0));
 			HeightMap hm = new HeightMap(50, 20, 50, tr, ntr);
 			HeightMapGeom hmg = new HeightMapGeom(grass, hm);
-			CompiledMesh hmm = new CompiledMesh(simpleProgram, hmg);
+			CompiledMesh hmm = new CompiledMesh(eventBus, simpleProgram, hmg);
 			// hmm.setWireFrame(true);
 			view.add(hmm);
 			new GravityController(eventBus, clock, view, hm);
 		}
 
-		{
+		if ( false ) {
 			LineGeom line = new LineGeom(
 					new Box(Vector.U1.times(-5), Vector.U2.times(5)), 0.2, marble);
 
-			CompiledMesh lineMesh = new CompiledMesh(simpleProgram, line);
+			CompiledMesh lineMesh = new CompiledMesh(eventBus, simpleProgram, line);
 			view.add(lineMesh);
 		}
 

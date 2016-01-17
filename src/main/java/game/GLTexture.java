@@ -1,20 +1,23 @@
 package game;
 
+import game.events.EventBus;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import com.google.common.base.Preconditions;
 
-public class GLTexture {
+public class GLTexture extends GLResource {
 	
 	private int id;
 
-	public GLTexture() {
+	public GLTexture(EventBus eventBus) {
+	  super(eventBus);
 		this.id = GL11.glGenTextures();
 	}
 
-	public void finalize() {
-		GL11.glDeleteTextures(id);
+	protected Runnable dispose() {
+		return () -> GL11.glDeleteTextures(id);
 	}
 	
 	public GLTexture withImage(Image img) {
