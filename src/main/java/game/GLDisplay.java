@@ -51,4 +51,8 @@ public class GLDisplay extends GLResource {
     return () -> Display.destroy();
   }
 
+  public double getHeightToWidthRatio() {
+    return ((double)Display.getHeight()) / Display.getWidth(); 
+  }
+
 }

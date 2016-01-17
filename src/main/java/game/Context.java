@@ -50,7 +50,7 @@ public class Context implements Runnable {
 		ImageTexture gradientTexture = new ImageTexture(eventBus, new GradientImage(256, 256));
 		TriangleMesh triangle = new TriangleMesh(eventBus, simpleProgram, gradientTexture);
 
-		View view = new View(simpleProgram, clock, eventBus);
+		View view = new View(display, simpleProgram, clock, eventBus);
 
 		MeshContainer meshContainer = new MeshContainer();
 

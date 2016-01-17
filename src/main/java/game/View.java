@@ -1,6 +1,7 @@
 package game;
 
 import game.events.Clock;
+import game.events.DisplayResizeEvent;
 import game.events.EventBus;
 import game.events.TickEvent;
 
@@ -18,22 +19,28 @@ public class View implements Consumer<TickEvent> {
 
   final static Logger log = LoggerFactory.getLogger(View.class);
 
-  private final SimpleProgram program;
+  private SimpleProgram program;
+  private GLDisplay display;
 
-  Vector position = Vector.U1.times(1.0);
-  Matrix viewMatrix = Matrix.IDENTITY;
-  Matrix rot = Matrix.IDENTITY;
+  private Vector position = Vector.U1.times(1.0);
+  private Matrix viewMatrix = Matrix.IDENTITY;
+  private Matrix rot = Matrix.IDENTITY;
 
-  List<Renderable> renderables = Lists.newArrayList();
+  private List<Renderable> renderables = Lists.newArrayList();
 
-  View(SimpleProgram program, Clock clock, EventBus eventBus) {
+  View(GLDisplay display, SimpleProgram program, Clock clock, EventBus eventBus) {
     this.program = program;
+    this.display = display;
     update();
     eventBus.onEventType(clock, this, TickEvent.class);
+    eventBus.onEventType(display, (e) -> update(), DisplayResizeEvent.class);
   }
 
   private void update() {
-    viewMatrix = Matrix.flip(1).times(Matrix.frustum(-1, 1, 1, -1, 1, 10000))
+    double dydx = display.getHeightToWidthRatio();
+    double dx = 1.0;
+    double dy = dydx * dx;
+    viewMatrix = Matrix.flip(1).times(Matrix.frustum(-dx, dx, dy, -dy, 1, 10000))
         .times(rot).times(Matrix.translate(position.minus()));
   }
 
