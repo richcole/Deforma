@@ -5,7 +5,7 @@ import game.events.RunnableEvent;
 
 public abstract class GLResource {
   
-  private EventBus eventBus;
+  protected EventBus eventBus;
 
   public GLResource(EventBus eventBus) {
     this.eventBus = eventBus;

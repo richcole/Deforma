@@ -11,11 +11,12 @@ import com.google.common.collect.Lists;
 import game.controllers.GravityController;
 import game.controllers.MarchingCubesPainterController;
 import game.controllers.PositionController;
+import game.events.ApplicationCloseEvent;
 import game.events.Clock;
+import game.events.DisplayCloseEvent;
 import game.events.EventBus;
 import game.geom.HeightMapGeom;
 import game.geom.LineGeom;
-import game.ui.UI;
 
 public class Context implements Runnable {
 
@@ -23,26 +24,27 @@ public class Context implements Runnable {
 
 	private EventBus eventBus;
 	private Thread thread;
-	private UI ui;
 
-	public Context(UI ui) {
-		this.ui = ui;
+	public Context() {
 		this.eventBus = new EventBus();
-		thread = new Thread(this);
+		this.thread = new Thread(this);
 		thread.setDaemon(true);
 		thread.start();
 	}
+	
+	public void join() throws InterruptedException {
+	  thread.join();
+	}
 
 	public void run() {
-		GLDisplay display = new GLDisplay();
+    Clock clock = new Clock(eventBus);
+		GLDisplay display = new GLDisplay(clock, eventBus);
 		
-		Clock clock = new Clock(eventBus);
-		CloseWatcher closeWatcher = new CloseWatcher(clock, this, eventBus);
+		eventBus.onEventType(display, (e) -> eventBus.post(new ApplicationCloseEvent(eventBus)), DisplayCloseEvent.class);
 		
 		EventRunner eventRunner = new EventRunner(eventBus);
 
 		SimpleProgram simpleProgram = new SimpleProgram(eventBus);
-		DisplayResizer dispayResizer = new DisplayResizer(clock, eventBus);
 		ImageTexture marble = new ImageTexture(eventBus, "skyline.jpg");
 		ImageTexture grass = new ImageTexture(eventBus, "grass.jpg");
 		ImageTexture gradientTexture = new ImageTexture(eventBus, new GradientImage(256, 256));
@@ -63,7 +65,7 @@ public class Context implements Runnable {
 					.load(eventBus, "/home/richcole/models/Girl/", marble);
 			CompiledMeshList girlModel = new CompiledMeshList(eventBus, simpleProgram,
 					girlModelList);
-			ModelController girlModelController = new ModelController(girlModel, ui);
+			// ModelController girlModelController = new ModelController(girlModel);
 
 			RenderableModel girl = new RenderableModel(girlModel);
 			girl.setModelTr(Matrix.rot(Math.PI / 2, Vector.U1));
@@ -90,7 +92,7 @@ public class Context implements Runnable {
 					marble, xpsBasicModel);
 			CompiledMesh xpsBoneModel = xpsBuilder.getBoneCompiledMesh(simpleProgram,
 					marble, xpsBasicModel);
-			ModelController xpsModelController = new ModelController(xpsModel, ui);
+			// ModelController xpsModelController = new ModelController(xpsModel, ui);
 
 			List<RenderableModel> xpsModels = Lists.newArrayList();
 			for (int i = 0; i < 1; ++i) {
@@ -126,7 +128,7 @@ public class Context implements Runnable {
 		view.add(triangle);
 		view.add(meshContainer);
 
-		while (!closeWatcher.isClosed()) {
+		while (!display.isClosed()) {
 			clock.run();
 			eventBus.processEvents();
 		}

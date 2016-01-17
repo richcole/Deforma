@@ -28,7 +28,7 @@ public class UI extends Application {
 
   @Override
   public void start(Stage primaryStage) {
-    context = new Context(this);
+    context = new Context();
 
     Button btn = new Button();
     btn.setText("Say 'Hello World'");
