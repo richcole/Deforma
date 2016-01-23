@@ -4,6 +4,7 @@ import game.events.Clock;
 import game.events.DisplayResizeEvent;
 import game.events.EventBus;
 import game.events.TickEvent;
+import game.events.ViewUpdatedEvent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,6 +23,9 @@ public class View implements Consumer<TickEvent> {
   private SimpleProgram program;
   private GLDisplay display;
 
+  private ViewUpdatedEvent viewUpdatedEvent;
+  private EventBus eventBus;
+
   private Vector position = Vector.U1.times(1.0);
   private Matrix viewMatrix = Matrix.IDENTITY;
   private Matrix rot = Matrix.IDENTITY;
@@ -29,8 +33,10 @@ public class View implements Consumer<TickEvent> {
   private List<Renderable> renderables = Lists.newArrayList();
 
   View(GLDisplay display, SimpleProgram program, Clock clock, EventBus eventBus) {
+    this.eventBus = eventBus;
     this.program = program;
     this.display = display;
+    this.viewUpdatedEvent = new ViewUpdatedEvent(this);
     update();
     eventBus.onEventType(clock, this, TickEvent.class);
     eventBus.onEventType(display, (e) -> update(), DisplayResizeEvent.class);
@@ -40,8 +46,10 @@ public class View implements Consumer<TickEvent> {
     double dydx = display.getHeightToWidthRatio();
     double dx = 1.0;
     double dy = dydx * dx;
-    viewMatrix = Matrix.flip(1).times(Matrix.frustum(-dx, dx, dy, -dy, 1, 10000))
+    viewMatrix = Matrix
+        .frustum(-dx, dx, dy, -dy, 1, 10000)
         .times(rot).times(Matrix.translate(position.minus()));
+    eventBus.post(viewUpdatedEvent);
   }
 
   public void move(Vector dx) {
@@ -78,7 +86,11 @@ public class View implements Consumer<TickEvent> {
   }
 
   public Vector getForward() {
-    return rot.times(Vector.U3);
+    return Vector.M3.times(rot);
+  }
+
+  public Vector getLeft() {
+    return Vector.M1.times(rot);
   }
 
   public Vector getPosition() {

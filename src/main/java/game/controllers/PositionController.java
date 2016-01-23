@@ -98,7 +98,7 @@ public class PositionController extends InputController {
 	}
 	
 	public Vector getForward() {
-		return rot2.times(Vector.U3);
+	  return view.getForward();
 	}
 	
 	public Vector getPosition() {
@@ -117,8 +117,8 @@ public class PositionController extends InputController {
     Matrix rotY1 = Matrix.rot2(sy, Vector.U1);
     Matrix rotY2 = Matrix.rot2(-sy, Vector.U1);
     
-    rot1 = rotY1.times(rotX1);
-    rot2 = rotX2.times(rotY2);
+    rot1 = rotY2.times(rotX1);
+    rot2 = rotX2.times(rotY1);
     
     view.setRotation(rot1);
   }

@@ -84,15 +84,26 @@ public class HeightMap {
 		return box.contains(p);
 	}
 
-	public Vector getGravityMovement(Vector p, double speed) {
-		Vector tp = ntr.times(p);
-		double y = heightAt(tp.x(), tp.z());
-		// log.info("tp " + tp + " y " + y);
-		if ( tp.y() < y ) {
-			return tr.times(new Vector(0, y - tp.y(), 0, 1.0));
+	public Vector getGravityMovement(Vector p, Vector left, double r, double speed) {
+	  Vector p1 = ntr.times(p.plus(left));
+	  Vector p2 = ntr.times(p.minus(left));
+    Vector p3 = ntr.times(p);
+		Vector tp1 = ntr.times(p1);
+    Vector tp2 = ntr.times(p2);
+    Vector tp3 = ntr.times(p3);
+    double y1 = heightAt(tp1.x(), tp1.z());
+    double y2 = heightAt(tp2.x(), tp2.z());
+    double y3 = heightAt(tp3.x(), tp3.z());
+    double ty1 = p1.y();
+    double ty2 = p2.y();
+    double ty3 = p3.y();
+    double ty  = Math.min(Math.min(ty1, ty2), ty3);
+    double y   = Math.max(Math.max(y1, y2), y3); 
+		if ( ty < y ) {
+			return tr.times(new Vector(0, y - ty, 0, 1.0));
 		}
 		else {
-			return tr.times(new Vector(0, Math.min(speed, y - tp.y()), 0, 1.0));
+			return tr.times(new Vector(0, Math.min(speed, y - ty), 0, 1.0));
 		}
 	}
 

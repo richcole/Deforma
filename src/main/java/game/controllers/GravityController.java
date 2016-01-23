@@ -28,12 +28,10 @@ public class GravityController {
 	}
 
 	private void onTick(TickEvent e) {
-		Vector p = view.getPosition().plus(Vector.U2.times(2));
-		if ( hm.contains(p) ) {
-			Vector m = hm.getGravityMovement(p, speed);
-			// log.info("pos " + p + " movement " + m);
-			view.move(m);
-		}
+		Vector p = view.getPosition().minus(Vector.U2.times(2).plus(view.getForward()));
+    if ( hm.contains(p.plus(Vector.U1).plus(Vector.U2)) && hm.contains(p.minus(Vector.U1).minus(Vector.U2)) ) {
+      view.move(hm.getGravityMovement(p, view.getLeft(), 0.2, speed));
+    }
 	}
 	
 	public void unregister() {

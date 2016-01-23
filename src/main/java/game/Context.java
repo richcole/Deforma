@@ -48,17 +48,27 @@ public class Context implements Runnable {
 		ImageTexture marble = new ImageTexture(eventBus, "skyline.jpg");
 		ImageTexture grass = new ImageTexture(eventBus, "grass.jpg");
 		ImageTexture gradientTexture = new ImageTexture(eventBus, new GradientImage(256, 256));
-		TriangleMesh triangle = new TriangleMesh(eventBus, simpleProgram, gradientTexture);
+    ImageTexture greenTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 0, 1.0, 0));
+    ImageTexture redTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 1.0, 0, 0));
+    ImageTexture blueTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 0, 0, 1.0));
 
 		View view = new View(display, simpleProgram, clock, eventBus);
 
-		MeshContainer meshContainer = new MeshContainer();
-
-		InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
-		PositionController positionController = new PositionController(eventBus, clock, inputProcessor, view);
-		MarchingCubesPainterController mcPainterController = new MarchingCubesPainterController(
-				eventBus, positionController, inputProcessor, simpleProgram,
-				gradientTexture, meshContainer);
+		
+		if ( true ) {
+  		MeshContainer meshContainer = new MeshContainer();
+  
+  		InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
+  		PositionController positionController = new PositionController(eventBus, clock, inputProcessor, view);
+  		MarchingCubesPainterController mcPainterController = new MarchingCubesPainterController(
+  				eventBus, positionController, inputProcessor, simpleProgram,
+  				gradientTexture, meshContainer);
+      view.add(meshContainer);
+  
+  		
+  		CenterCube centerCube = new CenterCube(eventBus, view, simpleProgram, marble);
+  		view.add(centerCube.getModel());
+		}
 
 		if (false) {
 			List<Geom> girlModelList = new ModelLoader()
@@ -105,7 +115,7 @@ public class Context implements Runnable {
 
 		}
 
-		if ( false )
+		if ( true )
 		{
 			Matrix tr = Matrix.scale(new Vector(20, 20, 20));
 			Matrix ntr = Matrix.scale(new Vector(1/20.0, 1/20.0, 1/20.0, 1.0));
@@ -117,16 +127,11 @@ public class Context implements Runnable {
 			new GravityController(eventBus, clock, view, hm);
 		}
 
-		if ( false ) {
-			LineGeom line = new LineGeom(
-					new Box(Vector.U1.times(-5), Vector.U2.times(5)), 0.2, marble);
-
-			CompiledMesh lineMesh = new CompiledMesh(eventBus, simpleProgram, line);
-			view.add(lineMesh);
+		if ( true ) {
+      view.add(new CompiledMesh(eventBus, simpleProgram, new LineGeom(new Box(Vector.Z, Vector.U1.times(5)), 0.2, redTexture)));
+      view.add(new CompiledMesh(eventBus, simpleProgram, new LineGeom(new Box(Vector.Z, Vector.U2.times(5)), 0.2, greenTexture)));
+      view.add(new CompiledMesh(eventBus, simpleProgram, new LineGeom(new Box(Vector.Z, Vector.U3.times(5)), 0.2, blueTexture)));
 		}
-
-		view.add(triangle);
-		view.add(meshContainer);
 
 		while (!display.isClosed()) {
 			clock.run();
