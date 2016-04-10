@@ -1,6 +1,6 @@
 package game.controllers;
 
-import game.DensityProvider;
+import game.voxel.DensityProvider;
 
 public class TerrainPoint implements DensityProvider {
   

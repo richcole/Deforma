@@ -1,5 +1,7 @@
 package game;
 
+import game.basicgeom.Matrix;
+
 public class RenderableModel implements RenderableResource {
 	
 	private ModelResource model;

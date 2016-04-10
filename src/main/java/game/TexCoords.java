@@ -1,5 +1,8 @@
 package game;
 
+import game.basicgeom.Vector;
+import game.image.Material;
+
 import java.util.List;
 
 import com.google.common.base.Throwables;

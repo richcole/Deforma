@@ -1,5 +1,10 @@
 package game;
 
+import game.basicgeom.Box;
+import game.basicgeom.Line;
+import game.basicgeom.Sphere;
+import game.basicgeom.Vector;
+
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -99,5 +104,5 @@ public class Utils {
   public static double squared(double d) {
     return d*d;
   }
-		
+
 }

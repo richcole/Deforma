@@ -1,9 +1,9 @@
 package game.controllers;
 
 import game.InputProcessor;
-import game.Matrix;
-import game.Vector;
 import game.View;
+import game.basicgeom.Matrix;
+import game.basicgeom.Vector;
 import game.events.Clock;
 import game.events.EventBus;
 import game.events.KeyDownEvent;
@@ -28,9 +28,6 @@ public class PositionController extends InputController {
 	
 	private boolean mouseDown;
 
-	Matrix rot1 = Matrix.IDENTITY;
-	Matrix rot2 = Matrix.IDENTITY;
-
 	public PositionController(EventBus eventBus, Clock clock, InputProcessor inputProcessor, View view) {
 	  super(inputProcessor, eventBus);
 		eventBus.onEventType(clock, (e) -> onTickEvent(e), TickEvent.class);
@@ -46,7 +43,7 @@ public class PositionController extends InputController {
     double dt = event.dt;
 		if ( dt != 0 && (vx != 0 || vy != 0) ) {
 			Vector dp = Vector.U1.times(vx * dt).plus(Vector.U3.times(vy * dt)).times(speed);
-			Vector rdp = rot2.times(dp);
+			Vector rdp = view.getRotationInv().times(dp);
 			view.move(rdp);
 		}
 	}
@@ -111,16 +108,7 @@ public class PositionController extends InputController {
     double sx = rx / 360.0;
     double sy = ry / 360.0;
     
-    Matrix rotX1 = Matrix.rot2(sx, Vector.U2);
-    Matrix rotX2 = Matrix.rot2(-sx, Vector.U2);
-    
-    Matrix rotY1 = Matrix.rot2(sy, Vector.U1);
-    Matrix rotY2 = Matrix.rot2(-sy, Vector.U1);
-    
-    rot1 = rotY2.times(rotX1);
-    rot2 = rotX2.times(rotY1);
-    
-    view.setRotation(rot1);
+    view.setRotation(sx, sy);
   }
 
 }

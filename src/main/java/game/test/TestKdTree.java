@@ -1,9 +1,9 @@
 package game.test;
 
-import game.BBox;
 import game.BiConsumerCounter;
 import game.KdTree;
-import game.Vector;
+import game.basicgeom.BBox;
+import game.basicgeom.Vector;
 
 import org.junit.Assert;
 import org.junit.Test;

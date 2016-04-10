@@ -16,4 +16,6 @@ void main() {
     gl_Position = fragTr * vec4(vert, 1);
     fragTexCoords = texCoords;
     fragLight = 0.2 + (abs(dot(vec3(1,1,1),normal)) * 0.8);
+    
+    
 }

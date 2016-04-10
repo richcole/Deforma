@@ -1,5 +1,7 @@
 package game;
 
+import game.basicgeom.Matrix;
+
 public class MeshContainer implements ModelResource {
 	
 	private ModelResource model;

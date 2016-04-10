@@ -1,6 +1,9 @@
 package game;
 
+import game.basicgeom.Matrix;
 import game.events.EventBus;
+import game.gl.GLProgram;
+import game.gl.GLShader;
 
 import org.lwjgl.opengl.GL20;
 

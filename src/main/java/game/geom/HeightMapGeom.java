@@ -1,10 +1,8 @@
 package game.geom;
 
-import game.Geom;
-import game.HeightMap;
-import game.Material;
 import game.TexCoords;
-import game.Vector;
+import game.basicgeom.Vector;
+import game.image.Material;
 
 import java.util.List;
 import java.util.Map;

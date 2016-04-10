@@ -8,15 +8,32 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+import game.basicgeom.Box;
+import game.basicgeom.Matrix;
+import game.basicgeom.Vector;
 import game.controllers.GravityController;
 import game.controllers.MarchingCubesPainterController;
 import game.controllers.PositionController;
+import game.entity.CenterCube;
+import game.entity.LogPane;
 import game.events.ApplicationCloseEvent;
 import game.events.Clock;
 import game.events.DisplayCloseEvent;
 import game.events.EventBus;
+import game.format.xps.XPSModel;
+import game.format.xps.XPSModelBuilder;
+import game.format.xps.XPSReader;
+import game.geom.Geom;
+import game.geom.HeightMap;
 import game.geom.HeightMapGeom;
 import game.geom.LineGeom;
+import game.gl.GLDisplay;
+import game.image.GradientImage;
+import game.image.ImageTexture;
+import game.image.MaterialSource;
+import game.image.SolidImage;
+import game.mesh.CompiledMesh;
+import game.mesh.CompiledMeshList;
 
 public class Context implements Runnable {
 
@@ -51,9 +68,9 @@ public class Context implements Runnable {
     ImageTexture greenTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 0, 1.0, 0));
     ImageTexture redTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 1.0, 0, 0));
     ImageTexture blueTexture = new ImageTexture(eventBus, new SolidImage(8, 8, 0, 0, 1.0));
+    Stats stats = new Stats();
 
 		View view = new View(display, simpleProgram, clock, eventBus);
-
 		
 		if ( true ) {
   		MeshContainer meshContainer = new MeshContainer();
@@ -64,11 +81,17 @@ public class Context implements Runnable {
   				eventBus, positionController, inputProcessor, simpleProgram,
   				gradientTexture, meshContainer);
       view.add(meshContainer);
+		}
   
-  		
+  	if (true) {
   		CenterCube centerCube = new CenterCube(eventBus, view, simpleProgram, marble);
   		view.add(centerCube.getModel());
 		}
+  	
+  	if (true) {
+  	  LogPane logPane = new LogPane(eventBus, view, simpleProgram, stats);
+  	  view.add(logPane.getModel());
+  	}
 
 		if (false) {
 			List<Geom> girlModelList = new ModelLoader()
@@ -124,7 +147,7 @@ public class Context implements Runnable {
 			CompiledMesh hmm = new CompiledMesh(eventBus, simpleProgram, hmg);
 			// hmm.setWireFrame(true);
 			view.add(hmm);
-			new GravityController(eventBus, clock, view, hm);
+			new GravityController(eventBus, clock, view, hm, stats);
 		}
 
 		if ( true ) {

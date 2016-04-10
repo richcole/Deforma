@@ -1,5 +1,9 @@
 package game;
 
+import game.basicgeom.Vector;
+import game.voxel.DensityFunction;
+import game.voxel.DensityProvider;
+
 public class KdTreeDensityFunction<T extends DensityProvider> implements DensityFunction {
   
   private KdTree<T> tree;

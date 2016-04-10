@@ -1,7 +1,6 @@
 package game.geom;
 
-import game.Geom;
-import game.Vector;
+import game.basicgeom.Vector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

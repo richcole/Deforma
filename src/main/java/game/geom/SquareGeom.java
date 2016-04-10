@@ -1,10 +1,9 @@
 package game.geom;
 
-import game.Geom;
-import game.Material;
 import game.TexCoords;
 import game.Utils;
-import game.Vector;
+import game.basicgeom.Vector;
+import game.image.Material;
 
 import java.util.List;
 
@@ -46,8 +45,6 @@ public class SquareGeom implements Geom {
 		result.add(center.minus(up).plus(right)); // right
 		result.add(center.minus(up).minus(right)); //
 		result.add(center.plus(up).minus(right)); // up
-
-		log.info("square verts " + result);
 
 		return result;
 	}

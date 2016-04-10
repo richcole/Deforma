@@ -1,5 +1,7 @@
 package game;
 
+import game.mesh.CompiledMesh;
+import game.mesh.CompiledMeshList;
 import game.ui.UI;
 import game.ui.TreeNode;
 import game.ui.TreeNodeClickedEvent;
