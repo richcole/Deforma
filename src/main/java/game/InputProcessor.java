@@ -8,15 +8,12 @@ import game.events.MouseButtonEvent;
 import game.events.MouseMoveEvent;
 import game.events.TickEvent;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 public class InputProcessor implements Consumer<TickEvent> {
 

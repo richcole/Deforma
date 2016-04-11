@@ -1,28 +1,22 @@
 package game.controllers;
 
-import org.lwjgl.input.Keyboard;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import game.InputProcessor;
 import game.KdTree;
 import game.KdTreeDensityFunction;
 import game.MeshContainer;
 import game.SimpleProgram;
-import game.Utils;
-import game.basicgeom.Box;
-import game.basicgeom.Line;
-import game.basicgeom.Sphere;
 import game.basicgeom.Vector;
 import game.events.EventBus;
 import game.events.KeyDownEvent;
 import game.geom.CubesGeom;
-import game.geom.LineGeom;
 import game.geom.VertexCloud;
 import game.image.Material;
 import game.mesh.CompiledMesh;
 import game.voxel.MarchingCubes;
-import game.voxel.SphericalDensityField;
+
+import org.lwjgl.input.Keyboard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MarchingCubesPainterController extends InputController {
 	

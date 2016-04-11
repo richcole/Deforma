@@ -1,7 +1,5 @@
 package game.events;
 
-import game.Context;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

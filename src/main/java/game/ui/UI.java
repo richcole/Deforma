@@ -1,10 +1,11 @@
 package game.ui;
 
-import java.util.function.Consumer;
-
 import game.Context;
 import game.Registration;
 import game.events.ApplicationCloseEvent;
+
+import java.util.function.Consumer;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

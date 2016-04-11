@@ -106,6 +106,7 @@
 			<artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
 			<version>${swt.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-common</artifactId>

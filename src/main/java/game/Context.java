@@ -1,13 +1,5 @@
 package game;
 
-import java.io.File;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-
 import game.basicgeom.Box;
 import game.basicgeom.Matrix;
 import game.basicgeom.Vector;
@@ -34,6 +26,21 @@ import game.image.MaterialSource;
 import game.image.SolidImage;
 import game.mesh.CompiledMesh;
 import game.mesh.CompiledMeshList;
+import game.models.AnimMesh;
+import game.models.AnimMeshRenderer;
+import game.models.ColorFactory;
+import game.models.TextureCache;
+import game.nwn.NwnMesh;
+import game.nwn.readers.KeyReader;
+import game.nwn.readers.MdlModel;
+
+import java.io.File;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 public class Context implements Runnable {
 
@@ -73,6 +80,18 @@ public class Context implements Runnable {
 		View view = new View(display, simpleProgram, clock, eventBus);
 		
 		if ( true ) {
+		  File nwnRoot = new File("/Users/Richard/nwn");
+		  KeyReader keyReader = new KeyReader(nwnRoot);
+		  MdlModel mdl = keyReader.getModel("c_wererat");
+		  AnimMesh animMesh = new NwnMesh(mdl).getAnimMesh();
+		  ColorFactory colorFactory = new ColorFactory();
+      TextureCache textureCache = new TextureCache();
+      AnimMeshRenderer animRenderer = new AnimMeshRenderer(eventBus, keyReader, textureCache, colorFactory);
+      NwnModel nwnModel = new NwnModel(animRenderer, animMesh); 
+      view.add(nwnModel);
+		}
+		
+		if ( true ) {
   		MeshContainer meshContainer = new MeshContainer();
   
   		InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
@@ -92,7 +111,7 @@ public class Context implements Runnable {
   	  LogPane logPane = new LogPane(eventBus, view, simpleProgram, stats);
   	  view.add(logPane.getModel());
   	}
-
+  	
 		if (false) {
 			List<Geom> girlModelList = new ModelLoader()
 					.load(eventBus, "/home/richcole/models/Girl/", marble);

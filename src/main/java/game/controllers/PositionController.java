@@ -2,7 +2,6 @@ package game.controllers;
 
 import game.InputProcessor;
 import game.View;
-import game.basicgeom.Matrix;
 import game.basicgeom.Vector;
 import game.events.Clock;
 import game.events.EventBus;

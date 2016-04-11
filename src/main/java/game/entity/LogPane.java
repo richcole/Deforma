@@ -5,16 +5,12 @@ import game.Renderable;
 import game.RenderableModel;
 import game.SimpleProgram;
 import game.Stats;
-import game.Utils;
 import game.View;
 import game.basicgeom.Matrix;
 import game.basicgeom.Vector;
 import game.events.EventBus;
 import game.events.ViewUpdatedEvent;
-import game.geom.CubesGeom;
 import game.geom.SquareGeom;
-import game.geom.VertexCloud;
-import game.image.Material;
 import game.mesh.CompiledMesh;
 
 

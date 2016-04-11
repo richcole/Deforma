@@ -1,6 +1,5 @@
 package game;
 
-import game.basicgeom.Vector;
 import game.events.EventBus;
 import game.gl.GLTexture;
 import game.image.BufferedImageImage;

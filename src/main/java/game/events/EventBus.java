@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class EventBus {
+  
+  private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
 		
 	private static final List<Registration<? extends Event>> EMPTY_LIST = Lists.newArrayList();
 
@@ -79,6 +84,7 @@ public class EventBus {
 					dispatch(reg.getAction(), event);
 				}
 				catch(Exception e) {
+				  logger.error("Exception: ", e);
 					// ignore for now
 				}
 			}

@@ -1,16 +1,16 @@
 package game;
 
-import java.io.File;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import game.events.EventBus;
 import game.format.DSReader;
 import game.format.DSReader.Chunk;
 import game.geom.Geom;
 import game.image.Material;
+
+import java.io.File;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModelLoader {
 	 

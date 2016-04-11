@@ -1,9 +1,5 @@
 package game.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import game.Context;
 import game.Registration;
 import game.Stats;
 import game.View;
@@ -12,6 +8,9 @@ import game.events.Clock;
 import game.events.EventBus;
 import game.events.TickEvent;
 import game.geom.HeightMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GravityController {
 	
@@ -36,9 +35,11 @@ public class GravityController {
 		stats.viewP = view.getPosition();
 		stats.gravityP = p;
 		stats.insideField = false;
-    if ( hm.contains(p.plus(Vector.U1).plus(Vector.U2)) && hm.contains(p.minus(Vector.U1).minus(Vector.U2)) ) {
+    Vector left = view.getLeft();
+    Vector fwd = view.getForward();
+    if ( hm.contains(p.plus(left).plus(fwd)) && hm.contains(p.minus(left).minus(fwd)) ) {
       stats.insideField = true;
-      view.move(hm.getGravityMovement(p, view.getLeft(), view.getForward(), speed));
+      view.move(hm.getGravityMovement(p, left, fwd, speed));
     }
 	}
 	
