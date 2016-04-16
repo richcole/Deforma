@@ -106,8 +106,39 @@ public class Utils {
 		return result;
 	}
 
+	public static double[] toDoubleArray16(List<Matrix> vs) {
+		double[] result = new double[vs.size() * 16];
+		int idx = 0;
+		for (Matrix v : vs) {
+			for(int i=0;i<v.v.length;++i) {
+				result[idx++] = v.v[i];
+			}
+		}
+		return result;
+	}
+
+	public static double[] toDoubleArray16(Matrix ... vs) {
+		double[] result = new double[vs.length * 16];
+		int idx = 0;
+		for (Matrix v : vs) {
+			for(int i=0;i<v.v.length;++i) {
+				result[idx++] = v.v[i];
+			}
+		}
+		return result;
+	}
+
 	public static int[] toIntArray(List<Integer> is) {
 		int[] result = new int[is.size()];
+		int idx = 0;
+		for(Integer i: is) {
+			result[idx++] = i;
+		}
+		return result;
+	}
+
+	public static int[] toIntArray(Integer ... is) {
+		int[] result = new int[is.length];
 		int idx = 0;
 		for(Integer i: is) {
 			result[idx++] = i;
@@ -125,4 +156,29 @@ public class Utils {
 		return result;
 	}
 
+	public static double[] toDoubleArray(List<Integer> vs) {
+		double[] result = new double[vs.size()];
+		int idx = 0;
+		for (Integer v : vs) {
+			result[idx++] = v;
+		}
+		return result;
+	}
+
+	public static double[] toDoubleArray(double ... vs) {
+		double[] result = new double[vs.length];
+		int idx = 0;
+		for (double v : vs) {
+			result[idx++] = v;
+		}
+		return result;
+	}
+
+	public static Quaternion lerp(double alpha, Quaternion p, Quaternion q) {
+		return p.times(alpha).plus(q.times(1 - alpha));
+	}
+
+	public static Vector lerp(double alpha, Vector p, Vector q) {
+		return p.times(alpha).plus(q.times(1 - alpha));
+	}
 }

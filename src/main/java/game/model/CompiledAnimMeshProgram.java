@@ -1,44 +1,65 @@
 package game.model;
 
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL31;
 
+import game.gl.GLBuffer;
 import game.gl.GLFactory;
 import game.gl.GLProgram;
 import game.math.Matrix;
+import game.model.UniformBindingPool.UniformBinding;
 
-public class CompiledMeshProgram {
+public class CompiledAnimMeshProgram {
 
 	private GLProgram program;
-	private int p1Binding;
-	private int p2Binding;
+	private int vertBinding;
 	private int normalBinding;
 	private int texCoordBinding;
 	private int viewTrBinding;
 	private int modelTrBinding;
-	private int alphaBinding;
 
-	public CompiledMeshProgram(GLFactory glFactory) {
-		String baseName = "simple";
+	private int boneBinding;
+	private int boneTrBlockIndex;
+	private int numBonesBinding;
+	private int frameBinding;
+
+	public CompiledAnimMeshProgram(GLFactory glFactory) {
+		String baseName = "anim";
 		program = glFactory.newProgram();
 		program.attach(glFactory.newShader(GL20.GL_VERTEX_SHADER).compile(baseName + ".vert"));
 		program.attach(glFactory.newShader(GL20.GL_FRAGMENT_SHADER).compile(baseName + ".frag"));
 		program.link();
 		program.setUniform("tex", 0);
-		p1Binding = program.getAttrib("p1");
-		p2Binding = program.getAttrib("p2");
+		vertBinding = program.getAttrib("vert");
 		normalBinding = program.getAttrib("normal");
 		texCoordBinding = program.getAttrib("texCoords");
 		viewTrBinding = program.getUniform("viewTr");
 		modelTrBinding = program.getUniform("modelTr");
-		alphaBinding = program.getUniform("alpha");
+
+		boneBinding = getProgram().getAttrib("bone");
+		numBonesBinding = getProgram().getUniform("numBones");
+		frameBinding = getProgram().getUniform("frame");
+		boneTrBlockIndex = getProgram().getUniformBlockIndex("Bones");
 	}
 
-	public int getP1Binding() {
-		return p1Binding;
+	public int getBoneBinding() {
+		return boneBinding;
 	}
 
-	public int getP2Binding() {
-		return p2Binding;
+	public void setBoneTr(GLBuffer btrbo, UniformBinding btrboBinding) {
+		GL31.glUniformBlockBinding(getProgram().getId(), boneTrBlockIndex, btrboBinding.getBindingIndex());
+	}
+
+	public void setNumBones(int numBones) {
+		getProgram().setUniform(numBonesBinding, numBones);
+	}
+
+	public void setFrame(int frame) {
+		getProgram().setUniform(frameBinding, frame);
+	}
+	
+	public int getVertBinding() {
+		return vertBinding;
 	}
 
 	public int getNormalBinding() {
@@ -63,10 +84,6 @@ public class CompiledMeshProgram {
 		GL20.glUniformMatrix4(viewTrBinding, true, viewTr.toBuf());
 	}
 
-	public void setAlpha(float alpha) {
-		GL20.glUniform1f(alphaBinding, alpha);
-	}
-
 	public void use() {
 		program.use();
 	}
@@ -74,5 +91,5 @@ public class CompiledMeshProgram {
 	public GLProgram getProgram() {
 		return program;
 	}
-
+	
 }

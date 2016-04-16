@@ -75,12 +75,12 @@ public class CompositeImage implements Image {
     return bytes;
   }
 
-  public double[] transform(Mesh mesh) {
-    double tv[] = new double[mesh.t.length];
-    for(int v=0; v<mesh.nv; ++v) {
-      Offset offset = offsets.get(mesh.imageList.get(mesh.i[v]));
-      tv[v*2+0] = mesh.t[v*2+0] + offset.ox;   
-      tv[v*2+1] = mesh.t[v*2+1] + offset.oy;   
+  public double[] transform(int nv, int[] i, List<String> imageList, double t[]) {
+    double tv[] = new double[nv*2];
+    for(int v=0; v<nv; ++v) {
+      Offset offset = offsets.get(imageList.get(i[v]));
+      tv[v*2+0] = t[v*2+0] + offset.ox;   
+      tv[v*2+1] = t[v*2+1] + offset.oy;   
     }
     return tv;
   }

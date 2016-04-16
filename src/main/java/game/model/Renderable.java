@@ -1,5 +1,7 @@
 package game.model;
 
+import game.math.Matrix;
+
 public interface Renderable {
-  void render();
+  void render(Matrix viewMatrix);
 }

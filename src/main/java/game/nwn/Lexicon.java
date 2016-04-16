@@ -32,4 +32,8 @@ public class Lexicon {
 		}
 		return result;
 	}
+
+	public int size() {
+		return stringMap.size();
+	}
 }

@@ -6,16 +6,16 @@ import game.math.Vector;
 public class PosititionRenderable implements Renderable {
   
   private Matrix modelTr;
-  private CompiledMesh mesh;
+  private TransformRenderable mesh;
 
-  public PosititionRenderable(CompiledMesh mesh, Vector position) {
-    this.modelTr = Matrix.translate(position);
+  public PosititionRenderable(TransformRenderable mesh, Matrix modelTr) {
+    this.modelTr = modelTr;
     this.mesh = mesh;
   }
 
   @Override
-  public void render() {
-    mesh.render(modelTr);
+  public void render(Matrix viewTr) {
+    mesh.render(viewTr, modelTr);
   }
 
 }

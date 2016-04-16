@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL31;
 
 import com.google.common.base.Preconditions;
 
@@ -52,6 +53,12 @@ public class GLProgram extends GLResource {
 	public int getUniform(String name) {
 		int attribId = GL20.glGetUniformLocation(id, name);
 		Preconditions.checkArgument(attribId >= 0);
+		return attribId;
+	}
+
+	public int getUniformBlockIndex(String name) {
+		int attribId = GL31.glGetUniformBlockIndex(id, name);
+		Preconditions.checkArgument(attribId != GL31.GL_INVALID_INDEX);
 		return attribId;
 	}
 

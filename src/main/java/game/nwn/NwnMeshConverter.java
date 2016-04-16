@@ -1,45 +1,195 @@
 package game.nwn;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import game.math.Matrix;
+import game.math.Quaternion;
 import game.math.Utils;
 import game.math.Vector;
+import game.model.AnimMesh;
+import game.model.Frame;
+import game.model.AnimMesh.AnimInfo;
 import game.model.Mesh;
+import game.model.MeshFrame;
+import game.model.MeshFrameList;
+import game.nwn.readers.MdlAnimation;
 import game.nwn.readers.MdlFace;
 import game.nwn.readers.MdlMeshHeader;
 import game.nwn.readers.MdlModel;
 import game.nwn.readers.MdlNodeHeader;
 
 public class NwnMeshConverter {
-
-	static class PlaneCollector implements MdlModelVisitor.MeshVisitor {
-		List<Vector> p = Lists.newArrayList();
-		List<Vector> n = Lists.newArrayList();
-		List<Vector> t = Lists.newArrayList();
-		List<Integer> e = Lists.newArrayList();
-		List<Integer> i = Lists.newArrayList();
-		Lexicon imageLexicon = new Lexicon();
+	
+	static class FrameCollector implements MdlModelVisitor.MeshVisitor {
+		Set<Double> beginTimes = Sets.newHashSet();
+		double      length = 0;
 		
-		Stack<Matrix> trs = new Stack<Matrix>();
-		Matrix tr = Matrix.IDENTITY;
+		@Override
+		public void preVisit(MdlNodeHeader node) {
+			addTimings(node.getPositionTimings());
+			addTimings(node.getOrientationTimings());
+		}
+
+		private void addTimings(float[] ts) {
+			if ( ts != null ) {
+				for(float t: ts) {
+					addTiming(t);
+				}
+			}
+		}
+
+		private void addTiming(double beginTime) {
+			this.length = Math.max(this.length, beginTime);
+			beginTimes.add(beginTime);
+		}
+
+		@Override
+		public void postVisit(MdlNodeHeader node) {
+		}
+		
+		public List<Frame> getFrames() {
+			List<Frame> frames = Lists.newArrayList();
+			Double[] sortedBeginTimes = beginTimes.toArray(new Double[beginTimes.size()]);
+			Arrays.sort(sortedBeginTimes);
+			for(int i=0; i<sortedBeginTimes.length-1; ++i) {
+				frames.add(new Frame(sortedBeginTimes[i], sortedBeginTimes[i+1]));
+			}
+			if ( sortedBeginTimes.length > 0 ) {
+				frames.add(new Frame(sortedBeginTimes[sortedBeginTimes.length-1], length));
+			}
+			return frames;
+		};
+	}
+	
+	static class AnimDescCollector implements MdlModelVisitor.MeshVisitor {
+		
+		private Map<String, MdlNodeHeader> animNodeMap = Maps.newHashMap();
+
+		public AnimDescCollector() {
+		}
 
 		@Override
 		public void preVisit(MdlNodeHeader node) {
-			MdlMeshHeader mhdr = node.getMeshHeader();
-			trs.push(tr);
+			animNodeMap.put(node.getName(), node);
+		}
 
+		@Override
+		public void postVisit(MdlNodeHeader node) {
+		}
+		
+	}
+	
+	static class BTrCollector implements MdlModelVisitor.MeshVisitor {
+
+		private AnimDescCollector anim;
+		private Frame frame;
+		private Stack<MdlNodeHeader> path = new Stack<MdlNodeHeader>();
+		private List<Matrix> bTr = Lists.newArrayList();
+
+		public BTrCollector(AnimDescCollector anim, Frame frame) {
+			this.anim = anim;
+			this.frame = frame;
+		}
+
+		@Override
+		public void preVisit(MdlNodeHeader node) {
+			path.push(node);
 			Matrix ltr = Matrix.IDENTITY;
-			if ( node.getPosition() != null ) {
-				ltr = ltr.times(Matrix.translate(node.getPosition()[0]));
+			for(MdlNodeHeader pNode: path) {
+				MdlNodeHeader animNode = anim.animNodeMap.get(pNode.getName());
+				if ( pNode.getPosition() != null ) {
+					ltr = ltr.times(Matrix.translate(pNode.getPosition()[0]));
+				}
+				if ( animNode != null && animNode.getPositionTimings() != null) {
+					int frameIndex = getTimingIndex(frame, animNode.getPositionTimings());
+					Vector tp;
+					if ( frameIndex+1 < animNode.getPositionTimings().length ) {
+						double alpha = 1.0 - getAlpha(frame, frameIndex, animNode.getPositionTimings());
+						tp = Utils.lerp(alpha, animNode.getPosition()[frameIndex], animNode.getPosition()[frameIndex+1]);
+					}
+					else {
+						tp = animNode.getPosition()[frameIndex];
+					}
+					ltr = ltr.times(Matrix.translate(tp));
+				}
+				if ( pNode.getOrientation() != null ) {
+					ltr = ltr.times(pNode.getOrientation()[0].toMatrix());
+				}
+				if ( animNode != null && animNode.getOrientationTimings() != null ) {
+					int frameIndex = getTimingIndex(frame, animNode.getOrientationTimings());
+					Quaternion q;
+					if ( frameIndex+1 < animNode.getOrientationTimings().length ) {
+						double alpha = 1.0 - getAlpha(frame, frameIndex, animNode.getOrientationTimings());
+						q = Utils.lerp(alpha, animNode.getOrientation()[frameIndex], animNode.getOrientation()[frameIndex+1]);
+					}
+					else {
+						q = animNode.getOrientation()[frameIndex];
+					}
+					ltr = ltr.times(q.toMatrix());
+				}
 			}
-			if ( node.getOrientation() != null ) {
-				ltr = ltr.times(node.getOrientation()[0].toMatrix());
+			bTr.add(ltr.transpose());
+		}
+
+		private double getAlpha(Frame frame, int frameIndex, float[] ts) {
+			return (frame.beginTime - ts[frameIndex]) / (ts[frameIndex+1] - ts[frameIndex]);
+		}
+
+		@Override
+		public void postVisit(MdlNodeHeader node) {
+			path.pop();
+		}
+			
+		private int getTimingIndex(Frame frame, float[] positionTimings) {
+			for(int i=0; i<positionTimings.length; ++i) {
+				if ( frame.beginTime >= positionTimings[i] && (i == (positionTimings.length - 1) || frame.beginTime <= positionTimings[i+1] )) {
+					return i;
+				}
 			}
-			tr = tr.times(ltr);
+			return 0;
+		}
+		
+		public List<Matrix> getBTr() {
+			return bTr;
+		}
+
+	}
+
+	static class PlaneCollector implements MdlModelVisitor.MeshVisitor {
+		private List<Vector> p = Lists.newArrayList();
+		private List<Vector> n = Lists.newArrayList();
+		private List<Vector> t = Lists.newArrayList();
+		private List<Integer> e = Lists.newArrayList();
+		private List<Integer> i = Lists.newArrayList();
+		private List<Integer> b = Lists.newArrayList();
+
+		private Lexicon boneLexicon = new Lexicon();
+		private Lexicon imageLexicon = new Lexicon();
+		
+		private Stack<MdlNodeHeader> path = new Stack<MdlNodeHeader>();
+
+		public PlaneCollector() {
+		}
+		
+		@Override
+		public void preVisit(MdlNodeHeader node) {
+			MdlMeshHeader mhdr = node.getMeshHeader();
+			int boneIndex = boneLexicon.getIndex(node.getName());
+			path.push(node);			
+			addFaces(mhdr, boneIndex);			
+		}
+
+		private void addFaces(MdlMeshHeader mhdr, int boneIndex) {
 			if ( mhdr != null && mhdr.getRender() == 1) {
 				for(MdlFace face: mhdr.getFaces()) {
 					for(int localTextureIndex=0; localTextureIndex<mhdr.getTextureCount(); ++localTextureIndex) {
@@ -48,10 +198,11 @@ public class NwnMeshConverter {
 						for(int vertexIndex: face.getVertex()) {
 							e.add(p.size());
 							Vector pos = mhdr.getVertices()[vertexIndex];
-							p.add(tr.times(pos));
+							p.add(pos);
 							n.add(face.getPlaneNormal());
 							t.add(mhdr.getTexturePoints()[0][vertexIndex]);
 							i.add(textureIndex);
+							b.add(boneIndex);
 						}
 					}
 				}
@@ -60,27 +211,115 @@ public class NwnMeshConverter {
 
 		@Override
 		public void postVisit(MdlNodeHeader node) {
-			tr = trs.pop();
+			path.pop();
 		}
 		
-		private Mesh getMesh() {
-			Mesh mesh = new Mesh(p.size(), e.size());
+		private AnimMesh getAnimMesh() {
+			AnimMesh mesh = new AnimMesh(p.size(), e.size());
 			mesh.p = Utils.toDoubleArray3(p);
 			mesh.n = Utils.toDoubleArray3(n);
 			mesh.t = Utils.toDoubleArray2(t);
 			mesh.i = Utils.toIntArray(i);
 			mesh.e = Utils.toIntArray(e);
-			mesh.b = new int[p.size()];
+			mesh.imageList = imageLexicon.toList();
+
+			mesh.b = Utils.toDoubleArray(b);
+			mesh.numBones = boneLexicon.size();
+			return mesh;
+		}
+
+		private Mesh getMesh(List<Matrix> btr) {
+			Mesh mesh = new Mesh(p.size(), e.size());
+			
+			List<Vector> np = Lists.newArrayList();
+			for(int i=0;i<p.size();++i) {
+				np.add(btr.get(b.get(i)).transpose().times(p.get(i)));
+			}
+			
+			mesh.p1 = Utils.toDoubleArray3(np);
+			mesh.n = Utils.toDoubleArray3(n);
+			mesh.t = Utils.toDoubleArray2(t);
+			mesh.i = Utils.toIntArray(i);
+			mesh.e = Utils.toIntArray(e);
 			mesh.imageList = imageLexicon.toList();
 			return mesh;
 		}
 	}
 
-	public Mesh convert(MdlModel model) {
-		PlaneCollector planeCollector = new PlaneCollector();
-		MdlModelVisitor visitor = new MdlModelVisitor(model);
-		visitor.visit(planeCollector);
-		return planeCollector.getMesh();
-	}
+	public AnimMesh convertToAnimMesh(MdlModel model) {
+		int numAnim = 0;
+		int numFrames = 0;
+		int numBtr = 0;
+		
+		MdlModelVisitor modelVisitor = new MdlModelVisitor();
+		List<Matrix> bTr = Lists.newArrayList();
+		List<AnimInfo> animInfoList = Lists.newArrayList();
+		
+		for(Entry<String, MdlAnimation> animEntry: model.getAnimMap().entrySet()) {
+			AnimInfo animInfo = new AnimInfo();
+			animInfo.name = animEntry.getKey();
+			animInfo.beginFrame = numFrames;
 
+			MdlAnimation animNode = animEntry.getValue();
+			
+			MdlNodeHeader animGeometry = animNode.getGeometryHeader().getGeometry();
+			FrameCollector frameCollector = new FrameCollector();
+			modelVisitor.visit(animGeometry, frameCollector);
+
+			List<Frame> frames = frameCollector.getFrames();
+			AnimDescCollector animCollector = new AnimDescCollector();
+			modelVisitor.visit(animGeometry, animCollector);
+			
+			animInfo.timings = new double[frames.size()];
+			
+			for(int i=0; i<frames.size(); ++i) {
+				Frame frame = frames.get(i);
+				animInfo.timings[i] = frame.beginTime;
+				BTrCollector btrCollector = new BTrCollector(animCollector, frame);
+				modelVisitor.visit(model.getGeometryHeader().getGeometry(), btrCollector);
+				bTr.addAll(btrCollector.getBTr());
+				numFrames += 1;
+			}
+			animInfo.endFrame = numFrames;
+			
+			numAnim += 1;			
+		}
+		
+		numBtr = bTr.size();
+
+		PlaneCollector planeCollector = new PlaneCollector();
+		modelVisitor.visit(model.getGeometryHeader().getGeometry(), planeCollector);
+		AnimMesh mesh = planeCollector.getAnimMesh();
+		mesh.bTr = Utils.toDoubleArray16(bTr);
+		mesh.anims = animInfoList.toArray(new AnimInfo[animInfoList.size()]);
+		return mesh;
+	}
+	
+	public MeshFrameList convertToMeshFrameList(MdlModel model, String animName) {
+
+		MdlAnimation animNode = model.getAnimMap().get(animName);
+		double animLength = animNode.getLength();
+		MdlNodeHeader animGeometry = animNode.getGeometryHeader().getGeometry();
+
+		MdlModelVisitor modelVisitor = new MdlModelVisitor();
+
+		PlaneCollector planeCollector = new PlaneCollector();
+		modelVisitor.visit(model.getGeometryHeader().getGeometry(), planeCollector);
+		
+		FrameCollector frameCollector = new FrameCollector();
+		modelVisitor.visit(animGeometry, frameCollector);
+		List<Frame> frames = frameCollector.getFrames();
+
+		AnimDescCollector animCollector = new AnimDescCollector();
+		modelVisitor.visit(animGeometry, animCollector);
+
+		MeshFrameList meshFrameList = new MeshFrameList(animLength);
+		for(Frame frame: frames) {
+			BTrCollector btrCollector = new BTrCollector(animCollector, frame);
+			modelVisitor.visit(model.getGeometryHeader().getGeometry(), btrCollector);
+			meshFrameList.add(new MeshFrame(planeCollector.getMesh(btrCollector.getBTr()), frame));
+		}
+		
+		return meshFrameList;
+	}
 }

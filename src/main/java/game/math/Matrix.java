@@ -6,7 +6,7 @@ import org.lwjgl.BufferUtils;
 
 public class Matrix {
 
-    double v[] = new double[16];
+    public double v[] = new double[16];
 
 	private FloatBuffer buf;
 

@@ -1,9 +1,17 @@
 #version 150
+
 uniform sampler2D tex; 
+
 in vec2 fragTexCoords;
 in mat4 fragTr;
+in float fragLight;
+
 out vec4 finalColor; 
 
 void main() {
-    finalColor = texture(tex, fragTexCoords);
+    vec4 color = texture(tex, fragTexCoords);
+    if ( color.a < 0.5 ) {
+      discard;
+    }
+    finalColor = texture(tex, fragTexCoords) * fragLight;
 }

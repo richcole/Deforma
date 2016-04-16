@@ -6,7 +6,7 @@ import game.events.TickEvent;
 import game.gl.GLDisplay;
 import game.math.Matrix;
 import game.math.Vector;
-import game.model.CompiledMeshProgram;
+import game.model.CompiledAnimMeshProgram;
 import game.model.Renderable;
 
 import java.util.List;
@@ -22,7 +22,6 @@ public class View {
 
   final static Logger log = LoggerFactory.getLogger(View.class);
 
-  private CompiledMeshProgram program;
   private EventBus eventBus;
 
   private Vector position = Vector.U1.times(1.0);
@@ -33,8 +32,7 @@ public class View {
   private List<Renderable> renderables = Lists.newArrayList();
   private GLDisplay display;
 
-  public View(EventBus eventBus, Clock clock, GLDisplay display, CompiledMeshProgram program) {
-    this.program = program;
+  public View(EventBus eventBus, Clock clock, GLDisplay display, CompiledAnimMeshProgram program) {
     this.eventBus = eventBus;
     this.display = display;
     clock.onTick((e) -> onTick(e));
@@ -61,11 +59,8 @@ public class View {
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-    program.use();
-    program.setViewTr(viewMatrix);
-
     for (Renderable r : renderables) {
-      r.render();
+      r.render(viewMatrix);
     }
     Display.update();
     Display.sync(60);
