@@ -12,7 +12,7 @@ import game.gl.GLVertexArray;
 import game.math.Matrix;
 import game.math.Utils;
 
-public class CompiledMesh {
+public class CompiledMesh implements TransformRenderable {
 
 	private GLVertexArray vao;
 	private GLBuffer p1bo;
@@ -63,5 +63,10 @@ public class CompiledMesh {
 		GL20.glEnableVertexAttribArray(program.getTexCoordBinding());
 		tex.bind(0);
 		ibo.drawElements();
+	}
+	
+	@Override
+	public void render(Matrix viewTr, Matrix modelTr) {
+		render(viewTr, modelTr, 0);
 	}
 }

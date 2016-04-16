@@ -6,7 +6,6 @@ import game.events.TickEvent;
 import game.gl.GLDisplay;
 import game.math.Matrix;
 import game.math.Vector;
-import game.model.CompiledAnimMeshProgram;
 import game.model.Renderable;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class View {
   private List<Renderable> renderables = Lists.newArrayList();
   private GLDisplay display;
 
-  public View(EventBus eventBus, Clock clock, GLDisplay display, CompiledAnimMeshProgram program) {
+  public View(EventBus eventBus, Clock clock, GLDisplay display) {
     this.eventBus = eventBus;
     this.display = display;
     clock.onTick((e) -> onTick(e));

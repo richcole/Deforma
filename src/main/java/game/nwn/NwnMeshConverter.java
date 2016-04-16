@@ -16,9 +16,8 @@ import game.math.Matrix;
 import game.math.Quaternion;
 import game.math.Utils;
 import game.math.Vector;
-import game.model.AnimMesh;
 import game.model.Frame;
-import game.model.AnimMesh.AnimInfo;
+import game.model.AnimSet;
 import game.model.Mesh;
 import game.model.MeshFrame;
 import game.model.MeshFrameList;
@@ -214,20 +213,6 @@ public class NwnMeshConverter {
 			path.pop();
 		}
 		
-		private AnimMesh getAnimMesh() {
-			AnimMesh mesh = new AnimMesh(p.size(), e.size());
-			mesh.p = Utils.toDoubleArray3(p);
-			mesh.n = Utils.toDoubleArray3(n);
-			mesh.t = Utils.toDoubleArray2(t);
-			mesh.i = Utils.toIntArray(i);
-			mesh.e = Utils.toIntArray(e);
-			mesh.imageList = imageLexicon.toList();
-
-			mesh.b = Utils.toDoubleArray(b);
-			mesh.numBones = boneLexicon.size();
-			return mesh;
-		}
-
 		private Mesh getMesh(List<Matrix> btr) {
 			Mesh mesh = new Mesh(p.size(), e.size());
 			
@@ -245,81 +230,38 @@ public class NwnMeshConverter {
 			return mesh;
 		}
 	}
-
-	public AnimMesh convertToAnimMesh(MdlModel model) {
-		int numAnim = 0;
-		int numFrames = 0;
-		int numBtr = 0;
+	
+	public AnimSet convertToMeshFrameList(MdlModel model) {
 		
-		MdlModelVisitor modelVisitor = new MdlModelVisitor();
-		List<Matrix> bTr = Lists.newArrayList();
-		List<AnimInfo> animInfoList = Lists.newArrayList();
+		AnimSet animSet = new AnimSet();
 		
-		for(Entry<String, MdlAnimation> animEntry: model.getAnimMap().entrySet()) {
-			AnimInfo animInfo = new AnimInfo();
-			animInfo.name = animEntry.getKey();
-			animInfo.beginFrame = numFrames;
-
-			MdlAnimation animNode = animEntry.getValue();
-			
+		for(String animName: model.getAnimMap().keySet()) {
+			MdlAnimation animNode = model.getAnimMap().get(animName);
+			double animLength = animNode.getLength();
 			MdlNodeHeader animGeometry = animNode.getGeometryHeader().getGeometry();
+	
+			MdlModelVisitor modelVisitor = new MdlModelVisitor();
+	
+			PlaneCollector planeCollector = new PlaneCollector();
+			modelVisitor.visit(model.getGeometryHeader().getGeometry(), planeCollector);
+			
 			FrameCollector frameCollector = new FrameCollector();
 			modelVisitor.visit(animGeometry, frameCollector);
-
 			List<Frame> frames = frameCollector.getFrames();
+	
 			AnimDescCollector animCollector = new AnimDescCollector();
 			modelVisitor.visit(animGeometry, animCollector);
-			
-			animInfo.timings = new double[frames.size()];
-			
-			for(int i=0; i<frames.size(); ++i) {
-				Frame frame = frames.get(i);
-				animInfo.timings[i] = frame.beginTime;
+	
+			MeshFrameList meshFrameList = new MeshFrameList(animLength);
+			for(Frame frame: frames) {
 				BTrCollector btrCollector = new BTrCollector(animCollector, frame);
 				modelVisitor.visit(model.getGeometryHeader().getGeometry(), btrCollector);
-				bTr.addAll(btrCollector.getBTr());
-				numFrames += 1;
+				meshFrameList.add(new MeshFrame(planeCollector.getMesh(btrCollector.getBTr()), frame));
 			}
-			animInfo.endFrame = numFrames;
 			
-			numAnim += 1;			
+			animSet.put(animName, meshFrameList);
 		}
 		
-		numBtr = bTr.size();
-
-		PlaneCollector planeCollector = new PlaneCollector();
-		modelVisitor.visit(model.getGeometryHeader().getGeometry(), planeCollector);
-		AnimMesh mesh = planeCollector.getAnimMesh();
-		mesh.bTr = Utils.toDoubleArray16(bTr);
-		mesh.anims = animInfoList.toArray(new AnimInfo[animInfoList.size()]);
-		return mesh;
-	}
-	
-	public MeshFrameList convertToMeshFrameList(MdlModel model, String animName) {
-
-		MdlAnimation animNode = model.getAnimMap().get(animName);
-		double animLength = animNode.getLength();
-		MdlNodeHeader animGeometry = animNode.getGeometryHeader().getGeometry();
-
-		MdlModelVisitor modelVisitor = new MdlModelVisitor();
-
-		PlaneCollector planeCollector = new PlaneCollector();
-		modelVisitor.visit(model.getGeometryHeader().getGeometry(), planeCollector);
-		
-		FrameCollector frameCollector = new FrameCollector();
-		modelVisitor.visit(animGeometry, frameCollector);
-		List<Frame> frames = frameCollector.getFrames();
-
-		AnimDescCollector animCollector = new AnimDescCollector();
-		modelVisitor.visit(animGeometry, animCollector);
-
-		MeshFrameList meshFrameList = new MeshFrameList(animLength);
-		for(Frame frame: frames) {
-			BTrCollector btrCollector = new BTrCollector(animCollector, frame);
-			modelVisitor.visit(model.getGeometryHeader().getGeometry(), btrCollector);
-			meshFrameList.add(new MeshFrame(planeCollector.getMesh(btrCollector.getBTr()), frame));
-		}
-		
-		return meshFrameList;
+		return animSet;
 	}
 }
