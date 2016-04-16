@@ -1,9 +1,12 @@
 package game.main;
 
 import java.io.File;
+import java.lang.reflect.GenericArrayType;
 import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import game.controllers.InputProcessor;
 import game.controllers.KeyDownEvent;
@@ -36,6 +39,8 @@ import game.nwn.readers.KeyReader;
 import game.view.View;
 
 public class Main {
+	
+	private static Logger log = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
 		EventBus eventBus = new EventBus();
@@ -56,26 +61,37 @@ public class Main {
 		
 		compositeImage.addAll(mesh.imageList);
 		
-		CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage);
+		CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage, true);
 		CompiledMesh compiledMesh = new CompiledMesh(glFactory, bindingPool, meshProgram, compiledTexture, mesh);
 		view.add(new PosititionRenderable(compiledMesh, Matrix.IDENTITY));
 
 		InputProcessor inputProcessor = new InputProcessor(clock, eventBus);
 		PositionController positionController = new PositionController(eventBus, clock, inputProcessor, view);
 
-		loadRat2(glFactory, bindingPool, meshProgram, view, eventBus, clock, inputProcessor);
+		KeyReader keyReader = new KeyReader(new File("/Users/richcole/nwn"));
+
+		Matrix tr;
+		
+		tr = Matrix.IDENTITY;
+		tr = tr.times(Matrix.translate(view.getForward().times(5)));
+		tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
+		loadModel(glFactory, bindingPool, meshProgram, view, eventBus, clock, inputProcessor, "c_wererat", tr, keyReader);
+
+		tr = Matrix.IDENTITY;
+		tr = tr.times(Matrix.translate(view.getForward().times(10)));
+		tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
+		loadModel(glFactory, bindingPool, meshProgram, view, eventBus, clock, inputProcessor, "c_manticore", tr, keyReader);
 		
 		while (!display.isClosed()) {
 			clock.tick();
 		}
 	}
 
-	private static void loadRat2(GLFactory glFactory, UniformBindingPool bindingPool, CompiledMeshProgram program,
-			View view, EventBus eventBus, Clock clock, InputProcessor inputProcessor) {
-		KeyReader keyReader = new KeyReader(new File("/Users/richcole/nwn"));
+	private static void loadModel(GLFactory glFactory, UniformBindingPool bindingPool, CompiledMeshProgram program,
+			View view, EventBus eventBus, Clock clock, InputProcessor inputProcessor, String modelName, Matrix tr, KeyReader keyReader) {
 		CachingImageProvider nwnImageProvider = new CachingImageProvider(new NwnImageProvider(keyReader));
 		
-		AnimSet animSet = new NwnMeshConverter().convertToMeshFrameList(keyReader.getModel("c_wererat"));
+		AnimSet animSet = new NwnMeshConverter().convertToMeshFrameList(keyReader.getModel(modelName));
 	    CompositeImage compositeImage = new CompositeImage(nwnImageProvider);
 	    
 	    for(Entry<String, MeshFrameList> animEntry: animSet) {
@@ -83,11 +99,12 @@ public class Main {
 	    		compositeImage.addAll(meshFrame.mesh.imageList);
 	    	}
 	    }
-	    CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage);
+	    CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage, false);
 	    CompiledAnimSet compiledAnimSet = new CompiledAnimSet();
 	    
 	    for(Entry<String, MeshFrameList> animEntry: animSet) {
 	    	String animName = animEntry.getKey();
+	    	log.info("animName=" + animName);
 	    	MeshFrameList meshFrameList = animEntry.getValue();
 		    CompiledMeshFrameList compiledMeshFrameList = new CompiledMeshFrameList(meshFrameList.getTotalFrameTime());
 		    for(MeshFrame meshFrame: meshFrameList.getMeshFrameList()) {
@@ -97,9 +114,6 @@ public class Main {
 		    compiledAnimSet.put(animName, compiledMeshFrameList);
 	    }
 
-	    Matrix tr = Matrix.IDENTITY;
-		tr = tr.times(Matrix.translate(view.getForward().times(5)));
-		tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
 		view.add(new PosititionRenderable(compiledAnimSet, tr));
 
 		eventBus.onEvent(inputProcessor, KeyDownEvent.class, (e) -> { 

@@ -199,7 +199,7 @@ public class NwnMeshConverter {
 							Vector pos = mhdr.getVertices()[vertexIndex];
 							p.add(pos);
 							n.add(face.getPlaneNormal());
-							t.add(mhdr.getTexturePoints()[0][vertexIndex]);
+							t.add(mhdr.getTexturePoints()[localTextureIndex][vertexIndex]);
 							i.add(textureIndex);
 							b.add(boneIndex);
 						}

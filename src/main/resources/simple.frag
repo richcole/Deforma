@@ -10,8 +10,5 @@ out vec4 finalColor;
 
 void main() {
     vec4 color = texture(tex, fragTexCoords);
-    if ( color.a < 0.5 ) {
-      discard;
-    }
     finalColor = texture(tex, fragTexCoords) * fragLight;
 }
