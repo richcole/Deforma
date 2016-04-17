@@ -9,6 +9,6 @@ in float fragLight;
 out vec4 finalColor; 
 
 void main() {
-    vec4 color = texture(tex, fragTexCoords);
-    finalColor = texture(tex, fragTexCoords) * fragLight;
+    vec4 c = texture(tex, fragTexCoords);
+    finalColor = c;
 }

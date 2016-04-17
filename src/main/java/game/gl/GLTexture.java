@@ -36,9 +36,7 @@ public class GLTexture extends GLResource {
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, img.getWidth(), img.getHeight(), 0, GL11.GL_RGBA,
 				GL11.GL_UNSIGNED_BYTE, Utils.toByteBuffer(img.getRGBA()));
-		if ( generateMipMap ) {
-			GL30.glGenerateMipmap(id);
-		}
+		GL30.glGenerateMipmap(id);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 

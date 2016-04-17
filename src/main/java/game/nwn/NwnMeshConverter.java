@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Stack;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -194,6 +195,7 @@ public class NwnMeshConverter {
 					for(int localTextureIndex=0; localTextureIndex<mhdr.getTextureCount(); ++localTextureIndex) {
 						String texture = mhdr.getTextures()[localTextureIndex];
 						Integer textureIndex = imageLexicon.getIndex(texture);
+						Preconditions.checkArgument(face.getVertex().length == 3);
 						for(int vertexIndex: face.getVertex()) {
 							e.add(p.size());
 							Vector pos = mhdr.getVertices()[vertexIndex];
