@@ -25,9 +25,7 @@ public class World {
     BroadphaseInterface broadphase = new DbvtBroadphase();
     DefaultCollisionConfiguration collisionConfiguration = new DefaultCollisionConfiguration();
     CollisionDispatcher dispatcher = new CollisionDispatcher(collisionConfiguration);
-
     SequentialImpulseConstraintSolver solver = new SequentialImpulseConstraintSolver();
-
     DiscreteDynamicsWorld dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
     // set the gravity of our world

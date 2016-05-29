@@ -20,6 +20,7 @@ import game.creature.Creature;
 import game.creature.CreatureFactory;
 import game.creature.CreatureModel;
 import game.creature.CreatureModelFactory;
+import game.creature.RandomWalkCreatureBehaviour;
 import game.events.Clock;
 import game.events.EventBus;
 import game.events.TickEvent;
@@ -29,6 +30,7 @@ import game.gl.GLFactory;
 import game.image.CachingImageProvider;
 import game.image.ResourceImageProvider;
 import game.math.Matrix;
+import game.math.Vector;
 import game.model.AnimSet;
 import game.model.CompiledAnimSet;
 import game.model.CompiledMesh;
@@ -98,22 +100,23 @@ public class Main {
 		CachingImageProvider nwnImageProvider = new CachingImageProvider(new NwnImageProvider(erfReaderList, keyReader));
 		Matrix tr;
 
-
 		CreatureModelFactory creatureModelFactory = new CreatureModelFactory(glFactory, bindingPool, meshProgram, view, eventBus, clock, inputProcessor, nwnImageProvider, keyReader);
 		Cache<CreatureModel> creatureModelFactoryCache = new Cache<CreatureModel>(creatureModelFactory);
 		CreatureFactory creatureFactory = new CreatureFactory(clock, view, eventBus, creatureModelFactoryCache);
 		
 		List<Creature> creatureList = Lists.newArrayList();
-		for(int i=0;i<100;++i) {
-			tr = Matrix.IDENTITY;
-			tr = tr.times(Matrix.translate(view.getForward().times(i*5).plus(view.getLeft().times(5))));
-			tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
-			creatureList.add(creatureFactory.createCreature("c_wererat", "cwalk", tr));
+		Vector pos;
+		Creature c;
+		for(int i=0;i<1;++i) {
+			pos = view.getForward().times(i*5).plus(view.getLeft().times(5));
+			c = creatureFactory.createCreature("c_wererat", "cwalk", pos, 0);
+			c.setCreatureBehaviour(new RandomWalkCreatureBehaviour(c));
+			creatureList.add(c);
 
-			tr = Matrix.IDENTITY;
-			tr = tr.times(Matrix.translate(view.getForward().times(i*5).plus(view.getLeft().times(10))));
-			tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
-			creatureList.add(creatureFactory.createCreature("c_manticore", "cwalk", tr));
+			pos = view.getForward().times(i*5).plus(view.getLeft().times(10));
+			c = creatureFactory.createCreature("c_manticore", "cwalk", pos, 0);
+			c.setCreatureBehaviour(new RandomWalkCreatureBehaviour(c));
+			creatureList.add(c);
 		}
 
 		while (!display.isClosed()) {

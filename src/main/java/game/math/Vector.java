@@ -19,10 +19,10 @@ public class Vector {
 	public static final Vector M3 = new Vector(0, 0, -1, 1);
 	public static final Vector Z = new Vector(0, 0, 0, 1);
 	public static final Vector ONES = new Vector(1, 1, 1, 1);
-  public static final Vector BL = new Vector( 0,  0,  0, 1);
-  public static final Vector BR = new Vector( 1,  0,  0, 1);
-  public static final Vector TL = new Vector( 0,  1,  0, 1);
-  public static final Vector TR = new Vector( 1,  1,  0, 1);
+	public static final Vector BL = new Vector( 0,  0,  0, 1);
+	public static final Vector BR = new Vector( 1,  0,  0, 1);
+	public static final Vector TL = new Vector( 0,  1,  0, 1);
+	public static final Vector TR = new Vector( 1,  1,  0, 1);
 
 	static {
 		if (!LEFT.cross(UP).equals(NORMAL)) {
