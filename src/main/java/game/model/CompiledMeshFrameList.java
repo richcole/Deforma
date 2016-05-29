@@ -6,13 +6,11 @@ import com.google.common.collect.Lists;
 
 import game.math.Matrix;
 
-public class CompiledMeshFrameList implements TransformRenderable {
+public class CompiledMeshFrameList {
 
 	List<CompiledMeshFrame> meshFrameList = Lists.newArrayList();
 	double totalFrameTime;
 
-	int currentFrame = 0;
-	double t;
 	float alpha = 0;
 	
 	public CompiledMeshFrameList(double totalFrameTime) {
@@ -23,16 +21,9 @@ public class CompiledMeshFrameList implements TransformRenderable {
 		meshFrameList.add(new CompiledMeshFrame(frame, compiledMesh));
 	}
 
-	@Override
-	public void render(Matrix viewTr, Matrix modelTr) {
-		meshFrameList.get(currentFrame).mesh.render(viewTr, modelTr, alpha);
-	}
-
-	public void nextFrame() {
-		currentFrame = currentFrame + 1;
-		if (currentFrame >= meshFrameList.size()) {
-			currentFrame = 0;
-		}
+	public void render(Matrix viewTr, Matrix modelTr, int frame, double t) {
+		t = t % totalFrameTime;
+		meshFrameList.get(frame).mesh.render(viewTr, modelTr, alpha);
 	}
 
 	private double getEndTime(int i) {
@@ -46,18 +37,18 @@ public class CompiledMeshFrameList implements TransformRenderable {
 		return endTime;
 	}
 
-	public void advanceSeconds(double dt) {
-		t = (t + dt) % totalFrameTime;
+	public int getFrame(double t) {
+		t = t % totalFrameTime;
 		for(int i=0;i < meshFrameList.size(); ++i) {
 			CompiledMeshFrame meshFrame = meshFrameList.get(i);
 			double beginTime = meshFrame.frame.beginTime;
 			double endTime = getEndTime(i);
 			if ( t >= beginTime && t < endTime ) {
 				alpha = (float)((t - beginTime) / (endTime - beginTime));
-				currentFrame = i;
-				break;
+				return i;
 			}
 		}
+		return 0;
 	}
 	
 }

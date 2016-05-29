@@ -3,15 +3,23 @@ package game.main;
 import java.io.File;
 import java.lang.reflect.GenericArrayType;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import game.controllers.InputProcessor;
 import game.controllers.KeyDownEvent;
 import game.controllers.PositionController;
+import game.creature.Cache;
+import game.creature.Creature;
+import game.creature.CreatureFactory;
+import game.creature.CreatureModel;
+import game.creature.CreatureModelFactory;
 import game.events.Clock;
 import game.events.EventBus;
 import game.events.TickEvent;
@@ -85,92 +93,32 @@ public class Main {
 		erfReaderList.add(new File(nwnRoot, "texturepacks/Textures_tpa.erf"));
 		erfReaderList.add(new File(nwnRoot, "texturepacks/xp1_tex_tpa.erf"));
 		erfReaderList.add(new File(nwnRoot, "texturepacks/xp2_tex_tpa.erf"));
-
-		/*
-		erfReaderList.addAll(nwnRoot);
 		
-		for(ErfReader reader: erfReaderList.getReaders()) {
-			for(String key: reader.getKeys()) {
-				if ( key.contains("c_manticore") ) {
-					log.info("key '" + key + "'");
-				}
-			}
-			if ( reader.getKeys().contains("c_manticore") ) {
-				log.info("Found c_manticore resource");
-				Collection<ErfKeyEntry> entryList = reader.getEntryList("c_manticore");
-				for(ErfKeyEntry entry: entryList) {
-					log.info("entry " + entry.name + " " + entry.resType);
-				}
-			}
-		}
-		*/
-		
-		// erfReaderList.addAll(nwnRoot);
-		byte[] manticore = erfReaderList.getResource("c_manticore", ResourceType.DDS);
 		KeyReader keyReader = new KeyReader(nwnRoot);
 		CachingImageProvider nwnImageProvider = new CachingImageProvider(new NwnImageProvider(erfReaderList, keyReader));
 		Matrix tr;
 
-		tr = Matrix.IDENTITY;
-		tr = tr.times(Matrix.translate(view.getForward().times(5)));
-		tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
-		loadModel(glFactory, bindingPool, meshProgram, view, eventBus, clock,
-				inputProcessor, "c_wererat", tr, nwnImageProvider, keyReader);
 
-		tr = Matrix.IDENTITY;
-		tr = tr.times(Matrix.translate(view.getForward().times(10)));
-		tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
-		loadModel(glFactory, bindingPool, meshProgram, view, eventBus, clock,
-				inputProcessor, "c_manticore", tr, nwnImageProvider, keyReader);
+		CreatureModelFactory creatureModelFactory = new CreatureModelFactory(glFactory, bindingPool, meshProgram, view, eventBus, clock, inputProcessor, nwnImageProvider, keyReader);
+		Cache<CreatureModel> creatureModelFactoryCache = new Cache<CreatureModel>(creatureModelFactory);
+		CreatureFactory creatureFactory = new CreatureFactory(clock, view, eventBus, creatureModelFactoryCache);
+		
+		List<Creature> creatureList = Lists.newArrayList();
+		for(int i=0;i<100;++i) {
+			tr = Matrix.IDENTITY;
+			tr = tr.times(Matrix.translate(view.getForward().times(i*5).plus(view.getLeft().times(5))));
+			tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
+			creatureList.add(creatureFactory.createCreature("c_wererat", "cwalk", tr));
+
+			tr = Matrix.IDENTITY;
+			tr = tr.times(Matrix.translate(view.getForward().times(i*5).plus(view.getLeft().times(10))));
+			tr = tr.times(Matrix.rot(Math.PI / 2, view.getLeft()));
+			creatureList.add(creatureFactory.createCreature("c_manticore", "cwalk", tr));
+		}
 
 		while (!display.isClosed()) {
 			clock.tick();
 		}
 	}
 
-	private static void loadModel(GLFactory glFactory,
-			UniformBindingPool bindingPool, CompiledMeshProgram program,
-			View view, EventBus eventBus, Clock clock,
-			InputProcessor inputProcessor, String modelName, Matrix tr,
-			CachingImageProvider imageProvider,
-			KeyReader keyReader) 
-	{
-		;
-
-		AnimSet animSet = new NwnMeshConverter()
-				.convertToMeshFrameList(keyReader.getModel(modelName));
-		CompositeImage compositeImage = new CompositeImage(imageProvider);
-
-		for (Entry<String, MeshFrameList> animEntry : animSet) {
-			for (MeshFrame meshFrame : animEntry.getValue().getMeshFrameList()) {
-				compositeImage.addAll(meshFrame.mesh.imageList);
-			}
-		}
-		CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage, false);
-		CompiledAnimSet compiledAnimSet = new CompiledAnimSet();
-
-		for (Entry<String, MeshFrameList> animEntry : animSet) {
-			String animName = animEntry.getKey();
-			log.info("animName=" + animName);
-			MeshFrameList meshFrameList = animEntry.getValue();
-			CompiledMeshFrameList compiledMeshFrameList = new CompiledMeshFrameList(
-					meshFrameList.getTotalFrameTime());
-			for (MeshFrame meshFrame : meshFrameList.getMeshFrameList()) {
-				CompiledMesh compiledMesh = new CompiledMesh(glFactory,
-						bindingPool, program, compiledTexture, meshFrame.mesh);
-				compiledMeshFrameList.add(meshFrame.frame, compiledMesh);
-			}
-			compiledAnimSet.put(animName, compiledMeshFrameList);
-		}
-
-		view.add(new PosititionRenderable(compiledAnimSet, tr));
-
-		eventBus.onEvent(inputProcessor, KeyDownEvent.class, (e) -> {
-			if (e.key == Keyboard.KEY_P)
-				compiledAnimSet.nextAnim();
-		});
-
-		eventBus.onEvent(clock, TickEvent.class,
-				(e) -> compiledAnimSet.advanceSeconds(e.dt));
-	}
 }

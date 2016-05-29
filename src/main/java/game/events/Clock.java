@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 public class Clock {
   
   private EventBus eventBus;
-  double t = System.nanoTime() / 1e-9;
+  double t = System.nanoTime() * 1e-9;
 
   public Clock(EventBus eventBus) {
     this.eventBus = eventBus;
