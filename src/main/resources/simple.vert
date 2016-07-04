@@ -19,5 +19,5 @@ void main() {
     vec3 p = (1 - alpha) * p1 + alpha * p2;
     gl_Position = fragTr * vec4(p, 1);
     fragTexCoords = texCoords;
-    fragLight = 0.2 + (abs(dot(vec3(1,1,1),normal)) * 0.8);
+    fragLight = 0.2 + (abs(dot(vec3(0.3,0.7,0.4),normal)) * 0.8);
 }

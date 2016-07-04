@@ -8,10 +8,10 @@ import com.google.common.collect.Maps;
 
 public class Lexicon {
 	
-	Map<String, Integer> stringMap = Maps.newHashMap();
-	Map<Integer, String> intMap = Maps.newHashMap();
+	private Map<String, Integer> stringMap = Maps.newHashMap();
+	private Map<Integer, String> intMap = Maps.newHashMap();
 
-	int getIndex(String string) {
+	public int getIndex(String string) {
 		Integer index = stringMap.get(string);
 		if ( index == null ) {
 			index = stringMap.size();
@@ -21,7 +21,7 @@ public class Lexicon {
 		return index;
 	}
 	
-	String getString(int i) {
+	public String getString(int i) {
 		return intMap.get(i);
 	}
 

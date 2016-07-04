@@ -8,6 +8,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL31;
+import org.lwjgl.opengl.Util;
 
 import com.google.common.base.Preconditions;
 
@@ -46,13 +47,14 @@ public class GLProgram extends GLResource {
 
 	public int getAttrib(String name) {
 		int attribId = GL20.glGetAttribLocation(id, name);
-		Preconditions.checkArgument(attribId >= 0);
+		Util.checkGLError();
+		Preconditions.checkArgument(attribId != GL31.GL_INVALID_INDEX);
 		return attribId;
 	}
 
 	public int getUniform(String name) {
 		int attribId = GL20.glGetUniformLocation(id, name);
-		Preconditions.checkArgument(attribId >= 0);
+		Preconditions.checkArgument(attribId != GL31.GL_INVALID_INDEX);
 		return attribId;
 	}
 
@@ -63,7 +65,9 @@ public class GLProgram extends GLResource {
 	}
 
 	public void setUniform(String name, int value) {
-		GL20.glUniform1i(GL20.glGetUniformLocation(id, name), value);
+		int uniformLocation = GL20.glGetUniformLocation(id, name);
+		Preconditions.checkArgument(uniformLocation != GL31.GL_INVALID_INDEX);
+		GL20.glUniform1i(uniformLocation, value);
 	}
 
 	public void setUniform(int var, int value) {

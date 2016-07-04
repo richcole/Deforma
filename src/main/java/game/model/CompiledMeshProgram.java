@@ -1,6 +1,7 @@
 package game.model;
 
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.Util;
 
 import game.gl.GLFactory;
 import game.gl.GLProgram;
@@ -23,7 +24,9 @@ public class CompiledMeshProgram {
 		program.attach(glFactory.newShader(GL20.GL_VERTEX_SHADER).compile(baseName + ".vert"));
 		program.attach(glFactory.newShader(GL20.GL_FRAGMENT_SHADER).compile(baseName + ".frag"));
 		program.link();
-		program.setUniform("tex", 0);
+		Util.checkGLError();
+		// program.setUniform("tex", 0);
+		Util.checkGLError();
 		p1Binding = program.getAttrib("p1");
 		p2Binding = program.getAttrib("p2");
 		normalBinding = program.getAttrib("normal");

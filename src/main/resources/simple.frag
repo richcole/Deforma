@@ -10,5 +10,5 @@ out vec4 finalColor;
 
 void main() {
     vec4 c = texture(tex, fragTexCoords);
-    finalColor = c;
+    finalColor = vec4(c.rgb * fragLight, c.a);
 }

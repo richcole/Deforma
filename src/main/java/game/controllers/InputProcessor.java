@@ -35,10 +35,10 @@ public class InputProcessor {
 			}
 		}
 
-		if ( mx != pmx || my != pmy ) {
-		  eventBus.emit(this, new MouseMoveEvent(mx - pmx, my - pmy));
-	    pmx = mx;
-	    pmy = my;
+		if (mx != pmx || my != pmy) {
+			eventBus.emit(this, new MouseMoveEvent(mx - pmx, my - pmy));
+			pmx = mx;
+			pmy = my;
 		}
 
 		while (Keyboard.next()) {

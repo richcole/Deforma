@@ -40,10 +40,11 @@ public class View {
 
   private void update() {
     double dydx = display.getHeightToWidthRatio();
-    double dx = 1.0;
+    double dx = 0.3;
     double dy = dydx * dx;
+    double dz = 0.3;
     viewMatrix = Matrix
-        .frustum(-dx, dx, dy, -dy, 1, 10000)
+        .frustum(-dx, dx, dy, -dy, 0.3, 10000)
         .times(rot).times(Matrix.translate(position.minus()));
     eventBus.emit(this, new ViewUpdatedEvent());
   }
