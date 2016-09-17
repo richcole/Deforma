@@ -69,7 +69,7 @@ public class Terrain {
 	}
 
 	private int getIndex(Vector x) {
-		return getIndex((int)x.x(), (int)x.y(), (int)x.z());
+		return getIndex((int)Math.round(x.x()), (int)Math.round(x.y()), (int)Math.round(x.z()));
 	}
 	
 	private int getIndex(int x, int y, int z) {

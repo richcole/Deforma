@@ -36,25 +36,30 @@ public class TerrainPlayerController {
 	}
 	
 	public Vector tryMove(Vector x, Vector dx) {
+		if ( false ) {
+			return dx;
+		}
 		if (terrain.insideTerrain(player.getPosition())) {
 			Vector dxz = new Vector(dx.x(), 0, dx.z(), 1.0);
 			Vector nx = x.plus(dxz).minus(Vector.U2);
-			Vector p1 = nx.plus(Vector.U1.times(0.5));
-			Vector p2 = nx.plus(Vector.U3.times(0.5));
-			Vector p3 = nx.minus(Vector.U1.times(0.5));
-			Vector p4 = nx.minus(Vector.U3.times(0.5));
 			
-			if ( terrain.getTerrain(p1) != 0 ) {
-				return Vector.Z;
-			}
-			if ( terrain.getTerrain(p2) != 0 ) {
-				return Vector.Z;
-			}
-			if ( terrain.getTerrain(p3) != 0 ) {
-				return Vector.Z;
-			}
-			if ( terrain.getTerrain(p4) != 0 ) {
-				return Vector.Z;
+			// work out the center of the square the character is
+			// in
+			Vector c = new Vector(Math.round(nx.x()), nx.y(), Math.round(nx.z()), 1.0);
+			
+			for(int cx=-1;cx<=1;cx+=1) {
+				for(int cz=-1;cz<=1;cz+=1) {
+					Vector ex = Vector.U1.times(cx);
+					Vector ez = Vector.U3.times(cz);
+					Vector exz = ex.plus(ez);
+					if ( terrain.getTerrain(c.plus(exz)) != 0) {
+						Vector cxmn = c.plus(exz.times(0.5)).minus(nx);
+						double l = cxmn.lengthSquared();
+						if ( l < 0.30 ) {
+							return Vector.Z;
+						}
+					}
+				}
 			}
 			
 			return dxz;
