@@ -5,28 +5,27 @@ import game.math.Vector;
 import game.view.View;
 
 public class Player {
-	
+
 	private View view;
 	private TerrainPlayerController terrainPlayerController;
 
 	public Player(View view) {
 		this.view = view;
 	}
-	
+
 	public void setTerrainPlayerController(TerrainPlayerController terrainPlayerController) {
 		this.terrainPlayerController = terrainPlayerController;
 	}
-	
+
 	public void move(Vector dx) {
 		view.move(dx);
 	}
-	
-	public void tryMove(Vector dx) {
-		if ( terrainPlayerController != null ) {
-			dx = terrainPlayerController.tryMove(getPosition(), dx);
+
+	public void tryMove(Vector dx, boolean playerMove) {
+		if (terrainPlayerController != null) {
+			dx = terrainPlayerController.tryMove(getPosition(), dx, playerMove);
 			view.move(dx);
-		}
-		else {
+		} else {
 			view.move(dx);
 		}
 	}

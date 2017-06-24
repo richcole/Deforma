@@ -11,7 +11,7 @@ import game.model.CompiledMesh;
 import game.model.CompiledMeshFrameList;
 import game.model.CompiledMeshProgram;
 import game.model.CompiledTexture;
-import game.model.CompositeImage;
+import game.model.DefaultCompositeImage;
 import game.model.MeshFrame;
 import game.model.MeshFrameList;
 import game.model.UniformBindingPool;
@@ -51,7 +51,7 @@ public class CreatureModelFactory implements Function<String, CreatureModel> {
 	public CreatureModel apply(String modelName) {
 		AnimSet animSet = new NwnMeshConverter()
 				.convertToMeshFrameList(keyReader.getModel(modelName));
-		CompositeImage compositeImage = new CompositeImage(imageProvider);
+		DefaultCompositeImage compositeImage = new DefaultCompositeImage(imageProvider);
 
 		for (Entry<String, MeshFrameList> animEntry : animSet) {
 			log.info("Anim name: " + animEntry.getKey());
@@ -59,8 +59,7 @@ public class CreatureModelFactory implements Function<String, CreatureModel> {
 				compositeImage.addAll(meshFrame.mesh.imageList);
 			}
 		}
-		CompiledTexture compiledTexture = new CompiledTexture(glFactory,
-				compositeImage, false);
+		CompiledTexture compiledTexture = new CompiledTexture(glFactory, compositeImage);
 		CompiledAnimSet compiledAnimSet = new CompiledAnimSet();
 
 		for (Entry<String, MeshFrameList> animEntry : animSet) {

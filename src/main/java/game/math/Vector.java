@@ -4,29 +4,35 @@ import java.util.Arrays;
 
 import org.lwjgl.opengl.GL11;
 
+import javax.vecmath.Vector3f;
+
 public class Vector {
 
 	double v[] = new double[4];
 
-	public static final Vector LEFT = new Vector(-1, 0, 0, 1);
-	public static final Vector UP = new Vector(0, 0, 1, 1);
-	public static final Vector NORMAL = new Vector(0, 1, 0, 1);
 	public static final Vector U1 = new Vector(1, 0, 0, 1);
 	public static final Vector U2 = new Vector(0, 1, 0, 1);
 	public static final Vector U3 = new Vector(0, 0, 1, 1);
-	public static final Vector M1 = new Vector(-1, 0, 0, 1);
-	public static final Vector M2 = new Vector(0, -1, 0, 1);
-	public static final Vector M3 = new Vector(0, 0, -1, 1);
+
+	public static final Vector M1 = new Vector(-1,  0,   0, 1);
+	public static final Vector M2 = new Vector( 0,  -1,  0, 1);
+	public static final Vector M3 = new Vector( 0,  0,  -1, 1);
+
+	public static final Vector RIGHT = U1;
+	public static final Vector UP    = U2;
+	public static final Vector FWD   = U3;
+
 	public static final Vector Z = new Vector(0, 0, 0, 1);
 	public static final Vector ONES = new Vector(1, 1, 1, 1);
+
 	public static final Vector BL = new Vector( 0,  0,  0, 1);
 	public static final Vector BR = new Vector( 1,  0,  0, 1);
 	public static final Vector TL = new Vector( 0,  1,  0, 1);
 	public static final Vector TR = new Vector( 1,  1,  0, 1);
 
 	static {
-		if (!LEFT.cross(UP).equals(NORMAL)) {
-			throw new RuntimeException("Not right handed " + LEFT.cross(UP) + " " + NORMAL);
+		if (!RIGHT.cross(UP).equals(FWD)) {
+			throw new RuntimeException("Not right handed " + RIGHT.cross(UP) + " " + FWD);
 		}
 	}
 
@@ -63,6 +69,12 @@ public class Vector {
 
 	public Vector project() {
 		return new Vector(v[0] / v[3], v[1] / v[3], v[2] / v[3], 1.0);
+	}
+
+	public Vector project(int i) {
+		Vector result = new Vector(0, 0, 0, 1);
+		result.set(i, v[i] / v[3]);
+		return result;
 	}
 
 	public Vector normalize() {
@@ -233,6 +245,10 @@ public class Vector {
 		return new Vector(Math.floor(x()), Math.floor(y()), Math.floor(z()), 1);
 	}
 
+	public Vector round() {
+		return new Vector(Math.round(x()), Math.round(y()), Math.round(z()), 1);
+	}
+
 	public boolean lessThan(Vector other) {
 		return x() < other.x() && y() < other.y() && z() < other.z();
 	}
@@ -273,4 +289,7 @@ public class Vector {
     return r;
   }
 
+	public Vector3f toVector3f() {
+		return new Vector3f((float)x(), (float)y(), (float)z());
+	}
 }

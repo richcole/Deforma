@@ -41,7 +41,7 @@ public class World {
     RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0,0,0)); 
     RigidBody groundRigidBody = new RigidBody(groundRigidBodyCI); 
 
-    // add our ground to the dynamic world..
+    // addComponent our ground to the dynamic world..
     dynamicsWorld.addRigidBody(groundRigidBody);  
 
     // setup the motion state for the ball
@@ -56,7 +56,7 @@ public class World {
     RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(mass,fallMotionState,fallShape,fallInertia); 
     RigidBody fallRigidBody = new RigidBody(fallRigidBodyCI); 
 
-    //now we add it to our physics simulation 
+    //now we addComponent it to our physics simulation
     dynamicsWorld.addRigidBody(fallRigidBody); 
 
     for (int i=0 ; i<300 ; i++) { 

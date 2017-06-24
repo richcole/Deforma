@@ -36,11 +36,11 @@ public class PositionController {
 	}
 
 	public void onTickEvent(TickEvent event) {
-		double dt = event.dt;
+		double dt = 0.01;
 		if (dt != 0 && (vx != 0 || vy != 0)) {
 			Vector dp = Vector.U1.times(vx * dt).plus(Vector.U3.times(vy * dt)).times(speed);
 			Vector rdp = player.getRotationInv().times(dp);
-			player.tryMove(rdp);
+			player.tryMove(rdp, true);
 		}
 	}
 

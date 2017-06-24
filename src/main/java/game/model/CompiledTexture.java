@@ -8,8 +8,8 @@ public class CompiledTexture {
   private GLTexture tex;
   private CompositeImage compositeImage;
 
-  public CompiledTexture(GLFactory glFactory, CompositeImage compositeImage, boolean generateMipMaps) {
-    this.tex = glFactory.newTexture(compositeImage, generateMipMaps);
+  public CompiledTexture(GLFactory glFactory, CompositeImage compositeImage) {
+    this.tex = compositeImage.getTexture(glFactory);
     this.compositeImage = compositeImage;
   }
 

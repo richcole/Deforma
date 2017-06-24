@@ -68,8 +68,16 @@ public class Terrain {
 		return 0;
 	}
 
+	public byte getTerrain(int x, int y, int z) {
+		int index = getIndex(x, y, z);
+		if ( index >= 0 && index < blockType.length ) {
+			return blockType[index];
+		}
+		return 0;
+	}
+
 	private int getIndex(Vector x) {
-		return getIndex((int)Math.round(x.x()), (int)Math.round(x.y()), (int)Math.round(x.z()));
+		return getIndex((int)Math.floor(x.x()), (int)Math.floor(x.y()), (int)Math.floor(x.z()));
 	}
 	
 	private int getIndex(int x, int y, int z) {
@@ -83,5 +91,16 @@ public class Terrain {
 	private boolean insideTerrain(int x, int y, int z) {
 		return x >= 0 && y >= 0 && z >= 0 && x < dx && y < dy && z < dz;
 	}
-	
+
+	public int getDx() {
+		return dx;
+	}
+
+	public int getDy() {
+		return dy;
+	}
+
+	public int getDz() {
+		return dz;
+	}
 }

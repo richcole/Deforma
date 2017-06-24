@@ -4,6 +4,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import javax.vecmath.Matrix4d;
+
 public class Matrix {
 
     public double v[] = new double[16];
@@ -156,6 +158,23 @@ public class Matrix {
         return r;
     }
 
+    public Matrix invert() {
+        Matrix4d tmp = new Matrix4d();
+        Matrix r = new Matrix();
+        for(int i = 0; i < 4; ++i) {
+            for(int j = 0; j < 4; ++j) {
+                tmp.setElement(i, j, get(i, j));
+            }
+        }
+        tmp.invert();
+        for(int i = 0; i < 4; ++i) {
+            for(int j = 0; j < 4; ++j) {
+                r.set(i, j, tmp.getElement(i, j));
+            }
+        }
+        return r;
+    }
+
     public static Matrix rot(double theta, Vector x) {
         x = x.normalize();
         Matrix square = Matrix.square(x);
@@ -219,9 +238,8 @@ public class Matrix {
         }
         tr.v[15] = 1.0;
         return tr;
-
     }
-    
+
     public static Matrix flip(int index) {
     	Matrix tr = new Matrix(Matrix.IDENTITY);
     	tr.set(index, index, -1);

@@ -54,7 +54,10 @@ public class CompiledMesh implements TransformRenderable {
 		program.setViewTr(viewTr);
 		program.setModelTr(modelTr);
 		program.setAlpha(alpha);
-		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		GL11.glPolygonMode(GL11.GL_FRONT, GL11.GL_FILL);
+		GL11.glFrontFace(GL11.GL_CCW);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glCullFace(GL11.GL_BACK);
 		// GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		GL30.glBindVertexArray(vao.getId());
 		GL20.glEnableVertexAttribArray(program.getP1Binding());

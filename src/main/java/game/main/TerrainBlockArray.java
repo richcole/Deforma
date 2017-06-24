@@ -1,8 +1,9 @@
 package game.main;
 
-import java.util.Random;
 import java.util.function.Function;
 
+import game.terrain.TerrainWithTr;
+import game.terrain.TerrainWithTrBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import game.math.Vector;
 import game.model.CompiledMesh;
 import game.model.CompiledMeshProgram;
 import game.model.CompiledTexture;
-import game.model.CompositeImage;
+import game.model.DefaultCompositeImage;
 import game.model.Mesh;
 import game.model.Renderable;
 import game.model.UniformBindingPool;
@@ -29,10 +30,10 @@ public class TerrainBlockArray implements Renderable {
 
 	private static Logger log = LoggerFactory.getLogger(TerrainBlockArray.class);
 	
-	private int dx = 8;
-	private int dy = 2;
-	private int dz = 8;
-	private int blockSize = 16;
+	private int dx = 1;
+	private int dy = 1;
+	private int dz = 1;
+	private int chunkSize = 16;
 
 	private View view;
 	private Terrain terrain;
@@ -45,16 +46,18 @@ public class TerrainBlockArray implements Renderable {
 		this.terrain = terrain;
 		
 		TerrainBlockTypes terrainBlockTypes = new TerrainBlockTypes();
-		TerrainBlockBuilder terrainBlock = new TerrainBlockBuilder(terrainBlockTypes, Matrix.IDENTITY);
-		CompositeImage terrainCompositeImage = new CompositeImage(resourceImageProvider);
+		TerrainBlockBuilder terrainBlock = new TerrainBlockBuilder(terrainBlockTypes);
+		DefaultCompositeImage terrainCompositeImage = new DefaultCompositeImage(resourceImageProvider);
 		terrainCompositeImage.addAll(Lists.newArrayList("marble.jpg"));
-		CompiledTexture terrainCompiledTexture = new CompiledTexture(glFactory, terrainCompositeImage, true);
+		CompiledTexture terrainCompiledTexture = new CompiledTexture(glFactory, terrainCompositeImage);
 		
 		for(int x=0;x<dx;x++) {
 			for(int y=0;y<dy;y++) {
 				for(int z=0;z<dz;z++) {
-					log.info("Create block " + x + " " + y + " " + z);
-					Mesh terrainMesh = terrainBlock.createMesh(terrain, new Vector(x, y, z).times(blockSize), blockSize);
+					log.info("Create chunk " + x + " " + y + " " + z);
+					Matrix tr = Matrix.translate(new Vector(x, y, z)).times(Matrix.scale(1.0));
+					TerrainWithTr terrainWithTr = new TerrainWithTrBuilder().terrain(terrain).tr(tr).build();
+					Mesh terrainMesh = terrainBlock.createMesh(terrainWithTr, x, y, z, chunkSize);
 					compiledMesh[index(x,y,z)] = new CompiledMesh(glFactory, bindingPool, meshProgram, terrainCompiledTexture, terrainMesh);
 				}
 			}
@@ -68,9 +71,9 @@ public class TerrainBlockArray implements Renderable {
 	@Override
 	public void render(Matrix viewMatrix) {
 		Vector p = view.getPosition();
-		int x = (int) Utils.clamp(p.x() / blockSize, 0, dx);
-		int y = (int) Utils.clamp(p.y() / blockSize, 0, dy);
-		int z = (int) Utils.clamp(p.z() / blockSize, 0, dz);
+		int x = (int) Utils.clamp(p.x() / chunkSize, 0, dx);
+		int y = (int) Utils.clamp(p.y() / chunkSize, 0, dy);
+		int z = (int) Utils.clamp(p.z() / chunkSize, 0, dz);
 		for(int sx=-1;sx<=1;++sx) {
 			for(int sy=-1;sy<=1;++sy) {
 				for(int sz=-1;sz<=1;++sz) {

@@ -23,7 +23,7 @@ public class View {
 
   private EventBus eventBus;
 
-  private Vector position = Vector.U1.times(1.0);
+  private Vector position = new Vector(-10, 10, -10, 1.0);
   private Matrix viewMatrix = Matrix.IDENTITY;
   private Matrix rot = Matrix.IDENTITY;
   private Matrix rotInv = Matrix.IDENTITY;
@@ -44,7 +44,7 @@ public class View {
     double dy = dydx * dx;
     double dz = 0.3;
     viewMatrix = Matrix
-        .frustum(-dx, dx, dy, -dy, 0.3, 10000)
+        .frustum(-dx, dx, dy, -dy, dz, 10000)
         .times(rot).times(Matrix.translate(position.minus()));
     eventBus.emit(this, new ViewUpdatedEvent());
   }

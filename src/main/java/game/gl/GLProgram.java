@@ -47,8 +47,8 @@ public class GLProgram extends GLResource {
 
 	public int getAttrib(String name) {
 		int attribId = GL20.glGetAttribLocation(id, name);
-		Util.checkGLError();
-		Preconditions.checkArgument(attribId != GL31.GL_INVALID_INDEX);
+		// Util.checkGLError();
+		// Preconditions.checkArgument(attribId != GL31.GL_INVALID_INDEX);
 		return attribId;
 	}
 

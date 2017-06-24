@@ -24,8 +24,8 @@ public class GLFactory {
     return new GLBuffer(disposer);
   }
 
-  public GLTexture newTexture(Image image, boolean generateMipMap) {
-    return new GLTexture(disposer, image, generateMipMap);
+  public GLTexture newTexture(Image image) {
+    return new GLTexture(disposer, image);
   }
 
   public GLProgram newProgram() {

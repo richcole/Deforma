@@ -15,7 +15,7 @@ public class MeshBuilder {
 	private List<Vector> ts = Lists.newArrayList();
 	private List<Integer> is = Lists.newArrayList();
 	private Lexicon images = new Lexicon();
-	private Matrix tr;
+	private Matrix tr = Matrix.IDENTITY;
 	
 	public MeshBuilder() {
 		
