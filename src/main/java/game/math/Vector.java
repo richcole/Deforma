@@ -20,7 +20,7 @@ public class Vector {
 
 	public static final Vector RIGHT = U1;
 	public static final Vector UP    = U2;
-	public static final Vector FWD   = U3;
+	public static final Vector FWD   = M3;
 
 	public static final Vector Z = new Vector(0, 0, 0, 1);
 	public static final Vector ONES = new Vector(1, 1, 1, 1);
@@ -31,7 +31,7 @@ public class Vector {
 	public static final Vector TR = new Vector( 1,  1,  0, 1);
 
 	static {
-		if (!RIGHT.cross(UP).equals(FWD)) {
+		if (!UP.cross(RIGHT).equals(FWD)) {
 			throw new RuntimeException("Not right handed " + RIGHT.cross(UP) + " " + FWD);
 		}
 	}

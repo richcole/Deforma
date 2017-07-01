@@ -12,44 +12,60 @@ public class Main {
 	public static void main(String[] args) {
 
 		log.info("Starting");
+		SimpleClock clock = new SimpleSystemClock();
 		GlEngine glEngine = new GlEngine();
 		InputController inputController = new InputController();
 
 		Scene scene = new Scene(glEngine, inputController);
 		ComponentBuilder componentBuilder = new ComponentBuilder(glEngine);
+		UIComponent uiComponent = new UIComponent(glEngine, clock);
 
-		DefaultRenderTarget renderTarget = new DefaultRenderTarget();
-		DefaultCameraComponent cameraComponent = new DefaultCameraComponent(renderTarget);
+		DefaultRenderTarget defaultRenderTarget = new DefaultRenderTarget();
+		DefaultCameraComponent defaultCameraComponent = new DefaultCameraComponent(defaultRenderTarget);
 
 		PlayerComponent playerComponent = new PlayerComponent();
-		playerComponent.setInvLocalTransform(Transform.lookAt(Vector.Z, Vector.ONES.times(10000), Vector.UP));
-
-		scene.addComponent(componentBuilder
-			.newSquare(Vector.RIGHT, Vector.FWD)
-			.withPosition(Vector.UP.minus().times(5))
-			.withScale(100, 100, 100)
-			.build());
-
-		scene.addComponent(componentBuilder
-			.newCube()
-			.withPosition(Vector.UP.times(30).plus(Vector.FWD.times(30)))
-			.withScale(10, 10, 10)
-			.build());
+		playerComponent.setLocalTransform(Transform.lookAt(Vector.Z, Vector.ONES.times(10000), Vector.UP).invert());
 
 		BufferedCamera bufferedCamera = new BufferedCamera(glEngine);
 
-		scene.addComponent(componentBuilder
-			.withTexture(bufferedCamera.getTexture())
-			.newSquare(Vector.RIGHT.minus(), Vector.UP)
-			.withPosition(Vector.ONES.times(10))
-			.withScale(10, 10, 10)
-			.build());
+		RenderComponent square = componentBuilder
+			.newSquare(Vector.RIGHT, Vector.FWD)
+			.withPosition(Vector.UP.minus().times(5))
+			.withScale(100, 100, 100)
+			.build();
 
-		scene.addComponent(renderTarget);
+		RenderComponent cube = componentBuilder
+			.newCube()
+			.withPosition(Vector.UP.times(30).plus(Vector.FWD.times(30)))
+			.withScale(10, 10, 10)
+			.build();
+
+		RenderComponent cameraSquare = componentBuilder
+			.withTexture(bufferedCamera.getTexture())
+			.newSquare(Vector.RIGHT, Vector.UP)
+			.withPosition(new Vector(10, 10, -10))
+			.withScale(10, 10, 10)
+			.build();
+
+		PlayerInputController playerInputController = new PlayerInputController(playerComponent.getPhysicalObject());
+		UIComponentController uiInputController = new UIComponentController(uiComponent);
+		PositionPainter printPositionController = new PositionPainter(uiComponent, playerComponent.getPhysicalObject());
+
+		scene.addComponent(playerInputController);
+		scene.addComponent(uiInputController);
+		uiComponent.addPainter(printPositionController);
+
+		scene.addComponent(square);
+		scene.addComponent(cube);
+		scene.addComponent(cameraSquare);
+
+		scene.addComponent(defaultRenderTarget);
 		scene.addComponent(playerComponent);
 
 		playerComponent.addComponent(bufferedCamera);
-		playerComponent.addComponent(cameraComponent);
+		playerComponent.addComponent(defaultCameraComponent);
+
+		scene.addComponent(uiComponent);
 
 		scene.run();
 	}

@@ -4,9 +4,10 @@ import game.math.Matrix;
 import game.math.Vector;
 
 public interface Transform {
-	public static final Transform IDENTITY = new DefaultTransform(Matrix.IDENTITY);
+	public static final Transform IDENTITY = new DefaultTransform(Matrix.IDENTITY, Matrix.IDENTITY);
 
 	Matrix getTr();
+	Matrix getInvTr();
 
 	default Transform transform(Transform childTransform) {
 		if (childTransform == Transform.IDENTITY) {

@@ -13,6 +13,6 @@ public class MeshComponent extends DefaultComponent implements RenderComponent {
 
 	@Override
 	public void render(Scene scene, CameraComponent camera) {
-		compiledMesh.render(camera.getInvGlobalTransform().getTr(), getGlobalTransform().getTr());
+		compiledMesh.render(camera.getGlobalTransform().getInvTr(), getGlobalTransform().getTr());
 	}
 }

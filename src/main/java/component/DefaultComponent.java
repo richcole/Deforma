@@ -3,6 +3,7 @@ package component;
 import com.google.common.collect.Lists;
 import functional.FUtils;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,19 +18,19 @@ public class DefaultComponent implements Component {
 	private Optional<Component> parent;
 
 	@Getter
-	private Transform localTransform;
+	@Setter
+	private boolean enabled = true;
+
 	@Getter
-	private Transform invLocalTransform;
+	private Transform localTransform;
 
 	public DefaultComponent() {
 		this.localTransform = Transform.IDENTITY;
-		this.invLocalTransform = Transform.IDENTITY;
 		this.parent = Optional.empty();
 	}
 
 	public DefaultComponent(Transform localTransform) {
 		this.localTransform = localTransform;
-		this.invLocalTransform = localTransform.invert();
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class DefaultComponent implements Component {
 	@Override
 	public <T> void forEachDecendent(Class<T> componentClass, Consumer<T> consumer) {
 		asStream(components).forEach(child -> {
-			if (instanceOf(child, componentClass)) {
+			if (child.isEnabled() && instanceOf(child, componentClass)) {
 				consumer.accept((T)child);
 			}
 			child.forEachDecendent(componentClass, consumer);
@@ -71,24 +72,8 @@ public class DefaultComponent implements Component {
 	}
 
 	@Override
-	public Transform getInvGlobalTransform() {
-		return getParent()
-			.map((parent) ->
-				getInvLocalTransform().transform(parent.getInvGlobalTransform()))
-			.orElseGet(() ->
-				getInvLocalTransform());
-	}
-
-	@Override
 	public void setLocalTransform(Transform localTransform) {
 		this.localTransform = localTransform;
-		this.invLocalTransform = localTransform.invert();
-	}
-
-	@Override
-	public void setInvLocalTransform(Transform invLocalTransform) {
-		this.invLocalTransform = invLocalTransform;
-		this.localTransform = invLocalTransform.invert();
 	}
 
 	@Override

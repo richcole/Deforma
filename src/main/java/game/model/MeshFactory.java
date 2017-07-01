@@ -29,7 +29,7 @@ public class MeshFactory {
 
 	public Mesh newSquareMesh(Vector center, Vector right, Vector up, String imageName) {
 
-		Mesh mesh = new Mesh(4 * 3, 2);
+		Mesh mesh = new Mesh(4, 2);
 
 		Vector n = right.cross(up).normalize();
 		Vector bl = center.minus(right).minus(up);
@@ -38,8 +38,8 @@ public class MeshFactory {
 		Vector tr = center.plus(right).plus(up);
 
 		setVertex(mesh, 0, bl, n, 0, 0);
-		setVertex(mesh, 1, tl, n, 0, 1);
-		setVertex(mesh, 2, tr, n, 1, 1);
+		setVertex(mesh, 1, tr, n, 1, 1);
+		setVertex(mesh, 2, tl, n, 0, 1);
 		setVertex(mesh, 3, br, n, 1, 0);
 
 		mesh.e = new int[6];
@@ -48,8 +48,8 @@ public class MeshFactory {
 		mesh.e[2] = 2;
 
 		mesh.e[3] = 0;
-		mesh.e[4] = 2;
-		mesh.e[5] = 3;
+		mesh.e[4] = 3;
+		mesh.e[5] = 1;
 
 		mesh.i = new int[mesh.nv];
 		for (int i = 0; i < mesh.nv; ++i) {

@@ -22,6 +22,6 @@ public class DefaultCameraComponent extends DefaultComponent implements CameraCo
 		double dx = 0.3;
 		double dy = dydx * dx;
 		double dz = 0.3;
-		setInvLocalTransform(new DefaultTransform(Matrix.frustum(-dx, dx, dy, -dy, dz, 10000)));
+		setLocalTransform(new DefaultTransform(Matrix.frustum(-dx, dx, dy, -dy, dz, 10000)).invert());
 	}
 }

@@ -55,6 +55,6 @@ public class Scene {
 	}
 
 	public double getDeltaTime() {
-		return (double)(lastTime - currTime) / 1000;
+		return (double)(currTime - lastTime) / 1000;
 	}
 }

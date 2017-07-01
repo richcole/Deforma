@@ -1,5 +1,6 @@
 package game.image;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
@@ -50,5 +51,8 @@ public class BufferedImageImage implements Image {
   public BufferedImage getImage() {
     return img;
   }
-  
+
+  public Graphics2D getGraphics() {
+    return (Graphics2D)img.getGraphics();
+  }
 }

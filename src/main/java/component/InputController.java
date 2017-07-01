@@ -14,6 +14,7 @@ public class InputController {
 	public static final int NUM_BUTTONS = 8;
 	public static final int NUM_KEYS = 256;
 
+	private BitSet keysPressed = new BitSet(NUM_KEYS);
 	private BitSet keysDown = new BitSet(NUM_KEYS);
 	private BitSet mouseButtonsDown = new BitSet(NUM_BUTTONS);
 
@@ -26,11 +27,13 @@ public class InputController {
 	public void processEvents() {
 		mdx = 0;
 		mdy = 0;
+		keysPressed.clear();
 		while(Keyboard.next()) {
 			int key = Keyboard.getEventKey();
 			if (key >= 0 && key < 256) {
 				boolean eventKeyState = Keyboard.getEventKeyState();
 				keysDown.set(key, eventKeyState);
+				keysPressed.set(key, eventKeyState);
 			}
 		}
 		while(Mouse.next()) {
@@ -40,6 +43,13 @@ public class InputController {
 			mdx += Mouse.getDX();
 			mdy += Mouse.getDY();
 		}
+	}
+
+	public boolean isKeyPressed(int key) {
+		if (key >= 0 && key < NUM_KEYS) {
+			return keysPressed.get(key);
+		}
+		return false;
 	}
 
 	public boolean isKeyDown(int key) {

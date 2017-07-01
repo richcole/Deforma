@@ -14,7 +14,7 @@ public class ComponentBuilder {
 
 	private final GlEngine glEngine;
 
-	private Component component;
+	private RenderComponent component;
 	private Vector position = Vector.Z;
 	private Vector scale = Vector.ONES;
 	private GLTexture texture;
@@ -53,7 +53,7 @@ public class ComponentBuilder {
 		return this;
 	}
 
-	public Component build() {
+	public RenderComponent build() {
 		component.setLocalTransform(new DefaultTransform(Matrix.translate(position).times(Matrix.scale(scale))));
 		return component;
 	}
